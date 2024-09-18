@@ -1,0 +1,39 @@
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+{ name: "CB_heep_ctrl",
+  clock_primary: "clk_i",
+  bus_interfaces: [
+    { protocol: "reg_iface", direction: "device" }
+  ],
+  regwidth: "32",
+  registers: [
+    { name:     "exit_loop",
+      desc:     "exit_sw_loop",
+      swaccess: "rw",
+      hwaccess: "hwo",
+      fields: [
+        { bits: "0", name: "EXIT_LOOP", desc: "EXIT_LOOP" }
+      ]
+    },
+    { name:     "boot_address",
+      desc:     "boot_address",
+      resval:   "0xF0100180"
+      swaccess: "rw",
+      hwaccess: "none",
+      fields: [
+        { bits: "31:0", name: "BOOT_ADDR", desc: "BOOT_ADDR" }
+      ]
+    },
+    { name:     "force_soft_error",
+      desc:     "force_soft_error",
+      resval:   "0x0"
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "0", name: "force_soft_error", desc: "force_soft_error" }
+      ]
+    }
+
+   ]
+}
