@@ -16,14 +16,14 @@
 # Author: Juan Sapriza (juan.sapriza@epfl.ch)
 
 build : build/Makefile
-	@echo build_CB_C${CORE}
-	${MAKE} -C build_CB_C${CORE}
+	@echo build
+	${MAKE} -C build
 
 setup : build/Makefile
 
 build/Makefile : CMakeLists.txt ${CMAKE_DIR}/riscv.cmake
-	if [ ! -d build_CB_C${CORE} ] ; then mkdir build_CB_C${CORE} ; fi
-	cd build_CB_C${CORE};  \
+	if [ ! -d build ] ; then mkdir build ; fi
+	cd build;  \
 		${CMAKE} \
 		    -G "Unix Makefiles" \
 			-DCMAKE_TOOLCHAIN_FILE=../${CMAKE_DIR}/riscv.cmake \
@@ -41,7 +41,7 @@ build/Makefile : CMakeLists.txt ${CMAKE_DIR}/riscv.cmake
 		    ../ 
 
 clean:
-	rm -rf build_CB_C${CORE}
+	rm -rf build
 
 .PHONY: setup build
 .SUFFIXES:

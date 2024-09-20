@@ -63,7 +63,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0
+CMAKE_BINARY_DIR = /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -90,9 +90,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -132,29 +132,29 @@ main.elf/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/build
 .PHONY : main.elf/fast
 
-applications_CB_C0/TMR_Safe_CPU/main.obj: applications_CB_C0/TMR_Safe_CPU/main.c.obj
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.obj
+applications/TMR_Safe_CPU/main.obj: applications/TMR_Safe_CPU/main.c.obj
+.PHONY : applications/TMR_Safe_CPU/main.obj
 
 # target to build an object file
-applications_CB_C0/TMR_Safe_CPU/main.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications_CB_C0/TMR_Safe_CPU/main.c.obj
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.c.obj
+applications/TMR_Safe_CPU/main.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications/TMR_Safe_CPU/main.c.obj
+.PHONY : applications/TMR_Safe_CPU/main.c.obj
 
-applications_CB_C0/TMR_Safe_CPU/main.i: applications_CB_C0/TMR_Safe_CPU/main.c.i
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.i
+applications/TMR_Safe_CPU/main.i: applications/TMR_Safe_CPU/main.c.i
+.PHONY : applications/TMR_Safe_CPU/main.i
 
 # target to preprocess a source file
-applications_CB_C0/TMR_Safe_CPU/main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications_CB_C0/TMR_Safe_CPU/main.c.i
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.c.i
+applications/TMR_Safe_CPU/main.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications/TMR_Safe_CPU/main.c.i
+.PHONY : applications/TMR_Safe_CPU/main.c.i
 
-applications_CB_C0/TMR_Safe_CPU/main.s: applications_CB_C0/TMR_Safe_CPU/main.c.s
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.s
+applications/TMR_Safe_CPU/main.s: applications/TMR_Safe_CPU/main.c.s
+.PHONY : applications/TMR_Safe_CPU/main.s
 
 # target to generate assembly for a file
-applications_CB_C0/TMR_Safe_CPU/main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications_CB_C0/TMR_Safe_CPU/main.c.s
-.PHONY : applications_CB_C0/TMR_Safe_CPU/main.c.s
+applications/TMR_Safe_CPU/main.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.elf.dir/build.make CMakeFiles/main.elf.dir/applications/TMR_Safe_CPU/main.c.s
+.PHONY : applications/TMR_Safe_CPU/main.c.s
 
 # Help Target
 help:
@@ -165,9 +165,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main.elf"
-	@echo "... applications_CB_C0/TMR_Safe_CPU/main.obj"
-	@echo "... applications_CB_C0/TMR_Safe_CPU/main.i"
-	@echo "... applications_CB_C0/TMR_Safe_CPU/main.s"
+	@echo "... applications/TMR_Safe_CPU/main.obj"
+	@echo "... applications/TMR_Safe_CPU/main.i"
+	@echo "... applications/TMR_Safe_CPU/main.s"
 .PHONY : help
 
 

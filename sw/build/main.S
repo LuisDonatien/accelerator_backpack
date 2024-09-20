@@ -197,7 +197,7 @@ f010018c:	3c810113          	addi	sp,sp,968 # f0109550 <_sp>
 f0100190:	20000537          	lui	a0,0x20000
    li a2, REFERENCE_CLOCK_Hz
 f0100194:	05f5e637          	lui	a2,0x5f5e
-f0100198:	10060613          	addi	a2,a2,256 # 5f5e100 <syscalls.c.1b5c30a8+0x5f5647c>
+f0100198:	10060613          	addi	a2,a2,256 # 5f5e100 <syscalls.c.e156dec8+0x5f5647c>
    sw a2, SOC_CTRL_SYSTEM_FREQUENCY_HZ_REG_OFFSET(a0)
 f010019c:	cd50                	sw	a2,28(a0)
 
@@ -2001,7 +2001,7 @@ f01009d2:	300004b7          	lui	s1,0x30000
 {
 f01009d6:	e2ba                	fsw	fa4,68(sp)
   *claim_data = rv_plic_peri->CC0;
-f01009d8:	20c4a903          	lw	s2,524(s1) # 3000020c <syscalls.c.1b5c30a8+0x2fff8588>
+f01009d8:	20c4a903          	lw	s2,524(s1) # 3000020c <syscalls.c.e156dec8+0x2fff8588>
 {
 f01009dc:	e0be                	fsw	fa5,64(sp)
 f01009de:	fe42                	fsw	fa6,60(sp)
@@ -2344,7 +2344,7 @@ f0100c20:	200007b7          	lui	a5,0x20000
 f0100c24:	c3c8                	sw	a0,4(a5)
   ((volatile uint8_t *)base.base)[offset / sizeof(uint8_t)] = value;
 f0100c26:	4705                	li	a4,1
-f0100c28:	00e78023          	sb	a4,0(a5) # 20000000 <syscalls.c.1b5c30a8+0x1fff837c>
+f0100c28:	00e78023          	sb	a4,0(a5) # 20000000 <syscalls.c.e156dec8+0x1fff837c>
     soc_ctrl_t soc_ctrl;
     soc_ctrl.base_addr = mmio_region_from_addr((uintptr_t)SOC_CTRL_START_ADDRESS);
     soc_ctrl_set_exit_value(&soc_ctrl, exit_status);
@@ -2473,7 +2473,7 @@ f0100c9e:	fca790e3          	bne	a5,a0,f0100c5e <_write+0x16>
 f0100ca2:	fdd5                	bnez	a1,f0100c5e <_write+0x16>
   ((volatile uint32_t *)base.base)[offset / sizeof(uint32_t)] = value;
 f0100ca4:	200b0737          	lui	a4,0x200b0
-f0100ca8:	00072623          	sw	zero,12(a4) # 200b000c <syscalls.c.1b5c30a8+0x200a8388>
+f0100ca8:	00072623          	sw	zero,12(a4) # 200b000c <syscalls.c.e156dec8+0x200a8388>
 f0100cac:	478d                	li	a5,3
 f0100cae:	cf5c                	sw	a5,28(a4)
 f0100cb0:	02072223          	sw	zero,36(a4)
@@ -4388,7 +4388,7 @@ f0101e36:	4625                	li	a2,9
 f0101e38:	4529                	li	a0,10
 f0101e3a:	00044703          	lbu	a4,0(s0)
 f0101e3e:	00140593          	addi	a1,s0,1
-f0101e42:	fd070713          	addi	a4,a4,-48 # fd0 <w25q.c.bd19d8c2+0x42e>
+f0101e42:	fd070713          	addi	a4,a4,-48 # fd0 <w25q.c.c0afe9b0+0x42e>
 f0101e46:	0ae67d63          	bgeu	a2,a4,f0101f00 <_vfiprintf_r+0x1ce>
 f0101e4a:	ceb5                	beqz	a3,f0101ec6 <_vfiprintf_r+0x194>
 f0101e4c:	ce3e                	sw	a5,28(sp)
@@ -5008,7 +5008,7 @@ f010244a:	00d40733          	add	a4,s0,a3
 f010244e:	03000613          	li	a2,48
 f0102452:	04c701a3          	sb	a2,67(a4)
 f0102456:	04544703          	lbu	a4,69(s0)
-f010245a:	00168793          	addi	a5,a3,1 # 1001 <w25q.c.bd19d8c2+0x45f>
+f010245a:	00168793          	addi	a5,a3,1 # 1001 <w25q.c.c0afe9b0+0x45f>
 f010245e:	97a2                	add	a5,a5,s0
 f0102460:	0689                	addi	a3,a3,2
 f0102462:	04e781a3          	sb	a4,67(a5)
@@ -5587,7 +5587,7 @@ f0102a26:	6ec1                	lui	t4,0x10
 	      udiv_qrnnd (q0, n1, n2, n1, d1);
 f0102a28:	8d59                	or	a0,a0,a4
 	      umul_ppmm (m1, m0, q0, d0);
-f0102a2a:	fffe8693          	addi	a3,t4,-1 # ffff <syscalls.c.1b5c30a8+0x837b>
+f0102a2a:	fffe8693          	addi	a3,t4,-1 # ffff <syscalls.c.e156dec8+0x837b>
 f0102a2e:	00d57733          	and	a4,a0,a3
 	      udiv_qrnnd (q0, n1, n2, n1, d1);
 f0102a32:	410787b3          	sub	a5,a5,a6
@@ -5924,7 +5924,7 @@ f0102d84:	6e41                	lui	t3,0x10
 	      udiv_qrnnd (q0, n1, n2, n1, d1);
 f0102d86:	8d59                	or	a0,a0,a4
 	      umul_ppmm (m1, m0, q0, d0);
-f0102d88:	fffe0693          	addi	a3,t3,-1 # ffff <syscalls.c.1b5c30a8+0x837b>
+f0102d88:	fffe0693          	addi	a3,t3,-1 # ffff <syscalls.c.e156dec8+0x837b>
 f0102d8c:	00d57733          	and	a4,a0,a3
 	      udiv_qrnnd (q0, n1, n2, n1, d1);
 f0102d90:	410787b3          	sub	a5,a5,a6

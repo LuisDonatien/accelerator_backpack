@@ -38,10 +38,6 @@ ARCH     ?= rv32imfc
 FPGA_BOARD 	?= pynq-z2
 
 
-# Default Core in CB-Accelerator.
-CORE		?= 0
-
-
 ##SW
 
 #Three option depending on which core it's choose.
@@ -55,20 +51,20 @@ app-xheep:
 #Core CB-Heep 
 # CORE ?=0
 app-cbcore: app-clean
-	$(MAKE) -C sw PROJECT=$(PROJECT) TARGET=$(TARGET) CORE=$(CORE) LINKER=$(LINKER) COMPILER=$(COMPILER) COMPILER_PREFIX=$(COMPILER_PREFIX) ARCH=$(ARCH)
+	$(MAKE) -C sw PROJECT=$(PROJECT) TARGET=$(TARGET) LINKER=$(LINKER) COMPILER=$(COMPILER) COMPILER_PREFIX=$(COMPILER_PREFIX) ARCH=$(ARCH)
 
 
 ## Clean the CMake build folder
 app-clean:
 	if [ -f "sw/build/Makefile" ]; then\
-		$(MAKE) -C sw/build_CB_C$(CORE) clean;\
+		$(MAKE) -C sw/build clean;\
 	else\
 		$(MAKE) app-restore;\
 	fi
 
 ## Removes the CMake build folder
 app-restore:
-	rm -rf sw/build_CB_C$(CORE)
+	rm -rf sw/build
 
 clean:
 	rm -rf build

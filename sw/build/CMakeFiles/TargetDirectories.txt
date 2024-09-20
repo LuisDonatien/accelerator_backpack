@@ -1,0 +1,3 @@
+/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/main.elf.dir
+/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/edit_cache.dir
+/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/rebuild_cache.dir

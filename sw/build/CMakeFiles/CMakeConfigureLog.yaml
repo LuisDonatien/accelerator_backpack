@@ -42,7 +42,7 @@ events:
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
       
       The C compiler identification is GNU, found in:
-        /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/3.27.7/CompilerIdC/a.out
+        /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/3.27.7/CompilerIdC/a.out
       
   -
     kind: "try_compile-v1"
@@ -53,8 +53,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK"
-      binary: "/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK"
+      source: "/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI"
+      binary: "/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI"
     cmakeVariables:
       CMAKE_C_FLAGS: " -g -march=rv32imfc -g -march=rv32imfc"
       CMAKE_C_FLAGS_DEBUG: "-g"
@@ -63,14 +63,14 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK'
+        Change Dir: '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI'
         
-        Run Build Command(s): /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_ad1fb/fast
-        gmake[3]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK'
-        make  -f CMakeFiles/cmTC_ad1fb.dir/build.make CMakeFiles/cmTC_ad1fb.dir/build
-        make[4]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK'
-        Building C object CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj
-        /home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc   -g -march=rv32imfc -g -march=rv32imfc    -v -o CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj -c /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c
+        Run Build Command(s): /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_faf4e/fast
+        gmake[2]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI'
+        make  -f CMakeFiles/cmTC_faf4e.dir/build.make CMakeFiles/cmTC_faf4e.dir/build
+        make[3]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI'
+        Building C object CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj
+        /home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc   -g -march=rv32imfc -g -march=rv32imfc    -v -o CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj -c /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c
         Using built-in specs.
         COLLECT_GCC=/home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc
         Target: riscv32-unknown-elf
@@ -78,8 +78,8 @@ events:
         Thread model: single
         Supported LTO compression algorithms: zlib
         gcc version 11.1.0 (GCC) 
-        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_ad1fb.dir/'
-         /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/cc1 -quiet -v /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_ad1fb.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -march=rv32imfc -march=rv32imfc -mtune=rocket -mabi=ilp32 -march=rv32imfc -march=rv32imfc -g -g -version -o /tmp/ccr3Ygo5.s
+        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_faf4e.dir/'
+         /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/cc1 -quiet -v /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_faf4e.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -march=rv32imfc -march=rv32imfc -mtune=rocket -mabi=ilp32 -march=rv32imfc -march=rv32imfc -g -g -version -o /tmp/cc6Lt5d4.s
         GNU C17 (GCC) version 11.1.0 (riscv32-unknown-elf)
         	compiled by GNU C version 11.4.0, GMP version 6.1.0, MPFR version 3.1.4, MPC version 1.0.3, isl version isl-0.18-GMP
         
@@ -97,15 +97,15 @@ events:
         
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
         Compiler executable checksum: 5fd7793496dcd3ce86159a7d256e716e
-        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_ad1fb.dir/'
-         /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/bin/as -v --gdwarf-5 --traditional-format -march=rv32imfc -march=rv32imfc -march=rv32imfc -march=rv32imfc -mabi=ilp32 -o CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj /tmp/ccr3Ygo5.s
+        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_faf4e.dir/'
+         /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/bin/as -v --gdwarf-5 --traditional-format -march=rv32imfc -march=rv32imfc -march=rv32imfc -march=rv32imfc -mabi=ilp32 -o CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj /tmp/cc6Lt5d4.s
         GNU assembler version 2.37 (riscv32-unknown-elf) using BFD version (GNU Binutils) 2.37
         COMPILER_PATH=/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/bin/
         LIBRARY_PATH=/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/:/home/luis/tools/riscv/riscv32-unknown-elf/lib/
-        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.'
-        Linking C executable cmTC_ad1fb
-        /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ad1fb.dir/link.txt --verbose=1
-        /home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc  -g -march=rv32imfc -g -march=rv32imfc   -v CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj -o cmTC_ad1fb 
+        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.'
+        Linking C executable cmTC_faf4e
+        /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_faf4e.dir/link.txt --verbose=1
+        /home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc  -g -march=rv32imfc -g -march=rv32imfc   -v CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj -o cmTC_faf4e 
         Using built-in specs.
         COLLECT_GCC=/home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc
         COLLECT_LTO_WRAPPER=/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/lto-wrapper
@@ -116,11 +116,11 @@ events:
         gcc version 11.1.0 (GCC) 
         COMPILER_PATH=/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/bin/
         LIBRARY_PATH=/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/:/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/:/home/luis/tools/riscv/riscv32-unknown-elf/lib/
-        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'cmTC_ad1fb' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'cmTC_ad1fb.'
-         /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/collect2 -plugin /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/liblto_plugin.so -plugin-opt=/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccsjen55.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgloss -plugin-opt=-pass-through=-lgcc --sysroot=/home/luis/tools/riscv/riscv32-unknown-elf -melf32lriscv -o cmTC_ad1fb /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/crt0.o /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/crtbegin.o -L/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0 -L/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib -L/home/luis/tools/riscv/riscv32-unknown-elf/lib CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj -lgcc --start-group -lc -lgloss --end-group -lgcc /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/crtend.o
-        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'cmTC_ad1fb' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'cmTC_ad1fb.'
-        make[4]: Leaving directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK'
-        gmake[3]: Leaving directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK'
+        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'cmTC_faf4e' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'cmTC_faf4e.'
+         /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/collect2 -plugin /home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/liblto_plugin.so -plugin-opt=/home/luis/tools/riscv/libexec/gcc/riscv32-unknown-elf/11.1.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccGH0iDl.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgloss -plugin-opt=-pass-through=-lgcc --sysroot=/home/luis/tools/riscv/riscv32-unknown-elf -melf32lriscv -o cmTC_faf4e /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/crt0.o /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/crtbegin.o -L/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0 -L/home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib -L/home/luis/tools/riscv/riscv32-unknown-elf/lib CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj -lgcc --start-group -lc -lgloss --end-group -lgcc /home/luis/tools/riscv/lib/gcc/riscv32-unknown-elf/11.1.0/crtend.o
+        COLLECT_GCC_OPTIONS='-g' '-march=rv32imfc' '-g' '-march=rv32imfc' '-v' '-o' 'cmTC_faf4e' '-mtune=rocket' '-mabi=ilp32' '-march=rv32imfc' '-march=rv32imfc' '-dumpdir' 'cmTC_faf4e.'
+        make[3]: Leaving directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI'
+        gmake[2]: Leaving directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI'
         
       exitCode: 0
   -
@@ -152,14 +152,14 @@ events:
     message: |
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(riscv32-unknown-elf-gcc|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        ignore line: [Change Dir: '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK']
+        ignore line: [Change Dir: '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI']
         ignore line: []
-        ignore line: [Run Build Command(s): /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_ad1fb/fast]
-        ignore line: [gmake[3]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK']
-        ignore line: [make  -f CMakeFiles/cmTC_ad1fb.dir/build.make CMakeFiles/cmTC_ad1fb.dir/build]
-        ignore line: [make[4]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/CMakeScratch/TryCompile-xjS0vK']
-        ignore line: [Building C object CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj]
-        link line: [/home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc   -g -march=rv32imfc -g -march=rv32imfc    -v -o CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj -c /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c]
+        ignore line: [Run Build Command(s): /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_faf4e/fast]
+        ignore line: [gmake[2]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI']
+        ignore line: [make  -f CMakeFiles/cmTC_faf4e.dir/build.make CMakeFiles/cmTC_faf4e.dir/build]
+        ignore line: [make[3]: Entering directory '/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/CMakeScratch/TryCompile-Yz2AiI']
+        ignore line: [Building C object CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj]
+        link line: [/home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc   -g -march=rv32imfc -g -march=rv32imfc    -v -o CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj -c /home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c]
           arg [/home/luis/tools/riscv/bin/riscv32-unknown-elf-gcc] ==> ignore
           arg [-g] ==> ignore
           arg [-march=rv32imfc] ==> ignore
@@ -167,7 +167,7 @@ events:
           arg [-march=rv32imfc] ==> ignore
           arg [-v] ==> ignore
           arg [-o] ==> ignore
-          arg [CMakeFiles/cmTC_ad1fb.dir/CMakeCCompilerABI.c.obj] ==> ignore
+          arg [CMakeFiles/cmTC_faf4e.dir/CMakeCCompilerABI.c.obj] ==> ignore
           arg [-c] ==> ignore
           arg [/home/luis/miniconda3/envs/core-v-mini-mcu/lib/python3.8/site-packages/cmake/data/share/cmake-3.27/Modules/CMakeCCompilerABI.c] ==> ignore
         implicit libs: []

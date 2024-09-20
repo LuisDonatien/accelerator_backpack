@@ -1,5 +1,5 @@
 
-/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build_CB_C0/CMakeFiles/main.elf.dir/applications_CB_C0/TMR_Safe_CPU/main.c.obj:     file format elf32-littleriscv
+/home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/build/CMakeFiles/main.elf.dir/applications/TMR_Safe_CPU/main.c.obj:     file format elf32-littleriscv
 
 
 Disassembly of section .text.startup.main:

@@ -1,5 +1,5 @@
-CMakeFiles/main.elf.dir/applications_CB_C0/TMR_Safe_CPU/main.c.obj: \
- /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/applications_CB_C0/TMR_Safe_CPU/main.c \
+CMakeFiles/main.elf.dir/applications/TMR_Safe_CPU/main.c.obj: \
+ /home/luis/Documents/PhD/CB-heep/hw/vendor/cei_mochila/sw/applications/TMR_Safe_CPU/main.c \
  /home/luis/tools/riscv/riscv32-unknown-elf/include/stdio.h \
  /home/luis/tools/riscv/riscv32-unknown-elf/include/_ansi.h \
  /home/luis/tools/riscv/riscv32-unknown-elf/include/newlib.h \

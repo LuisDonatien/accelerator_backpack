@@ -41,7 +41,6 @@ ARCH     ?= rv32imc
 # Path relative from the location of sw/Makefile from which to fetch source files. The directory of that file is the default value.
 SOURCE 	 ?= $(".")
 
-CORE	 ?= 0
 
 # riscv toolchain install path
 RISCV                      ?= ~/.riscv
@@ -63,7 +62,7 @@ $(info $$You are fetching sources from $(source_path) )
 SOURCE_PATH   		       = $(source_path)/
 ROOT_PROJECT               = $(mkfile_path)/
 INC_FOLDERS                = $(mkfile_path)/device/target/$(TARGET)/
-LINK_FOLDER                = $(mkfile_path)/linker_CB_C$(CORE)
+LINK_FOLDER                = $(mkfile_path)/linker
 
 $(info $$SOURCE_PATH $(SOURCE_PATH))
 $(info $$ROOT_PROJECT $(ROOT_PROJECT))
