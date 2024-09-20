@@ -31,8 +31,6 @@ module ext_cpu_system
     //Core 2
     input logic [31:0] intc_core2,
 
-    output logic [NHARTS-1:0] new_irq_o,
-
     output logic     [NHARTS-1:0]   sleep_o,
 
     // Debug Interface
@@ -98,12 +96,11 @@ end
         .data_rvalid_i(core_data_resp_i[0].rvalid),
         .data_err_i   (1'b0),
 
-        .irq_software_i(),
-        .irq_timer_i   (),
-        .irq_external_i(),
+        .irq_software_i('0),
+        .irq_timer_i   ('0),
+        .irq_external_i('0),
         .irq_fast_i    (intc_core0[31:16]),
         .irq_nm_i      (1'b0),
-        .new_irq_o(new_irq_o[0]),
 
         .debug_req_i (debug_req_i[0]),
         .crash_dump_o(),
@@ -145,12 +142,11 @@ end
         .data_rvalid_i(core_data_resp_i[1].rvalid),
         .data_err_i   (1'b0),
 
-        .irq_software_i(),
-        .irq_timer_i   (),
-        .irq_external_i(),
+        .irq_software_i('0),
+        .irq_timer_i   ('0),
+        .irq_external_i('0),
         .irq_fast_i    (intc_core1[31:16]),
         .irq_nm_i      (1'b0),
-        .new_irq_o(new_irq_o[1]),
 
         .debug_req_i (debug_req_i[1]),
         .crash_dump_o(),
@@ -191,12 +187,11 @@ end
         .data_rvalid_i(core_data_resp_i[2].rvalid),
         .data_err_i   (1'b0),
 
-        .irq_software_i(),
-        .irq_timer_i   (),
-        .irq_external_i(),
+        .irq_software_i('0),
+        .irq_timer_i   ('0),
+        .irq_external_i('0),
         .irq_fast_i    (intc_core2[31:16]),
         .irq_nm_i      (1'b0),
-        .new_irq_o(new_irq_o[2]),
 
         .debug_req_i (debug_req_i[2]),
         .crash_dump_o(),

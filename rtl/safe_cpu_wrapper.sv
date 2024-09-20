@@ -58,7 +58,6 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic [NHARTS-1:0] intc_halt_s;
     logic [NHARTS-1:0] sleep_s;
     logic [NHARTS-1:0] debug_mode_s;
-    logic [NHARTS-1:0] new_irq_s;
     logic End_sw_routine_s;
     logic Start_s;
     logic Start_Boot_s;
@@ -130,8 +129,7 @@ ext_cpu_system #(
 
     //Core 2
     .intc_core2(intr[2]),
-
-    .new_irq_o(new_irq_s),
+    
 
     .sleep_o(sleep_s),
 

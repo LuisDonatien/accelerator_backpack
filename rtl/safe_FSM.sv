@@ -604,7 +604,6 @@ module safe_FSM
       Interrupt_swResync_o[i] = 1'b0;
       Interrupt_CpyResync_o[i] = 1'b0;
       Interrupt_DMSH_Sync_o[i] = 1'b0;
-      dbg_halt_req_tmr_s[i] = 1'b0;
       unique case (ctrl_tmr_rec_fsm_cs[i])
 
         TMR_REC_DMODE:
