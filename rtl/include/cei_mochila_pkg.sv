@@ -133,7 +133,7 @@ package cei_mochila_pkg;
   localparam CPU_XBAR_NRULES = 3; //Depending on the external address.
 
   localparam logic [31:0] BUS_SYSTEM_START_ADDRESS = PERIPHERAL_START_ADDRESS;
-  localparam logic [31:0] BUS_SYSTEM_SIZE = 32'h0FFEFFFF;
+  localparam logic [31:0] BUS_SYSTEM_SIZE = 32'h00FEFFFF;
   localparam logic [31:0] BUS_SYSTEM_END_ADDRESS = BUS_SYSTEM_START_ADDRESS + BUS_SYSTEM_SIZE;
   localparam logic [31:0] BUS_SYSTEM_IDX = 32'd0;
 
