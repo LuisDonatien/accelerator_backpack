@@ -5,6 +5,7 @@
 
 module safe_cpu_wrapper
   import obi_pkg::*;
+  import reg_pkg::*;
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
@@ -23,14 +24,21 @@ module safe_cpu_wrapper
     output obi_req_t  [NHARTS-1 : 0] core_data_req_o,
     input  obi_resp_t [NHARTS-1 : 0] core_data_resp_i,
 
-
-    // Safe Wrapper Control/Status Register
-    input  obi_req_t  wrapper_csr_req_i,
-    output obi_resp_t wrapper_csr_resp_o,
-
+    // OBI -> Memory mapped register control Safe CPU
+    input  obi_req_t    wrapper_csr_req_i,
+    output obi_resp_t   wrapper_csr_resp_o,
 
     // Debug Interface
-    input logic       debug_req_i
+    input logic       debug_req_i,
+
+    //Control Signals
+    output logic ext_EndSw_o,
+    input logic [2:0] ext_master_core_i,
+    input logic ext_safe_mode_i,
+    input logic [1:0] ext_safe_configuration_i,
+    input logic ext_critical_section_i,
+    input logic ext_Start_i,
+    input logic [31:0] boot_addr_i
 );
 
 localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
@@ -92,9 +100,9 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     reg_pkg::reg_req_t  [NHARTS-1 : 0]cpu_reg_req;
     reg_pkg::reg_rsp_t  [NHARTS-1 : 0]cpu_reg_rsp;    
 
-    //Control & Status Regs 
-    reg_pkg::reg_req_t  reg_req;
-    reg_pkg::reg_rsp_t  reg_rsp;  
+    //Safe CPU reg port
+    reg_pkg::reg_req_t  safe_cpu_wrapper_reg_req;
+    reg_pkg::reg_rsp_t  safe_cpu_wrapper_reg_rsp;   
 
 
     //Configuration IDs Cores
@@ -138,6 +146,30 @@ ext_cpu_system #(
     .debug_mode_o(debug_mode_s)
 );
 
+// OBI Slave[1] -> Safe CPU Wrapper Register 
+    periph_to_reg #(
+        .req_t(reg_pkg::reg_req_t),
+        .rsp_t(reg_pkg::reg_rsp_t),
+        .IW(1)
+    ) cpu_periph_to_reg_i (
+        .clk_i,
+        .rst_ni,
+        .req_i(wrapper_csr_req_i.req),
+        .add_i(wrapper_csr_req_i.addr),
+        .wen_i(~wrapper_csr_req_i.we),
+        .wdata_i(wrapper_csr_req_i.wdata),
+        .be_i(wrapper_csr_req_i.be),
+        .id_i('0),
+        .gnt_o(wrapper_csr_resp_o.gnt),
+        .r_rdata_o(wrapper_csr_resp_o.rdata),
+        .r_opc_o(),
+        .r_id_o(),
+        .r_valid_o(wrapper_csr_resp_o.rvalid),
+        .reg_req_o(safe_cpu_wrapper_reg_req),
+        .reg_rsp_i(safe_cpu_wrapper_reg_rsp)
+  );
+//
+
 safe_wrapper_ctrl #(
     .reg_req_t(reg_pkg::reg_req_t),
     .reg_rsp_t(reg_pkg::reg_rsp_t)
@@ -146,8 +178,16 @@ safe_wrapper_ctrl #(
     .rst_ni,
 
     // Bus Interface
-    .reg_req_i(reg_req),
-    .reg_rsp_o(reg_rsp),
+    .reg_req_i(safe_cpu_wrapper_reg_req),
+    .reg_rsp_o(safe_cpu_wrapper_reg_rsp),
+
+    // External Control Signal
+    .ext_master_core_i,
+    .ext_safe_mode_i,
+    .ext_safe_configuration_i,
+    .ext_critical_section_i,
+    .ext_Start_i,
+    .boot_addr_i,
 
     .master_core_o(master_core_s),
     .safe_mode_o         (safe_mode_s),
@@ -161,29 +201,7 @@ safe_wrapper_ctrl #(
     .en_ext_debug_i(en_ext_debug_s) //Todo: other more elegant solution for debugging
     );
 
-
-periph_to_reg #(
-      .req_t(reg_pkg::reg_req_t),
-      .rsp_t(reg_pkg::reg_rsp_t),
-      .IW(1)
-  ) periph_to_reg_i (
-      .clk_i,
-      .rst_ni,
-      .req_i(wrapper_csr_req_i.req),
-      .add_i(wrapper_csr_req_i.addr),
-      .wen_i(~wrapper_csr_req_i.we),
-      .wdata_i(wrapper_csr_req_i.wdata),
-      .be_i(wrapper_csr_req_i.be),
-      .id_i('0),
-      .gnt_o(wrapper_csr_resp_o.gnt),
-      .r_rdata_o(wrapper_csr_resp_o.rdata),
-      .r_opc_o(),
-      .r_id_o(),
-      .r_valid_o(wrapper_csr_resp_o.rvalid),
-      .reg_req_o(reg_req),
-      .reg_rsp_i(reg_rsp)
-  );
-
+    assign ext_EndSw_o = End_sw_routine_s;
 //FSM
 
 safe_FSM safe_FSM_i (

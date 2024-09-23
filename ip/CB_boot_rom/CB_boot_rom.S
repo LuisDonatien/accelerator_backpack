@@ -15,6 +15,13 @@
 #define RESUMING  0x110
 #define EXCEPTION 0x118
 
+#################################
+#define GLOBAL_BASE_ADDRESS 0xF0000000
+#define SAFE_WRAPPER_CTRL_BASEADDRESS    (0x00012000 | GLOBAL_BASE_ADDRESS)
+#define SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET      (SAFE_WRAPPER_CTRL_BASEADDRESS | 0x20)
+
+
+#################################
 // Region of memory where each hart has 1
 // byte to read.
 #define FLAGS 0x400
@@ -49,8 +56,8 @@ wfi_entry:
        nop
 single_boot:
        //Program Counter -> dpc Control & Status Register  
-       lui   a0, 0xF0020  
-       lw    a0, 32(a0)          //Base Address CPU Private Registers          
+       lui   a0, 0xF0012  
+       lw    a0, 28(a0)          //Base Address CPU Private Registers          
        csrw dpc, a0
 
        //Resume//
@@ -88,7 +95,7 @@ single_boot:
 debug_entry: 
        csrw CSR_DSCRATCH1, a0       // Save a0 to allow loading arbitrary DM base
        csrw CSR_DSCRATCH0, s0       // Save s0 to allow signaling MHARTID
-       lui   a0, 0xF0020  
+       lui   a0, 0xF0012  
        lw    a0, 16(a0)          //Base Address CPU Private Registers
 
        // Check whether debug_ext_req flag is 1, otherwise jump back to halt_switch routine Todo: Choose better way to reduce 
@@ -186,7 +193,8 @@ whereto:
 */
 halt_boot:
        //Control & Status Register//
-       li   t5,0xF0108000
+       li   t5,SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET
+       lw   t5, 0(t5)
 
        // csr mstatus
        lw   t6, 0(t5)
@@ -208,111 +216,108 @@ halt_boot:
        lw   t6, 16(t5)
        csrw mtval, t6
 
-       //Register File//
-       li   t6,0xF0108100
-
        //x1
-       lw   ra, 0(t6)
+       lw   ra, 20(t5)
 
        //x2
-       lw   sp, 4(t6)   
+       lw   sp, 24(t5)   
 
        //x3
-       lw   gp, 8(t6)   
+       lw   gp, 28(t5)   
 
        //x4
-       lw   tp, 12(t6)     
+       lw   tp, 32(t5)     
        
        //x5
-       lw   t0, 16(t6)
+       lw   t0, 36(t5)
 
        //x6
-       lw   t1, 20(t6)
+       lw   t1, 40(t5)
 
        //x7
-       lw   t2, 24(t6)
+       lw   t2, 44(t5)
 
        //x8
-       lw   s0, 28(t6)
+       lw   s0, 48(t5)
 
        //x9
-       lw   s1, 32(t6)
+       lw   s1, 52(t5)
 
        //x10
-       lw   a0, 36(t6)   
+       lw   a0, 56(t5)   
 
        //x11
-       lw   a1, 40(t6)     
+       lw   a1, 60(t5)     
        
        //x12
-       lw   a2, 44(t6)
+       lw   a2, 64(t5)
 
        //x13
-       lw   a3, 48(t6)
+       lw   a3, 68(t5)
 
        //x14
-       lw   a4, 52(t6)
+       lw   a4, 72(t5)
 
        //x15
-       lw   a5, 56(t6)
+       lw   a5, 76(t5)
 
        //x16
-       lw   a6, 60(t6)
+       lw   a6, 80(t5)
 
        //x17
-       lw   a7, 64(t6) 
+       lw   a7, 84(t5) 
 
        //x18
-       lw   s2, 68(t6)   
+       lw   s2, 88(t5)   
 
        //x19
-       lw   s3, 72(t6)     
+       lw   s3, 92(t5)     
        
        //x20
-       lw   s4, 76(t6)
+       lw   s4, 96(t5)
 
        //x21
-       lw   s5, 80(t6)
+       lw   s5, 100(t5)
 
        //x22
-       lw   s6, 84(t6)
+       lw   s6, 104(t5)
 
        //x23
-       lw   s7, 88(t6)
+       lw   s7, 108(t5)
 
        //x24
-       lw   s8, 92(t6)
+       lw   s8, 112(t5)
 
        //x25
-       lw   s9, 96(t6)   
+       lw   s9, 116(t5)   
 
        //x26
-       lw   s10, 100(t6)     
+       lw   s10, 120(t5)     
        
        //x27
-       lw   s11, 104(t6)
+       lw   s11, 124(t5)
 
        //x28
-       lw   t3, 108(t6)
+       lw   t3, 128(t5)
 
        //x29
-       lw   t4, 112(t6)
+       lw   t4, 132(t5)
 
        //x30
-       lw   t5, 116(t6)
+       lw   t5, 136(t5)
 
        //x31
-       lw   t6, 120(t6) 
+       lw   t6, 140(t5) 
 
 
        //
        //Program Counter//
-       lw   t5, 124(t6)
+       lw   t6, 144(t5)
 
        //Ensure the read data dpc is performed before instruction bus.
        fence 
        //Program Counter -> dpc Control & Status Register            
-       csrw dpc, t5
+       csrw dpc, t6
 
        //Resume//
        dret

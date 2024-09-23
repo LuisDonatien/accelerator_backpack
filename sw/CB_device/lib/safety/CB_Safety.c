@@ -5,8 +5,7 @@
 
 //Todo Check influence of t0-t6 in simple function
 void TMR_Safe_Activate(void){
-volatile unsigned int *P=0xF0109000;
-volatile unsigned int *Safe_config_reg= SAFE_REG_BASEADDRESS;
+volatile unsigned int *Safe_config_reg= SAFE_WRAPPER_CTRL_BASEADDRESS;
 volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
 
      //Starting Configuration
@@ -27,7 +26,8 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
         
     //Control & Status Register
     //Set Base Address
-        asm volatile("li   t5,0xF0108000");
+        asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw        t5,0(t5)");
     //Machine Status
     //mstatus   0x300
         asm volatile("csrr t6, mstatus");
@@ -56,136 +56,135 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
 
     //Register File
         //x1    ra
-        asm volatile("li t6, 0xF0108100");
-        asm volatile("sw ra, 0(t6)");
+        asm volatile("sw ra, 20(t5)");
 
         //x2    sp
 //        asm volatile("li t6, 0xC804");
-        asm volatile("sw sp, 4(t6)");
+        asm volatile("sw sp, 24(t5)");
 
         //x3    gp
 //        asm volatile("li t6, 0xC808");
-        asm volatile("sw gp, 8(t6)"); 
+        asm volatile("sw gp, 28(t5)"); 
 
         //x4    tp
 //        asm volatile("li t6, 0xC80C");
-        asm volatile("sw tp, 12(t6)");
+        asm volatile("sw tp, 32(t5)");
 
         //x5    t0
 //        asm volatile("li t6, 0xC810");
-        asm volatile("sw t0, 16(t6)");   
+        asm volatile("sw t0, 36(t5)");   
 
         //x6    t1
 //        asm volatile("li t6, 0xC814");
-        asm volatile("sw t1, 20(t6)");       
+        asm volatile("sw t1, 40(t5)");       
 
         //x7    t2
 //        asm volatile("li t6, 0xC818");
-        asm volatile("sw t2, 24(t6)");
+        asm volatile("sw t2, 44(t5)");
 
         //x8   s0/fp
 //        asm volatile("li t6, 0xC81C");
-        asm volatile("sw s0, 28(t6)");
+        asm volatile("sw s0, 48(t5)");
 
         //x9    s1
 //        asm volatile("li t6, 0xC820");
-        asm volatile("sw s1, 32(t6)");
+        asm volatile("sw s1, 52(t5)");
 
         //x10   a0 
 //        asm volatile("li t6, 0xC824");
-        asm volatile("sw a0, 36(t6)");
+        asm volatile("sw a0, 56(t5)");
 
         //x11   a1 
 //        asm volatile("li t6, 0xC828");
-        asm volatile("sw a1, 40(t6)");
+        asm volatile("sw a1, 60(t5)");
 
         //x12   a2 
 //        asm volatile("li t6, 0xC82C");
-        asm volatile("sw a2, 44(t6)");
+        asm volatile("sw a2, 64(t5)");
 
         //x13   a3 
 //        asm volatile("li t6, 0xC830");
-        asm volatile("sw a3, 48(t6)");
+        asm volatile("sw a3, 68(t5)");
 
 
         //x14   a4 
 //        asm volatile("li t6, 0xC834");
-        asm volatile("sw a4, 52(t6)");
+        asm volatile("sw a4, 72(t5)");
 
         //x15   a5 
 //        asm volatile("li t6, 0xC838");
-        asm volatile("sw a5, 56(t6)");
+        asm volatile("sw a5, 76(t5)");
 
         //x16   a6 
 //        asm volatile("li t6, 0xC83C");
-        asm volatile("sw a6, 60(t6)");
+        asm volatile("sw a6, 80(t5)");
 
         //x17   a7 
 //        asm volatile("li t6, 0xC840");
-        asm volatile("sw a7, 64(t6)");
+        asm volatile("sw a7, 84(t5)");
 
         //x18   s2 
 //        asm volatile("li t6, 0xC844");
-        asm volatile("sw s2, 68(t6)");
+        asm volatile("sw s2, 88(t5)");
 
         //x19   s3 
 //        asm volatile("li t6, 0xC848");
-        asm volatile("sw s3, 72(t6)");
+        asm volatile("sw s3, 92(t5)");
 
         //x20   s4 
 //        asm volatile("li t6, 0xC84C");
-        asm volatile("sw s4, 76(t6)");
+        asm volatile("sw s4, 96(t5)");
 
         //x21   s5 
 //        asm volatile("li t6, 0xC850");
-        asm volatile("sw s5, 80(t6)");
+        asm volatile("sw s5, 100(t5)");
 
         //x22   s6 
 //        asm volatile("li t6, 0xC854");
-        asm volatile("sw s6, 84(t6)");
+        asm volatile("sw s6, 104(t5)");
 
         //x23   s7 
 //        asm volatile("li t6, 0xC858");
-        asm volatile("sw s7, 88(t6)");
+        asm volatile("sw s7, 108(t5)");
 
         //x24   s8 
 //        asm volatile("li t6, 0xC85C");
-        asm volatile("sw s8, 92(t6)");
+        asm volatile("sw s8, 112(t5)");
 
         //x25   s9 
 //        asm volatile("li t6, 0xC860");
-        asm volatile("sw s9, 96(t6)");
+        asm volatile("sw s9, 116(t5)");
 
         //x26   s10 
 //        asm volatile("li t6, 0xC864");
-        asm volatile("sw s10, 100(t6)");
+        asm volatile("sw s10, 120(t5)");
 
         //x27   s11 
 //        asm volatile("li t6, 0xC868");
-        asm volatile("sw s11, 104(t6)");
+        asm volatile("sw s11, 124(t5)");
 
         //x28   t3 
 //        asm volatile("li t6, 0xC86C");
-        asm volatile("sw t3, 108(t6)");
+        asm volatile("sw t3, 128(t5)");
 
         //x29   t4 
 //        asm volatile("li t6, 0xC870");
-        asm volatile("sw t4, 112(t6)"); 
+        asm volatile("sw t4, 132(t5)"); 
 
         //x30   t5  
 //        asm volatile("li t6, 0xC874");
-        asm volatile("sw t5, 116(t6)"); 
+        asm volatile("sw t5, 136(t5)"); 
 
         //x31   t6 
 //        asm volatile("li t6, 0xC878");
-        asm volatile("sw t6, 120(t6)");
+        asm volatile("sw t6, 140(t5)");
 
         //Master Sync Priv Reg
         *(Safe_config_reg+5) = 0x1;
         asm volatile(".ALIGN(2)");
         //PC Program Counter
-        asm volatile("auipc t5, 0");
-        asm volatile("sw t5, 124(t6)");
+        asm volatile("auipc t6, 0");
+        asm volatile("sw t6, 144(t5)");
 
 
         asm volatile("fence");
@@ -199,7 +198,7 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
 
 
 void TMR_Safe_Stop(unsigned int master){
-volatile unsigned int *Safe_config_reg= SAFE_REG_BASEADDRESS;
+volatile unsigned int *Safe_config_reg= SAFE_WRAPPER_CTRL_BASEADDRESS;
         if(*Safe_config_reg == 0x1){
                 if (*(Safe_config_reg+3) ==0x1)
                         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);

@@ -8,32 +8,64 @@
   ],
   regwidth: "32",
   registers: [
-    { name:     "exit_loop",
-      desc:     "exit_sw_loop",
-      swaccess: "rw",
-      hwaccess: "hwo",
-      fields: [
-        { bits: "0", name: "EXIT_LOOP", desc: "EXIT_LOOP" }
-      ]
-    },
-    { name:     "boot_address",
-      desc:     "boot_address",
-      resval:   "0xF0100180"
-      swaccess: "rw",
-      hwaccess: "none",
-      fields: [
-        { bits: "31:0", name: "BOOT_ADDR", desc: "BOOT_ADDR" }
-      ]
-    },
-    { name:     "force_soft_error",
-      desc:     "force_soft_error",
-      resval:   "0x0"
+    { name:     "Safe_configuration",
+      desc:     "Configure Single, TMR, DMR or Lockstep",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-        { bits: "0", name: "force_soft_error", desc: "force_soft_error" }
+        { bits: "1:0", name: "Safe_configuration", desc: "Safe_configuration" }
+      ]
+    },
+    { name:     "Safe_mode",
+      desc:     "Activate Safe Mode",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "0", name: "Safe_mode", desc: "Safe_mode" }
+      ]
+    },
+    { name:     "Master_core",
+      desc:     "Master Core Configuration",
+      swaccess: "rw",
+      resval:   "0x1", //Core 0 0'b001
+      hwaccess: "hro",
+      fields: [
+        { bits: "2:0", name: "Master_core", desc: "MASTER CORE" }
+      ]
+    },
+    { name:     "critical_section",
+      desc:     "critical_section",
+      resval:   "0x0",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "0", name: "critical_section", desc: "critical_section" }
+      ]
+    },
+    { name:     "START",
+      desc:     "INIT IP based on configuration",
+      swaccess: "rw",
+      hwaccess: "hrw",
+      fields: [
+        { bits: "0", name: "Start", desc: "Start" }
+      ]
+    },    
+    { name:     "boot_address",
+      desc:     "boot_address",
+      resval:   "0x00"
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "31:0", name: "BOOT_ADDR", desc: "BOOT_ADDR" }
       ]
     }
-
+    { name:     "End_SW_Routine",
+      desc:     "End_SW_Routine",
+      swaccess: "rw",
+      hwaccess: "hwo",
+      fields: [
+        { bits: "0", name: "End_SW_Routine", desc: "End_SW_Routine" }
+      ]
+    } 
    ]
 }

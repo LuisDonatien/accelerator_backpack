@@ -20,17 +20,14 @@
 #include <stdlib.h>
 #include "CB_Safety.h"
 
+
 int main(int argc, char *argv[])
 {
-    volatile unsigned int *P = 0xF0108000;
-    volatile unsigned int *START_P = 0xF0020018;
-    volatile unsigned int *ENTRY_PROG = 0xF0020020;
-    volatile unsigned int *END_SW = 0xF002001C;
-    volatile unsigned int *CONFIG = 0xF0020000;
-    *END_SW = 0x0;
+    volatile unsigned int *END_SW_P = SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET;
+    *END_SW_P = 0x0;
 
     printf("[IP_CB]: hello world...!\n");
-    *END_SW = 0x1;
+    *END_SW_P = 0x1;
     while(1){asm volatile("wfi");}
     return 0;
     //return EXIT_SUCCESS;

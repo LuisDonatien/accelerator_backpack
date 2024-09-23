@@ -10,7 +10,7 @@
 module cb_heep_ctrl_reg_top #(
   parameter type reg_req_t = logic,
   parameter type reg_rsp_t = logic,
-  parameter int AW = 4
+  parameter int AW = 5
 ) (
   input logic clk_i,
   input logic rst_ni,
@@ -68,41 +68,161 @@ module cb_heep_ctrl_reg_top #(
   // Define SW related signals
   // Format: <reg>_<field>_{wd|we|qs}
   //        or <reg>_{wd|we|qs} if field == 1 or 0
-  logic exit_loop_qs;
-  logic exit_loop_wd;
-  logic exit_loop_we;
+  logic [1:0] safe_configuration_qs;
+  logic [1:0] safe_configuration_wd;
+  logic safe_configuration_we;
+  logic safe_mode_qs;
+  logic safe_mode_wd;
+  logic safe_mode_we;
+  logic [2:0] master_core_qs;
+  logic [2:0] master_core_wd;
+  logic master_core_we;
+  logic critical_section_qs;
+  logic critical_section_wd;
+  logic critical_section_we;
+  logic start_qs;
+  logic start_wd;
+  logic start_we;
   logic [31:0] boot_address_qs;
   logic [31:0] boot_address_wd;
   logic boot_address_we;
-  logic force_soft_error_qs;
-  logic force_soft_error_wd;
-  logic force_soft_error_we;
+  logic end_sw_routine_qs;
+  logic end_sw_routine_wd;
+  logic end_sw_routine_we;
 
   // Register instances
-  // R[exit_loop]: V(False)
+  // R[safe_configuration]: V(False)
+
+  prim_subreg #(
+    .DW      (2),
+    .SWACCESS("RW"),
+    .RESVAL  (2'h0)
+  ) u_safe_configuration (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (safe_configuration_we),
+    .wd     (safe_configuration_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.safe_configuration.q ),
+
+    // to register interface (read)
+    .qs     (safe_configuration_qs)
+  );
+
+
+  // R[safe_mode]: V(False)
 
   prim_subreg #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h0)
-  ) u_exit_loop (
+  ) u_safe_mode (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (exit_loop_we),
-    .wd     (exit_loop_wd),
+    .we     (safe_mode_we),
+    .wd     (safe_mode_wd),
 
     // from internal hardware
-    .de     (hw2reg.exit_loop.de),
-    .d      (hw2reg.exit_loop.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
-    .q      (),
+    .q      (reg2hw.safe_mode.q ),
 
     // to register interface (read)
-    .qs     (exit_loop_qs)
+    .qs     (safe_mode_qs)
+  );
+
+
+  // R[master_core]: V(False)
+
+  prim_subreg #(
+    .DW      (3),
+    .SWACCESS("RW"),
+    .RESVAL  (3'h1)
+  ) u_master_core (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (master_core_we),
+    .wd     (master_core_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.master_core.q ),
+
+    // to register interface (read)
+    .qs     (master_core_qs)
+  );
+
+
+  // R[critical_section]: V(False)
+
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_critical_section (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (critical_section_we),
+    .wd     (critical_section_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.critical_section.q ),
+
+    // to register interface (read)
+    .qs     (critical_section_qs)
+  );
+
+
+  // R[start]: V(False)
+
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_start (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (start_we),
+    .wd     (start_wd),
+
+    // from internal hardware
+    .de     (hw2reg.start.de),
+    .d      (hw2reg.start.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.start.q ),
+
+    // to register interface (read)
+    .qs     (start_qs)
   );
 
 
@@ -111,7 +231,7 @@ module cb_heep_ctrl_reg_top #(
   prim_subreg #(
     .DW      (32),
     .SWACCESS("RW"),
-    .RESVAL  (32'hf0100180)
+    .RESVAL  (32'h0)
   ) u_boot_address (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -126,48 +246,52 @@ module cb_heep_ctrl_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (),
+    .q      (reg2hw.boot_address.q ),
 
     // to register interface (read)
     .qs     (boot_address_qs)
   );
 
 
-  // R[force_soft_error]: V(False)
+  // R[end_sw_routine]: V(False)
 
   prim_subreg #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h0)
-  ) u_force_soft_error (
+  ) u_end_sw_routine (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (force_soft_error_we),
-    .wd     (force_soft_error_wd),
+    .we     (end_sw_routine_we),
+    .wd     (end_sw_routine_wd),
 
     // from internal hardware
-    .de     (1'b0),
-    .d      ('0  ),
+    .de     (hw2reg.end_sw_routine.de),
+    .d      (hw2reg.end_sw_routine.d ),
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.force_soft_error.q ),
+    .q      (),
 
     // to register interface (read)
-    .qs     (force_soft_error_qs)
+    .qs     (end_sw_routine_qs)
   );
 
 
 
 
-  logic [2:0] addr_hit;
+  logic [6:0] addr_hit;
   always_comb begin
     addr_hit = '0;
-    addr_hit[0] = (reg_addr == CB_HEEP_CTRL_EXIT_LOOP_OFFSET);
-    addr_hit[1] = (reg_addr == CB_HEEP_CTRL_BOOT_ADDRESS_OFFSET);
-    addr_hit[2] = (reg_addr == CB_HEEP_CTRL_FORCE_SOFT_ERROR_OFFSET);
+    addr_hit[0] = (reg_addr == CB_HEEP_CTRL_SAFE_CONFIGURATION_OFFSET);
+    addr_hit[1] = (reg_addr == CB_HEEP_CTRL_SAFE_MODE_OFFSET);
+    addr_hit[2] = (reg_addr == CB_HEEP_CTRL_MASTER_CORE_OFFSET);
+    addr_hit[3] = (reg_addr == CB_HEEP_CTRL_CRITICAL_SECTION_OFFSET);
+    addr_hit[4] = (reg_addr == CB_HEEP_CTRL_START_OFFSET);
+    addr_hit[5] = (reg_addr == CB_HEEP_CTRL_BOOT_ADDRESS_OFFSET);
+    addr_hit[6] = (reg_addr == CB_HEEP_CTRL_END_SW_ROUTINE_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -177,32 +301,64 @@ module cb_heep_ctrl_reg_top #(
     wr_err = (reg_we &
               ((addr_hit[0] & (|(CB_HEEP_CTRL_PERMIT[0] & ~reg_be))) |
                (addr_hit[1] & (|(CB_HEEP_CTRL_PERMIT[1] & ~reg_be))) |
-               (addr_hit[2] & (|(CB_HEEP_CTRL_PERMIT[2] & ~reg_be)))));
+               (addr_hit[2] & (|(CB_HEEP_CTRL_PERMIT[2] & ~reg_be))) |
+               (addr_hit[3] & (|(CB_HEEP_CTRL_PERMIT[3] & ~reg_be))) |
+               (addr_hit[4] & (|(CB_HEEP_CTRL_PERMIT[4] & ~reg_be))) |
+               (addr_hit[5] & (|(CB_HEEP_CTRL_PERMIT[5] & ~reg_be))) |
+               (addr_hit[6] & (|(CB_HEEP_CTRL_PERMIT[6] & ~reg_be)))));
   end
 
-  assign exit_loop_we = addr_hit[0] & reg_we & !reg_error;
-  assign exit_loop_wd = reg_wdata[0];
+  assign safe_configuration_we = addr_hit[0] & reg_we & !reg_error;
+  assign safe_configuration_wd = reg_wdata[1:0];
 
-  assign boot_address_we = addr_hit[1] & reg_we & !reg_error;
+  assign safe_mode_we = addr_hit[1] & reg_we & !reg_error;
+  assign safe_mode_wd = reg_wdata[0];
+
+  assign master_core_we = addr_hit[2] & reg_we & !reg_error;
+  assign master_core_wd = reg_wdata[2:0];
+
+  assign critical_section_we = addr_hit[3] & reg_we & !reg_error;
+  assign critical_section_wd = reg_wdata[0];
+
+  assign start_we = addr_hit[4] & reg_we & !reg_error;
+  assign start_wd = reg_wdata[0];
+
+  assign boot_address_we = addr_hit[5] & reg_we & !reg_error;
   assign boot_address_wd = reg_wdata[31:0];
 
-  assign force_soft_error_we = addr_hit[2] & reg_we & !reg_error;
-  assign force_soft_error_wd = reg_wdata[0];
+  assign end_sw_routine_we = addr_hit[6] & reg_we & !reg_error;
+  assign end_sw_routine_wd = reg_wdata[0];
 
   // Read data return
   always_comb begin
     reg_rdata_next = '0;
     unique case (1'b1)
       addr_hit[0]: begin
-        reg_rdata_next[0] = exit_loop_qs;
+        reg_rdata_next[1:0] = safe_configuration_qs;
       end
 
       addr_hit[1]: begin
-        reg_rdata_next[31:0] = boot_address_qs;
+        reg_rdata_next[0] = safe_mode_qs;
       end
 
       addr_hit[2]: begin
-        reg_rdata_next[0] = force_soft_error_qs;
+        reg_rdata_next[2:0] = master_core_qs;
+      end
+
+      addr_hit[3]: begin
+        reg_rdata_next[0] = critical_section_qs;
+      end
+
+      addr_hit[4]: begin
+        reg_rdata_next[0] = start_qs;
+      end
+
+      addr_hit[5]: begin
+        reg_rdata_next[31:0] = boot_address_qs;
+      end
+
+      addr_hit[6]: begin
+        reg_rdata_next[0] = end_sw_routine_qs;
       end
 
       default: begin
@@ -227,7 +383,7 @@ endmodule
 
 module cb_heep_ctrl_reg_top_intf
 #(
-  parameter int AW = 4,
+  parameter int AW = 5,
   localparam int DW = 32
 ) (
   input logic clk_i,

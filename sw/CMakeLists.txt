@@ -424,7 +424,7 @@ if((${LINKER} STREQUAL "flash_load") OR (${LINKER} STREQUAL "flash_exec"))
             COMMENT "Invoking: Hexdump")
 else()
     add_custom_command(TARGET ${MAINFILE}.elf POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --adjust-vma=-0xF0100000 -O verilog  ${MAINFILE}.elf  ${MAINFILE}.hex
+            COMMAND ${CMAKE_OBJCOPY} --adjust-vma=-0xF0020000 -O verilog  ${MAINFILE}.elf  ${MAINFILE}.hex
             COMMENT "Invoking: Hexdump")
 endif()
 

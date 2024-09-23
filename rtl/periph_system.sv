@@ -14,7 +14,16 @@ module periph_system
     input  obi_req_t  slave_req_i,
     output obi_resp_t slave_resp_o,
 
-    output logic force_error_o
+    input  obi_req_t    csr_reg_req_i,
+    output obi_resp_t   csr_reg_resp_o,    
+    //CB CTRL
+    input  logic EndSw_i,
+    output logic [2:0] master_core_o,
+    output logic safe_mode_o,
+    output logic [1:0] safe_configuration_o,
+    output logic critical_section_o,
+    output logic Start_o,
+    output logic [31:0] boot_addr_o
 );
 
   import cei_mochila_pkg::*;
@@ -115,8 +124,14 @@ module periph_system
     .clk_i,
     .rst_ni,
     // Bus Interface
-    .reg_req_i(peripheral_slv_req[cei_mochila_pkg::CB_CTRL_IDX]),
-    .reg_rsp_o(peripheral_slv_rsp[cei_mochila_pkg::CB_CTRL_IDX]),
-    .force_error_o(force_error_o)
+    .reg_req_i(csr_reg_req_i),
+    .reg_rsp_o(csr_reg_resp_o),
+    .EndSw_i,
+    .master_core_o,
+    .safe_mode_o,
+    .safe_configuration_o,
+    .critical_section_o,
+    .Start_o,
+    .boot_addr_o
     );
 endmodule

@@ -7,48 +7,91 @@
 package cb_heep_ctrl_reg_pkg;
 
   // Address widths within the block
-  parameter int BlockAw = 4;
+  parameter int BlockAw = 5;
 
   ////////////////////////////
   // Typedefs for registers //
   ////////////////////////////
 
   typedef struct packed {
+    logic [1:0]  q;
+  } cb_heep_ctrl_reg2hw_safe_configuration_reg_t;
+
+  typedef struct packed {
     logic        q;
-  } cb_heep_ctrl_reg2hw_force_soft_error_reg_t;
+  } cb_heep_ctrl_reg2hw_safe_mode_reg_t;
+
+  typedef struct packed {
+    logic [2:0]  q;
+  } cb_heep_ctrl_reg2hw_master_core_reg_t;
+
+  typedef struct packed {
+    logic        q;
+  } cb_heep_ctrl_reg2hw_critical_section_reg_t;
+
+  typedef struct packed {
+    logic        q;
+  } cb_heep_ctrl_reg2hw_start_reg_t;
+
+  typedef struct packed {
+    logic [31:0] q;
+  } cb_heep_ctrl_reg2hw_boot_address_reg_t;
 
   typedef struct packed {
     logic        d;
     logic        de;
-  } cb_heep_ctrl_hw2reg_exit_loop_reg_t;
+  } cb_heep_ctrl_hw2reg_start_reg_t;
+
+  typedef struct packed {
+    logic        d;
+    logic        de;
+  } cb_heep_ctrl_hw2reg_end_sw_routine_reg_t;
 
   // Register -> HW type
   typedef struct packed {
-    cb_heep_ctrl_reg2hw_force_soft_error_reg_t force_soft_error; // [0:0]
+    cb_heep_ctrl_reg2hw_safe_configuration_reg_t safe_configuration; // [39:38]
+    cb_heep_ctrl_reg2hw_safe_mode_reg_t safe_mode; // [37:37]
+    cb_heep_ctrl_reg2hw_master_core_reg_t master_core; // [36:34]
+    cb_heep_ctrl_reg2hw_critical_section_reg_t critical_section; // [33:33]
+    cb_heep_ctrl_reg2hw_start_reg_t start; // [32:32]
+    cb_heep_ctrl_reg2hw_boot_address_reg_t boot_address; // [31:0]
   } cb_heep_ctrl_reg2hw_t;
 
   // HW -> register type
   typedef struct packed {
-    cb_heep_ctrl_hw2reg_exit_loop_reg_t exit_loop; // [1:0]
+    cb_heep_ctrl_hw2reg_start_reg_t start; // [3:2]
+    cb_heep_ctrl_hw2reg_end_sw_routine_reg_t end_sw_routine; // [1:0]
   } cb_heep_ctrl_hw2reg_t;
 
   // Register offsets
-  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_EXIT_LOOP_OFFSET = 4'h 0;
-  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_BOOT_ADDRESS_OFFSET = 4'h 4;
-  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_FORCE_SOFT_ERROR_OFFSET = 4'h 8;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_SAFE_CONFIGURATION_OFFSET = 5'h 0;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_SAFE_MODE_OFFSET = 5'h 4;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_MASTER_CORE_OFFSET = 5'h 8;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_CRITICAL_SECTION_OFFSET = 5'h c;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_START_OFFSET = 5'h 10;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_BOOT_ADDRESS_OFFSET = 5'h 14;
+  parameter logic [BlockAw-1:0] CB_HEEP_CTRL_END_SW_ROUTINE_OFFSET = 5'h 18;
 
   // Register index
   typedef enum int {
-    CB_HEEP_CTRL_EXIT_LOOP,
+    CB_HEEP_CTRL_SAFE_CONFIGURATION,
+    CB_HEEP_CTRL_SAFE_MODE,
+    CB_HEEP_CTRL_MASTER_CORE,
+    CB_HEEP_CTRL_CRITICAL_SECTION,
+    CB_HEEP_CTRL_START,
     CB_HEEP_CTRL_BOOT_ADDRESS,
-    CB_HEEP_CTRL_FORCE_SOFT_ERROR
+    CB_HEEP_CTRL_END_SW_ROUTINE
   } cb_heep_ctrl_id_e;
 
   // Register width information to check illegal writes
-  parameter logic [3:0] CB_HEEP_CTRL_PERMIT [3] = '{
-    4'b 0001, // index[0] CB_HEEP_CTRL_EXIT_LOOP
-    4'b 1111, // index[1] CB_HEEP_CTRL_BOOT_ADDRESS
-    4'b 0001  // index[2] CB_HEEP_CTRL_FORCE_SOFT_ERROR
+  parameter logic [3:0] CB_HEEP_CTRL_PERMIT [7] = '{
+    4'b 0001, // index[0] CB_HEEP_CTRL_SAFE_CONFIGURATION
+    4'b 0001, // index[1] CB_HEEP_CTRL_SAFE_MODE
+    4'b 0001, // index[2] CB_HEEP_CTRL_MASTER_CORE
+    4'b 0001, // index[3] CB_HEEP_CTRL_CRITICAL_SECTION
+    4'b 0001, // index[4] CB_HEEP_CTRL_START
+    4'b 1111, // index[5] CB_HEEP_CTRL_BOOT_ADDRESS
+    4'b 0001  // index[6] CB_HEEP_CTRL_END_SW_ROUTINE
   };
 
 endpackage
