@@ -3,6 +3,7 @@
  *
  * Description: Contains common system definitions.
  *
+ *
  */
 
 package cei_mochila_pkg;
@@ -11,6 +12,12 @@ package cei_mochila_pkg;
 
 
 //System Bus
+  typedef enum logic {
+    NtoM,
+    onetoM
+  } bus_type_e;
+
+  localparam bus_type_e BusType = NtoM;
 
   //master idx
   localparam logic [31:0] CORE0_INSTR_IDX = 0;

@@ -50,7 +50,7 @@ app-xheep:
 
 #Core CB-Heep 
 # CORE ?=0
-app-cbcore: app-clean
+app-cbcore: app-restore
 	$(MAKE) -C sw PROJECT=$(PROJECT) TARGET=$(TARGET) LINKER=$(LINKER) COMPILER=$(COMPILER) COMPILER_PREFIX=$(COMPILER_PREFIX) ARCH=$(ARCH)
 
 
