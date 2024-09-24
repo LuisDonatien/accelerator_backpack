@@ -14,20 +14,11 @@
 
 int main(int argc, char *argv[]) 
 {
-
-volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET;     
-
         volatile unsigned int *P = FREE_LOCATION_POINTER;
-
-        asm volatile("csrr t6, mstatus");
-        asm volatile("ori t6,t6,0x08"); 
-        asm volatile("csrw mstatus, t6");  
-        // Set mie.MEIE bit to one to enable machine-level external interrupts
-        asm volatile("li   t6,0xFFFF0000"); 
-        asm volatile("csrw mie, t6"); //mask = 1 << 31        
+        volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET;   
         //Entering Safe mode TMR 
         TMR_Safe_Activate(); 
-        //TMR_Set_Critical_Section(CRITICAL_SECTION);
+//        TMR_Set_Critical_Section(CRITICAL_SECTION);
 
 
         CSR_READ(CSR_REG_MHARTID,P);  
@@ -40,7 +31,7 @@ volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET;
 
       //  Check_RF();
 
-        //TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
+//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
  
         Check_RF();
 
@@ -89,7 +80,7 @@ volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET;
 
  
 //       CSR_READ(CSR_REG_MHARTID,P); 
-        /******END PROGRAM******/  
+        /******END PROGRAM******/    
         *END_SW = 0x1;
         asm volatile("fence");
         while(1){ 

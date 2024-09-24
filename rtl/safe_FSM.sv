@@ -546,7 +546,7 @@ module safe_FSM
 
           TMR_REC_DMODE:
           begin
-            if (tmr_critical_section_i == 1'b0)
+            if (tmr_critical_section_i == 1'b0 && End_sw_routine_i == 1'b0)
               ctrl_tmr_rec_fsm_ns[i] = TMR_REC_DMCPY;
             else if(End_sw_routine_i == 1'b1 && Hart_wfi_i[i] == 1'b1)
               ctrl_tmr_rec_fsm_ns[i] = TMR_REC_IDLE;
