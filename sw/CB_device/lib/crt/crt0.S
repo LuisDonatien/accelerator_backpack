@@ -32,11 +32,6 @@ _start:
 /* initialize stack pointer */
    la sp, _sp
 
-/* set the frequency */
-   li a0, SOC_CTRL_START_ADDRESS
-   li a2, REFERENCE_CLOCK_Hz
-   sw a2, SOC_CTRL_SYSTEM_FREQUENCY_HZ_REG_OFFSET(a0)
-
 /* clear the bss segment */
 _init_bss:
     la     a0, __bss_start
@@ -64,6 +59,14 @@ _init_bss:
     la a0, __vector_start
     ori a0, a0, 0x1
     csrw mtvec, a0
+
+/* set active interruption */
+    csrr a0, mstatus;
+    ori a0,a0,0x08; 
+    csrw mstatus, a0;  
+   /*Set mie.MEIE bit mask to one to enable machine-level external interrupts*/
+    li   a0,0xFFFF0000 
+    csrw mie, a0      
 
 /* new-style constructors and destructors */
 /*
