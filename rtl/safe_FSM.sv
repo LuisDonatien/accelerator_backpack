@@ -76,8 +76,6 @@ module safe_FSM
   logic Enable_Switch_s;
 
 
-  //################################MOMENTANEO
-
   logic  halt_req_s;
   logic Single_Boot_s;
   logic [NHARTS-1:0] TMR_Boot_s;

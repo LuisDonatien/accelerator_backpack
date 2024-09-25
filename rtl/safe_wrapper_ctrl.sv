@@ -66,14 +66,18 @@ module safe_wrapper_ctrl #(
       assign safe_configuration_o = ext_safe_configuration_i;
       assign critical_section_o = ext_critical_section_i;
 
-      assign hw2reg.master_core.de = 1'b1;
-      assign hw2reg.master_core.d = ext_master_core_i;
-      assign hw2reg.safe_mode.de = 1'b1;
-      assign hw2reg.safe_mode.d = ext_safe_mode_i;
-      assign hw2reg.safe_configuration.de = 1'b1;
-      assign hw2reg.safe_configuration.d = ext_safe_configuration_i;
-      assign hw2reg.critical_section.de = 1'b1;
-      assign hw2reg.critical_section.d = ext_critical_section_i;
+      assign hw2reg.master_core = {ext_master_core_i , 1'b1};
+//      assign hw2reg.master_core.de = 1'b1;
+//      assign hw2reg.master_core.d = ext_master_core_i;
+      assign hw2reg.safe_mode = {ext_safe_mode_i, 1'b1};
+//      assign hw2reg.safe_mode.de = 1'b1;
+//      assign hw2reg.safe_mode.d = ext_safe_mode_i;
+      assign hw2reg.safe_configuration = {ext_safe_configuration_i, 1'b1};
+//      assign hw2reg.safe_configuration.de = 1'b1;
+//      assign hw2reg.safe_configuration.d = ext_safe_configuration_i;
+      assign hw2reg.critical_section = {ext_critical_section_i, 1'b1};
+//      assign hw2reg.critical_section.de = 1'b1;
+//      assign hw2reg.critical_section.d = ext_critical_section_i;
     end
     else begin //Reg2Hw read
       assign master_core_o = reg2hw.master_core.q;
@@ -81,14 +85,18 @@ module safe_wrapper_ctrl #(
       assign safe_configuration_o = reg2hw.safe_configuration.q;
       assign critical_section_o = reg2hw.critical_section.q;
 
-      assign hw2reg.master_core.de = 1'b0;
-      assign hw2reg.master_core.d = '0;
-      assign hw2reg.safe_mode.de = 1'b0;
-      assign hw2reg.safe_mode.d = '0;
-      assign hw2reg.safe_configuration.de = 1'b0;
-      assign hw2reg.safe_configuration.d = '0;
-      assign hw2reg.critical_section.de = 1'b0;
-      assign hw2reg.critical_section.d = '0;
+      assign hw2reg.master_core = '0;
+//      assign hw2reg.master_core.de = 1'b0;
+//      assign hw2reg.master_core.d = '0;
+      assign hw2reg.safe_mode = '0;
+//      assign hw2reg.safe_mode.de = 1'b0;
+//      assign hw2reg.safe_mode.d = '0;
+      assign hw2reg.safe_configuration = '0;
+//      assign hw2reg.safe_configuration.de = 1'b0;
+//      assign hw2reg.safe_configuration.d = '0;
+      assign hw2reg.critical_section = '0;
+//      assign hw2reg.critical_section.de = 1'b0;
+//      assign hw2reg.critical_section.d = '0;
     end
   end
   assign End_sw_routine_o = reg2hw.end_sw_routine.q;
