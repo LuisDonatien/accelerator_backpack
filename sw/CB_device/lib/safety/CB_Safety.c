@@ -613,14 +613,19 @@ void handler_tmr_dmcontext_copy(void){
 
 }
 void handler_tmr_dmshsync(void){
-  volatile unsigned int *Priv_Reg = 0xFF000004;
-  *Priv_Reg = 0x1;
-  *Priv_Reg = 0x0;
+        asm volatile("addi    sp,sp,-16");
+        asm volatile("sw      t5,12(sp)");
+        asm volatile("sw      t6,8(sp)");
+
+        asm volatile("li t5, %0" : : "i"    (PRIVATE_REG_BASEADDRESS));
+        asm volatile("li t6, 0x1");
+        asm volatile("sw t6,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));
+        asm volatile("sw zero,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));             
 
     //Control & Status Register
     //Set Base Address
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw   t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
 
     //Machine Exception Program Counter
     //mepc      0x341
@@ -628,6 +633,10 @@ void handler_tmr_dmshsync(void){
         asm volatile("lw t5, 12(t5)");
         asm volatile("csrw mepc, t5"); 
         asm volatile("lw t5, -4(sp)");
+
+        asm volatile("lw     t5,12(sp)");
+        asm volatile("lw     t6,8(sp)");
+        asm volatile("addi   sp,sp,16");
 
 }
 

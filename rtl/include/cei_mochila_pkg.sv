@@ -144,8 +144,8 @@ package cei_mochila_pkg;
   localparam logic [31:0] EXT_BUS_SYSTEM_END_ADDRESS = EXT_BUS_SYSTEM_START_ADDRESS + EXT_BUS_SYSTEM_SIZE;
   localparam logic [31:0] EXT_BUS_SYSTEM_IDX = 32'd0;
 
-  localparam logic [31:0] CPU_REG_START_ADDRESS = 32'hFF000000; //Todo modificar la reg privada
-  localparam logic [31:0] CPU_REG_SIZE = 32'h00001000;
+  localparam logic [31:0] CPU_REG_START_ADDRESS = GLOBAL_BASE_ADDRESS; //Todo modificar la reg privada
+  localparam logic [31:0] CPU_REG_SIZE = 32'h00010000;
   localparam logic [31:0] CPU_REG_END_ADDRESS = CPU_REG_START_ADDRESS + CPU_REG_SIZE;
   localparam logic [31:0] CPU_REG_IDX = 32'd1;
 
