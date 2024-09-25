@@ -57,7 +57,7 @@ module mochila_top
     obi_req_t  [N_BANKS-1:0]ram_req;
     obi_resp_t [N_BANKS-1:0]ram_resp;   
 
-    //CB Control
+    // Safe CPU wrapper external control signals
     logic endSw_s;
     logic [2:0] master_core_s;
     logic safe_mode_s;

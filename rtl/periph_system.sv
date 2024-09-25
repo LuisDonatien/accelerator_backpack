@@ -14,9 +14,11 @@ module periph_system
     input  obi_req_t  slave_req_i,
     output obi_resp_t slave_resp_o,
 
+    //External MM CSR ports 
     input  obi_req_t    csr_reg_req_i,
-    output obi_resp_t   csr_reg_resp_o,    
-    //CB CTRL
+    output obi_resp_t   csr_reg_resp_o, 
+
+    //***Safe CPU wrapper control ports***//
     input  logic EndSw_i,
     output logic [2:0] master_core_o,
     output logic safe_mode_o,

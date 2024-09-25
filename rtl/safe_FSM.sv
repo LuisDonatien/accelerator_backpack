@@ -100,7 +100,7 @@ module safe_FSM
         end
       end
   //////////////////////////////////////////////////////////////////////////////////////////////
-  //SAFE FSM    
+  //SAFE FSM    GENERAL FSM
   //////////////////////////////////////////////////////////////////////////////////////////////
       always_comb begin
         
@@ -278,7 +278,7 @@ module safe_FSM
   //////////////////////////////////////////////////////////////////////////////////////////////
   //TMR FSM    
   //////////////////////////////////////////////////////////////////////////////////////////////
-// Mealy FSM depending on Master Core for different outputs behavior
+// Mealy FSM depending on Master Core selection for different outputs behavior
 
   for(genvar i=0; i<NHARTS;i++) begin : TMR_FSM_NormalBehaviour
 
@@ -453,10 +453,10 @@ module safe_FSM
 
   end
 
-//****************************************************************//
-//***********************TMR Recovery FSM*************************//
-//****************************************************************//
-//****************************************************************//
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  //TMR RECOVERY FSM
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
   for(genvar i=0; i<NHARTS;i++) begin : TMR_FSM_Recovery
 
       always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -465,9 +465,7 @@ module safe_FSM
         end else begin
           ctrl_tmr_rec_fsm_cs[i] <= ctrl_tmr_rec_fsm_ns[i];
         end
-      end
-
-// Safe FSM 
+      end 
 
       always_comb begin
         
@@ -495,7 +493,7 @@ module safe_FSM
             else
               ctrl_tmr_rec_fsm_ns[i] = TMR_REC_IDLE;
           end
-          //SW TMR Recovery//
+          //***SW TMR Recovery***//
           TMR_REC_SYNCINTC:
           begin
             if (Hart_intc_ack_i[0] && Hart_intc_ack_i[1] && Hart_intc_ack_i[2])
@@ -510,8 +508,8 @@ module safe_FSM
             else
               ctrl_tmr_rec_fsm_ns[i] = TMR_REC_SWSYNC;
           end
-          //***************//
-          //HW TMR Recovery//
+          //*********************//
+          //***HW TMR Recovery***//
           TMR_REC_SHWFI:
           begin
             if (Hart_wfi_i[i] == 1'b1)
@@ -631,8 +629,6 @@ module safe_FSM
           dual_mode_tmr_s[i] = 1'b1;              
         end
 
-
-
         TMR_REC_DMWFI:
         begin
           DMR_Mode_SHWFI_s[i] = 1'b1; 
@@ -655,7 +651,6 @@ module safe_FSM
           Interrupt_DMSH_Sync_o[i] = 1'b1; 
         end
 
-
         TMR_REC_DMWAITSH:
         begin
           DMR_Mode_SHWFI_s[i] = 1'b1; 
@@ -669,8 +664,7 @@ module safe_FSM
           enable_interrupt_tmr_SHhalt_s[i] = 1'b1;      
         end
 
-
-        //Software
+        //Software Recovery Routine
         TMR_REC_SYNCINTC:
         begin
           Interrupt_swResync_o[i] = 1'b1;
@@ -684,50 +678,15 @@ module safe_FSM
 
   end
 
-//  logic Switch_SingletoTMR_ff;
-//  logic Clear_Switch_s/
-//  logic Enable_Switch_s
-/*
-  assign Clear_Switch_s = Clear_Switch_ss[0] || Clear_Switch_ss[1] || Clear_Switch_ss[2];
-
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-      if (!rst_ni) begin
-        Switch_SingletoTMR_ff <= 1'b0;
-      end else begin
-        if (Clear_Switch_s == 1'b1) 
-          Switch_SingletoTMR_ff <= 1'b0;
-        else if (Enable_Switch_s == 1'b1)
-          Switch_SingletoTMR_ff <= 1'b1;
-      end
-    end
-*/
-
-
-
-
-
-
-
-
-
-
 // Inter-FSM Signals operation
 assign halt_req_s = dbg_halt_req_s[0] || dbg_halt_req_s[1] || dbg_halt_req_s[2];
 
-// In-Out FSM Signals operation
+// In-Out FSM Signals operation Todo: Can be found a more elegant solution
 assign Single_Bus_o = single_bus_s[0] || single_bus_s[1] || single_bus_s[2];
 assign Tmr_voter_enable_o = (tmr_voter_enable_s[0] || tmr_voter_enable_s[1] || tmr_voter_enable_s[2]);
 assign Dmr_comparator_enable_o = (dmr_comparator_enable_s[0] || dmr_comparator_enable_s[1] || dmr_comparator_enable_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
 assign Dual_mode_tmr_o = (dual_mode_tmr_s[0] || dual_mode_tmr_s[1] || dual_mode_tmr_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
 
-/*
-always_comb begin
-  dbg_halt_req_general_s = '0;
-  if (enable_interrupt_halt_s[0] == 1'b1 || enable_interrupt_halt_s[1] == 1'b1 || enable_interrupt_halt_s[2] == 1'b1) begin
-    dbg_halt_req_general_s= ~Master_Core_i;
-  end
-end
-*/
 always_comb begin
   dbg_halt_req_tmr_s = '0;
   if (enable_interrupt_tmr_halt_s[0] == 1'b1 || enable_interrupt_tmr_halt_s[1] == 1'b1 || enable_interrupt_tmr_halt_s[2] == 1'b1) begin

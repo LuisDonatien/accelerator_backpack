@@ -15,7 +15,7 @@ module safe_wrapper_ctrl #(
     input  reg_req_t reg_req_i,
     output reg_rsp_t reg_rsp_o,
 
-    // External Control Signal
+    // External safe_wrapper_cpu Control Signal
     input logic [2:0] ext_master_core_i,
     input logic ext_safe_mode_i,
     input logic [1:0] ext_safe_configuration_i,
@@ -31,7 +31,7 @@ module safe_wrapper_ctrl #(
     output logic Initial_Sync_Master_o,
     output logic Start_o,
     output logic End_sw_routine_o,
-    //input logic Debug_ext_req_i,
+
     input logic Start_Boot_i,
     input logic en_ext_debug_i
 );

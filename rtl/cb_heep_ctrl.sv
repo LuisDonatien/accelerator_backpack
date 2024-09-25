@@ -15,8 +15,7 @@ module cb_heep_ctrl #(
     input  reg_req_t reg_req_i,
     output reg_rsp_t reg_rsp_o,
 
-    //Signals
-
+    //External Safe CPU wrapper control port
     input  logic EndSw_i,
     output logic [2:0] master_core_o,
     output logic safe_mode_o,

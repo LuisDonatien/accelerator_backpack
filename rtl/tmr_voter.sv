@@ -24,14 +24,14 @@ module tmr_voter
     output  [NHARTS-1:0]   error_id_o
 );
 
-logic [5:0] error_s;
-logic [NHARTS-1:0] instr_error_s;
-logic [NHARTS-1:0] data_error_s;
+    logic [5:0] error_s;
+    logic [NHARTS-1:0] instr_error_s;
+    logic [NHARTS-1:0] data_error_s;
 
-obi_req_t   voted_core_instr_req_s;
-obi_req_t   voted_core_data_req_s;
-//Classic Implementation Voter
+    obi_req_t   voted_core_instr_req_s;
+    obi_req_t   voted_core_data_req_s;
 
+// Classic Implementation Voter
 
 assign  voted_core_instr_req_s.addr = ((core_instr_req_i[0].addr & core_instr_req_i[1].addr) |
                                  (core_instr_req_i[1].addr & core_instr_req_i[2].addr) |
@@ -76,35 +76,35 @@ assign  voted_core_data_req_s.req = (core_data_req_i[0].req & core_data_req_i[1]
 
 
 
-//Checker 
+// Checker 
 always_comb begin
     instr_error_s = '0;
     data_error_s = '0;
     error_s = '0;
 
-        //Instruction
-        for(int i=0; i<NHARTS;i++) begin : instr_bus_checker 
-            if (((voted_core_instr_req_s.addr != core_instr_req_i[i].addr) ||
-                (voted_core_instr_req_s.wdata != core_instr_req_i[i].wdata) ||
-                (voted_core_instr_req_s.be != core_instr_req_i[i].be) ||
-                (voted_core_instr_req_s.we != core_instr_req_i[i].we) ||
-                (voted_core_instr_req_s.req != core_instr_req_i[i].req)) && enable_i) begin
-                instr_error_s[i] = 1'b1;
-                error_s[i] = 1'b1;    
-            end
+    //Instruction
+    for(int i=0; i<NHARTS;i++) begin : instr_bus_checker 
+        if (((voted_core_instr_req_s.addr != core_instr_req_i[i].addr) ||
+            (voted_core_instr_req_s.wdata != core_instr_req_i[i].wdata) ||
+            (voted_core_instr_req_s.be != core_instr_req_i[i].be) ||
+            (voted_core_instr_req_s.we != core_instr_req_i[i].we) ||
+            (voted_core_instr_req_s.req != core_instr_req_i[i].req)) && enable_i) begin
+            instr_error_s[i] = 1'b1;
+            error_s[i] = 1'b1;    
         end
+    end
     
-        //Data
-        for(int i=0; i<NHARTS;i++) begin : data_bus_checker 
-            if (((voted_core_data_req_s.addr != core_data_req_i[i].addr) ||
-                (voted_core_data_req_s.wdata != core_data_req_i[i].wdata) ||
-                (voted_core_data_req_s.be != core_data_req_i[i].be) ||
-                (voted_core_data_req_s.we != core_data_req_i[i].we) ||
-                (voted_core_data_req_s.req != core_data_req_i[i].req)) && enable_i) begin
-                data_error_s[i] = 1'b1;
-                error_s[3+i] = 1'b1;    
-            end
-        end      
+    //Data
+    for(int i=0; i<NHARTS;i++) begin : data_bus_checker 
+        if (((voted_core_data_req_s.addr != core_data_req_i[i].addr) ||
+            (voted_core_data_req_s.wdata != core_data_req_i[i].wdata) ||
+            (voted_core_data_req_s.be != core_data_req_i[i].be) ||
+            (voted_core_data_req_s.we != core_data_req_i[i].we) ||
+            (voted_core_data_req_s.req != core_data_req_i[i].req)) && enable_i) begin
+            data_error_s[i] = 1'b1;
+            error_s[3+i] = 1'b1;    
+        end
+    end      
 end  
 
 

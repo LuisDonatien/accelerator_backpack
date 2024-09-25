@@ -77,13 +77,12 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     obi_req_t  [NHARTS-1 : 0] core_data_req;
     obi_resp_t [NHARTS-1 : 0] core_data_resp;
 
-
     // XBAR_CPU Slaves Signals
     obi_req_t  [NHARTS-1 : 0][1:0] xbar_core_data_req;
     obi_resp_t [NHARTS-1 : 0][1:0] xbar_core_data_resp;
     obi_req_t  [NHARTS-1 : 0]      xbar_core_data_req_s;  
 
-    //Voted_CPU Signals
+    // Voted_CPU Signals
     obi_req_t  voted_core_instr_req_o;
     obi_req_t  voted_core_data_req_o; 
     logic tmr_error_s;
@@ -92,7 +91,7 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic [2:0] tmr_dmr_config_s;
     logic dual_mode_tmr_s;
 
-    //Compared CPU Signals
+    // Compared CPU Signals
     obi_req_t  [NRCOMPARATORS-1:0] compared_core_instr_req_o;
     obi_req_t  [NRCOMPARATORS-1:0] compared_core_data_req_o;   
 
@@ -100,12 +99,12 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     reg_pkg::reg_req_t  [NHARTS-1 : 0]cpu_reg_req;
     reg_pkg::reg_rsp_t  [NHARTS-1 : 0]cpu_reg_rsp;    
 
-    //Safe CPU reg port
+    // Safe CPU reg port
     reg_pkg::reg_req_t  safe_cpu_wrapper_reg_req;
     reg_pkg::reg_rsp_t  safe_cpu_wrapper_reg_rsp;   
 
 
-    //Configuration IDs Cores
+    // Configuration IDs Cores
 
     logic [2:0][NHARTS-1:0] Core_ID;
     assign Core_ID[0] = {3'b001};
@@ -113,12 +112,12 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     assign Core_ID[2] = {3'b100};
 
 
-//Cores System//
+//***Cores System***//
 
-ext_cpu_system #(
+    cpu_system #(
         .HARTID        (HARTID),
         .DM_HALTADDRESS  (DM_HALTADDRESS)
-    )ext_cpu_system_i(
+    )cpu_system_i(
     .clk_i,
     .rst_ni,
     // Instruction memory interface
@@ -146,7 +145,7 @@ ext_cpu_system #(
     .debug_mode_o(debug_mode_s)
 );
 
-// OBI Slave[1] -> Safe CPU Wrapper Register 
+//***OBI Slave[1] -> Safe CPU Wrapper Register***//
     periph_to_reg #(
         .req_t(reg_pkg::reg_req_t),
         .rsp_t(reg_pkg::reg_rsp_t),
@@ -168,7 +167,7 @@ ext_cpu_system #(
         .reg_req_o(safe_cpu_wrapper_reg_req),
         .reg_rsp_i(safe_cpu_wrapper_reg_rsp)
   );
-//
+//***Safe CPU Wrapper Register***//
 
 safe_wrapper_ctrl #(
     .reg_req_t(reg_pkg::reg_req_t),
@@ -202,7 +201,8 @@ safe_wrapper_ctrl #(
     );
 
     assign ext_EndSw_o = End_sw_routine_s;
-//FSM
+
+//***Safe FSM***//
 
 safe_FSM safe_FSM_i (
     // Clock and Reset
@@ -244,7 +244,7 @@ safe_FSM safe_FSM_i (
     12'b0, Interrupt_DMSH_Sync_s[2], Interrupt_CpyResync_s[2], intc_sync_s[2], Interrupt_swResync_s[2], 16'b0 
   };
 
-  //Todo future posibility to debug during TMR_SYNC or DMR_IDLE_SYNC
+  //Todo: future posibility to debug during TMR_SYNC or DMR_SYNC
   assign debug_req[0] = (debug_req_i && en_ext_debug_s && master_core_s[0]) || intc_halt_s[0];
   assign debug_req[1] = (debug_req_i && en_ext_debug_s && master_core_s[1]) || intc_halt_s[1];
   assign debug_req[2] = (debug_req_i && en_ext_debug_s && master_core_s[2]) || intc_halt_s[2];
@@ -463,7 +463,8 @@ end
 
 //*******************************************************//
 
-// Private CPU Register
+//***Private CPU Register***//
+
 for(genvar i=0; i<NHARTS;i++) begin :priv_reg
   // ARCHITECTURE
   // ------------
@@ -472,7 +473,7 @@ for(genvar i=0; i<NHARTS;i++) begin :priv_reg
   //                `---- SLAVE[1] (Private Register)
   //
 
-//CPU xbar
+//***CPU xbar***//
     xbar_varlat_one_to_n #(
         .XBAR_NSLAVE   (cei_mochila_pkg::CPU_XBAR_SLAVE),
         .NUM_RULES    (cei_mochila_pkg::CPU_XBAR_NRULES),
@@ -488,7 +489,7 @@ for(genvar i=0; i<NHARTS;i++) begin :priv_reg
         .slave_resp_i  (xbar_core_data_resp[i])
     );
 
-// OBI Slave[1] -> Private Address CPU Register
+//***OBI Slave[1] -> Private Address CPU Register***//
     periph_to_reg #(
         .req_t(reg_pkg::reg_req_t),
         .rsp_t(reg_pkg::reg_rsp_t),
@@ -511,7 +512,7 @@ for(genvar i=0; i<NHARTS;i++) begin :priv_reg
         .reg_rsp_i(cpu_reg_rsp[i])
   );
 
-// CPU Private Register
+//***CPU Private Register***//
 
     cpu_private_reg#(
         .reg_req_t(reg_pkg::reg_req_t),
@@ -527,7 +528,5 @@ for(genvar i=0; i<NHARTS;i++) begin :priv_reg
     .Core_id_i(Core_ID[i]), 
     .Hart_intc_ack_o(Hart_intc_ack_s[i])
     );
-
 end
-
 endmodule

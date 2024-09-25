@@ -21,7 +21,7 @@ module dmr_comparator
     output  logic   error_o
 );
 
-logic [1:0] error_s;
+    logic [1:0] error_s;
 
 //Classic Implementation Comparator
 //Checker 
@@ -46,7 +46,7 @@ always_comb begin
         end    
 end  
 
-//D-Gated-Output
+//Gated-Output
 //Output is gated to ensure that an error does not propagate to the rest of the circuit.
 always_comb begin
     if (error_s[0] || error_s[1]) begin
