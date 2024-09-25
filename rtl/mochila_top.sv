@@ -30,8 +30,12 @@ module mochila_top
     output obi_resp_t   csr_reg_resp_o,
 
     // Debug Interface
-    input logic         debug_req_i
+    input logic         debug_req_i,
 
+    // power manager signals that goes to the ASIC macros
+    input  logic [N_BANKS-1:0] pwrgate_ni,
+    output logic [N_BANKS-1:0] pwrgate_ack_no,
+    input  logic [N_BANKS-1:0] set_retentive_ni
 );
 
 
@@ -120,7 +124,11 @@ memory_sys memory_sys_i(
     .rst_ni,
 
     .ram_req_i(ram_req),
-    .ram_resp_o(ram_resp)   
+    .ram_resp_o(ram_resp), 
+    // power manager signals that goes to the ASIC macros
+    .pwrgate_ni,
+    .pwrgate_ack_no,
+    .set_retentive_ni
 );
 
 

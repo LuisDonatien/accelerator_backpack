@@ -12,7 +12,12 @@ module memory_sys
     input logic rst_ni,
 
     input  obi_req_t   [NUM_BANKS-1:0]ram_req_i,
-    output obi_resp_t  [NUM_BANKS-1:0]ram_resp_o
+    output obi_resp_t  [NUM_BANKS-1:0]ram_resp_o,
+
+    // power manager signals that goes to the ASIC macros
+    input  logic [NUM_BANKS-1:0] pwrgate_ni,
+    output logic [NUM_BANKS-1:0] pwrgate_ack_no,
+    input  logic [NUM_BANKS-1:0] set_retentive_ni
 
 );
   logic [NUM_BANKS-1:0] ram_valid_q;
@@ -47,8 +52,11 @@ module memory_sys
         .addr_i(ram_req_i[i].addr[AddrWidth-1:2]),
         .wdata_i(ram_req_i[i].wdata),
         .be_i(ram_req_i[i].be),
+        .pwrgate_ni(pwrgate_ni[i]),
+        .pwrgate_ack_no(pwrgate_ack_no[i]),
+        .set_retentive_ni(set_retentive_ni[i]),
         .rdata_o(ram_resp_o[i].rdata)
     );
-  end
+  end 
 
 endmodule

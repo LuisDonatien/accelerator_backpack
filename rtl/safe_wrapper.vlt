@@ -27,3 +27,6 @@ lint_off -rule UNUSED -file "*/safe_FSM.sv" -match "Signal is not driven: 'fsm_d
 //lint_off -rule WIDTH -file "*/tmr_voter.sv" -match "*"
 
 lint_off -rule PINNOCONNECT -file "*/safe_FSM.sv" -match "*"
+
+lint_off -rule UNUSED -file "*/hw/vendor/cei_mochila/sim/memory_wrapper.sv" -match "*"
+lint_off -rule UNDRIVEN -file "*/hw/vendor/cei_mochila/sim/memory_wrapper.sv" -match "*"
