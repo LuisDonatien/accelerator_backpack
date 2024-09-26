@@ -113,14 +113,23 @@ module safe_wrapper_ctrl #(
   assign hw2reg.entry_address.de = !ext_Start_i;
   //Generate Flip-Flop Bi-Stable
   // When pos edge End_Program switch off start. When start switch off positive En_Program
+  logic enable, clear;
+
+
+  //synopsys sync_set_reset "enable"
+  assign enable = !Startff  && ext_Start_i;
+  //synopsys sync_set_reset "clear"
+  assign clear = !enable;
+  //synopsys sync_set_reset "enable"
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       Startff <= 1'b0;
       Start_Flag <= 1'b0;
     end else begin
       Startff <= ext_Start_i;
-      Start_Flag <= 1'b0;
-      if (Startff == 1'b0 && ext_Start_i == 1'b1) 
+      if (clear)
+        Start_Flag <= 1'b0;
+      else if (enable) 
         Start_Flag <= 1'b1;
     end
   end

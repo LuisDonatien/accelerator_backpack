@@ -60,17 +60,24 @@ module cb_heep_ctrl #(
 
   //Generate Flip-Flop Bi-Stable
   // When pos edge End_Program switch off start. When start switch off positive En_Program
+  logic enable, clear;
+
+  //synopsys sync_set_reset "enable"
+  assign enable = !en_sw_routineff && EndSw_i;
+  //synopsys sync_set_reset "clear"
+  assign clear = !enable;
+  //synopsys sync_set_reset "enable"
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       en_sw_routineff <= 1'b0;
       EndSw_Flag <= 1'b0;
     end else begin
       en_sw_routineff <= EndSw_i;
-      EndSw_Flag <= 1'b0;
-
-      if (en_sw_routineff == 1'b0 && EndSw_i == 1'b1) 
+      if (clear)      
+        EndSw_Flag <= 1'b0;
+      else if(enable)   
         EndSw_Flag <= 1'b1;
-    end
+      end
   end
 
 endmodule : cb_heep_ctrl
