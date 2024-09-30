@@ -19,6 +19,7 @@ MAKE = make
 .PHONY: test
 
 PROJECT  ?= hello_world
+
 # Linker options are 'on_chip' (default),'flash_load','flash_exec','freertos'
 LINKER   ?= on_chip
 
