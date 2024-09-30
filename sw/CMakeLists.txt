@@ -79,9 +79,7 @@ FOREACH(file_path ${new_list})
     SET(add 1)
   elseif( ${file_path} MATCHES "/CB_device/" )
     if(${file_path} MATCHES "/lib/") # Add it if its in Safety
-        if(${file_path} MATCHES "/safety/") # Add it if its in Safety
           SET(add 1)
-        endif()
     endif()
   endif()
 

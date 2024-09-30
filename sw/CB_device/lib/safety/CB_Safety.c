@@ -15,11 +15,11 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
 
      //Starting Configuration
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET));
+        asm volatile("lw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_REG_OFFSET));
         asm volatile("bnez t6, _exit_TMR_Safe_Activate");
         asm volatile("li t6, 0x1");
-        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET));
-        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_MODE_OFFSET));
+        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_REG_OFFSET));
+        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_SAFE_MODE_REG_OFFSET));
 /*     //Starting Configuration
      if (*Safe_config_reg==0x0){
         *Safe_config_reg = 0x1;
@@ -28,7 +28,7 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
     //Control & Status Register
     //Set Base Address
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET));
     //Machine Status
     //mstatus   0x300
         asm volatile("csrr t6, mstatus");
@@ -186,11 +186,11 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
         //Master Sync Priv Reg
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
         asm volatile("li   t6, 0x1");
-        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_OFFSET));
+        asm volatile("sw t6, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_REG_OFFSET));
 
         asm volatile(".ALIGN(2)");
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET));
         //PC Program Counter
         asm volatile("auipc t6, 0");
         asm volatile("sw t6, 144(t5)");
@@ -201,9 +201,9 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
 
         //Reset Values 
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("sw zero, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_OFFSET));
+        asm volatile("sw zero, %0(t5)" : : "i" (SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_REG_OFFSET));
         asm volatile("li   t5, %0" : : "i" (PRIVATE_REG_BASEADDRESS));
-        asm volatile("sw zero, %0(t5)" : : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));        
+        asm volatile("sw zero, %0(t5)" : : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));        
 
         //Reference for if-else (already in TMR mode or not checking configuration reg)
         asm volatile(".global _exit_TMR_Safe_Activate");
@@ -237,7 +237,7 @@ void handler_tmr_recoverysync(void){
         
         asm volatile ("li a4,1");          //Operate with address INTC ACK
         asm volatile ("li a5, %0" : : "i" (PRIVATE_REG_BASEADDRESS));
-        asm volatile ("sw  a4,%0(a5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));
+        asm volatile ("sw  a4,%0(a5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));
 
         asm volatile("lw      a4,12(sp)");
         asm volatile("lw      a5,8(sp)");
@@ -411,7 +411,7 @@ void handler_tmr_recoverysync(void){
         asm volatile("lw t6, -124(sp)");  
 
         asm volatile ("li a5, %0" : : "i" (PRIVATE_REG_BASEADDRESS));
-        asm volatile("sw  zero,%0(a5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET)); 
+        asm volatile("sw  zero,%0(a5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET)); 
         asm volatile("lw  a5,8(sp)");
         asm volatile("addi sp,sp,16");
 }
@@ -423,8 +423,8 @@ void handler_safe_fsm(void) {
 
         asm volatile("li t5, %0" : : "i"    (PRIVATE_REG_BASEADDRESS));
         asm volatile("li t6, 0x1");
-        asm volatile("sw t6,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));
-        asm volatile("sw zero,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));             
+        asm volatile("sw t6,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));
+        asm volatile("sw zero,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));             
 
         asm volatile("lw     t5,12(sp)");
         asm volatile("lw     t6,8(sp)");
@@ -451,7 +451,7 @@ void handler_tmr_dmcontext_copy(void){
     //Control & Status Register
     //Set Base Address
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET));
     //Machine Status
     //mstatus   0x300
  //       asm volatile("csrr t6, mstatus");
@@ -619,13 +619,13 @@ void handler_tmr_dmshsync(void){
 
         asm volatile("li t5, %0" : : "i"    (PRIVATE_REG_BASEADDRESS));
         asm volatile("li t6, 0x1");
-        asm volatile("sw t6,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));
-        asm volatile("sw zero,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_OFFSET));             
+        asm volatile("sw t6,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));
+        asm volatile("sw zero,%0(t5)": : "i" (CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET));             
 
     //Control & Status Register
     //Set Base Address
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("lw   t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET));
+        asm volatile("lw   t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET));
 
     //Machine Exception Program Counter
     //mepc      0x341

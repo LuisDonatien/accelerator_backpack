@@ -7,10 +7,14 @@ OBJCOPY?=$(RISCV)/bin/riscv32-unknown-elf-objcopy
 OBJDUMP?=$(RISCV)/bin/riscv32-unknown-elf-objdump
 PYTHON?=python
 
-INC_FOLDERS                 = $(sort $(dir $(wildcard ../../../sw/device/lib/drivers/*/)))
-INC_FOLDERS                += $(sort $(dir $(wildcard ../../../sw/device/lib/base/*/)))
-INC_FOLDERS                += $(sort $(dir $(wildcard ../../../sw/device/lib/runtime/)))
+INC_FOLDERS                 = ../../sw/CB_device/lib/base_address
+INC_FOLDERS                += ../../sw/CB_device/lib/cb_register
+
 INC_FOLDERS_GCC             = $(addprefix -I ,$(INC_FOLDERS))
+
+print-inc-folders:
+	@echo "Directorios de inclusión:"
+	@echo $(INC_FOLDERS_GCC)
 
 all: $(CB_boot_rom) CB_boot_rom.dump
 
@@ -24,10 +28,10 @@ all: $(CB_boot_rom) CB_boot_rom.dump
 	$(OBJCOPY) -O binary $< $@
 
 %.elf: $(findstring CB_boot_rom, $(CB_boot_rom)).S link.ld
-	$(GCC) $(INC_FOLDERS_GCC) -Tlink.ld $< -nostdlib -fPIC -static -Wl,--no-gc-sections -o $@
+	$(GCC) $(INC_FOLDERS_GCC) -Tlink.ld $< -nostdlib -fPIC -static -Wl,--no-gc-sections -o $@ 
 
 %.dump: %.elf
-	$(OBJDUMP) -d $< --disassemble-all --disassemble-zeroes  --section=.text --section=.debug > $@
+	$(OBJDUMP) -d $< --disassemble-all --disassemble-zeroes  --section=.text --section=.debug > $@ 
 
 clean:
 	rm -f *.img *.bin *.sv .*dump

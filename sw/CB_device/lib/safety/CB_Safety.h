@@ -12,35 +12,10 @@ extern "C" {
 }
 #endif
 
-//Define
-#define GLOBAL_BASE_ADDRESS 0xF0000000
-
-
-//Priv Reg
-#define PRIVATE_REG_BASEADDRESS 0x00000000 | GLOBAL_BASE_ADDRESS
-
-#define CPU_PRIVATE_CORE_ID_OFFSET 0x0
-#define CPU_PRIVATE_HART_INTC_ACK_OFFSET 0x4
-
-
-//Priv Reg
-#define SAFE_WRAPPER_CTRL_BASEADDRESS    (0x00012000 | GLOBAL_BASE_ADDRESS)
-
-#define SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET     0x0
-#define SAFE_WRAPPER_CTRL_SAFE_MODE_OFFSET              0x4
-#define SAFE_WRAPPER_CTRL_MASTER_CORE_OFFSET            0x8
-#define SAFE_WRAPPER_CTRL_CRITICAL_SECTION_OFFSET       0xC
-#define SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ_OFFSET     0x10
-#define SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_OFFSET    0x14
-#define SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET         0x18
-#define SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_OFFSET          0x1C
-#define SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET      0x20
-
-//Debug BOOT ADDRESS
-#define BOOT_DEBUG_ROM_BASEADDRESS (0x00010000 | GLOBAL_BASE_ADDRESS)
-
-#define BOOT_OFFSET     (BOOT_DEBUG_ROM_BASEADDRESS | 0x0)
-#define DEBUG_OFFSET    (BOOT_DEBUG_ROM_BASEADDRESS | 0x50)
+#include "base_address.h"
+#include "CPU_Private_regs.h"
+#include "CB_heep_ctrl_regs.h"
+#include "Safe_wrapper_ctrl_regs.h"
 
 #define CHECK_RAM_ADDRESS       0xF002B000
 
@@ -59,7 +34,7 @@ extern "C" {
 __attribute__((aligned(4))) void TMR_Safe_Activate(void);
 __attribute__((aligned(4))) void TMR_Safe_Stop(unsigned int master);
 __attribute__((aligned(4),always_inline)) inline void TMR_Set_Critical_Section(unsigned int critical){
-        volatile unsigned int *Priv_Reg = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_CRITICAL_SECTION_OFFSET;
+        volatile unsigned int *Priv_Reg = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_CRITICAL_SECTION_REG_OFFSET;
         *Priv_Reg = critical;}
         
 __attribute__((aligned(4))) void Check_RF(void);

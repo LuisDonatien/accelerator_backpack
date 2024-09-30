@@ -20,6 +20,11 @@
 #define SAFE_WRAPPER_CTRL_BASEADDRESS    (0x00012000 | GLOBAL_BASE_ADDRESS)
 #define SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET      (SAFE_WRAPPER_CTRL_BASEADDRESS | 0x20)
 
+#include "base_address.h"
+#include "CPU_Private_regs.h"
+#include "Safe_wrapper_ctrl_regs.h"
+
+
 
 #################################
 // Region of memory where each hart has 1
@@ -56,8 +61,8 @@ wfi_entry:
        nop
 single_boot:
        //Program Counter -> dpc Control & Status Register  
-       lui   a0, 0xF0012  
-       lw    a0, 28(a0)          //Base Address CPU Private Registers          
+       lui   a0, %hi(SAFE_WRAPPER_CTRL_BASEADDRESS)  
+       lw    a0, SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_REG_OFFSET(a0)          //Base Address CPU Private Registers          
        csrw dpc, a0
 
        //Resume//
@@ -95,8 +100,8 @@ single_boot:
 debug_entry: 
        csrw CSR_DSCRATCH1, a0       // Save a0 to allow loading arbitrary DM base
        csrw CSR_DSCRATCH0, s0       // Save s0 to allow signaling MHARTID
-       lui   a0, 0xF0012  
-       lw    a0, 16(a0)          //Base Address CPU Private Registers
+       lui   a0, %hi(SAFE_WRAPPER_CTRL_BASEADDRESS)  
+       lw    a0, SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ_REG_OFFSET(a0)          //Base Address CPU Private Registers
 
        // Check whether debug_ext_req flag is 1, otherwise jump back to halt_switch routine Todo: Choose better way to reduce 
        //cycles
@@ -193,8 +198,8 @@ whereto:
 */
 halt_boot:
        //Control & Status Register//
-       li   t5,SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET
-       lw   t5, 0(t5)
+       lui   t5, %hi(SAFE_WRAPPER_CTRL_BASEADDRESS)
+       lw   t5, SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET(t5)
 
        // csr mstatus
        lw   t6, 0(t5)
