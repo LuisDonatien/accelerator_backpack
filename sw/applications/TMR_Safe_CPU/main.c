@@ -15,7 +15,7 @@
 int main(int argc, char *argv[]) 
 {
         volatile unsigned int *P = FREE_LOCATION_POINTER;
-        volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS |SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET; 
+        volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS |SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET; 
 
         //Entering Safe mode TMR 
         TMR_Safe_Activate(); 

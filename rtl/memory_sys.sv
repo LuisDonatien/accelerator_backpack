@@ -41,7 +41,7 @@ module memory_sys
 
 
     //Fixed to 8KWords per bank (32KB)
-    memory_wrapper #(
+    sram_wrapper #(
         .NumWords (NumWords),
         .DataWidth(32'd32)
     ) mem_i (
