@@ -75,7 +75,7 @@ end
         .test_en_i(1'b0),
         .ram_cfg_i('0),
 
-        .hart_id_i  (32'h02),
+        .hart_id_i  (HARTID),
         .boot_addr_i(BOOT_ADDR),
 
         .instr_addr_o  (core_instr_req_o[0].addr),
@@ -121,7 +121,7 @@ end
         .test_en_i(1'b0),
         .ram_cfg_i('0),
 
-        .hart_id_i  (32'h02),
+        .hart_id_i  (HARTID),
         .boot_addr_i(BOOT_ADDR),
 
         .instr_addr_o  (core_instr_req_o[1].addr),
