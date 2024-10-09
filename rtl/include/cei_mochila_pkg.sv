@@ -10,6 +10,13 @@ package cei_mochila_pkg;
 
   import addr_map_rule_pkg::*;
 
+  //INTC TYPE
+  typedef enum logic {
+    EDGE,
+    LEVEL
+  } interrupt_type_e;
+  
+  localparam interrupt_type_e Intc_Iype = EDGE;
 
 //System Bus
   typedef enum logic {
