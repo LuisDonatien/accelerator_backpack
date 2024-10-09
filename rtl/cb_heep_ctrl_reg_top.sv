@@ -10,7 +10,7 @@
 module cb_heep_ctrl_reg_top #(
   parameter type reg_req_t = logic,
   parameter type reg_rsp_t = logic,
-  parameter int AW = 5
+  parameter int AW = 6
 ) (
   input logic clk_i,
   input logic rst_ni,
@@ -89,6 +89,14 @@ module cb_heep_ctrl_reg_top #(
   logic end_sw_routine_qs;
   logic end_sw_routine_wd;
   logic end_sw_routine_we;
+  logic interrupt_controler_enable_interrupt_qs;
+  logic interrupt_controler_enable_interrupt_wd;
+  logic interrupt_controler_enable_interrupt_we;
+  logic interrupt_controler_status_interrupt_qs;
+  logic interrupt_controler_status_interrupt_wd;
+  logic interrupt_controler_status_interrupt_we;
+  logic [2:0] cb_heep_status_cores_sleep_qs;
+  logic [2:0] cb_heep_status_cores_debug_mode_qs;
 
   // Register instances
   // R[safe_configuration]: V(False)
@@ -280,9 +288,115 @@ module cb_heep_ctrl_reg_top #(
   );
 
 
+  // R[interrupt_controler]: V(False)
+
+  //   F[enable_interrupt]: 0:0
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_interrupt_controler_enable_interrupt (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (interrupt_controler_enable_interrupt_we),
+    .wd     (interrupt_controler_enable_interrupt_wd),
+
+    // from internal hardware
+    .de     (hw2reg.interrupt_controler.enable_interrupt.de),
+    .d      (hw2reg.interrupt_controler.enable_interrupt.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.interrupt_controler.enable_interrupt.q ),
+
+    // to register interface (read)
+    .qs     (interrupt_controler_enable_interrupt_qs)
+  );
 
 
-  logic [6:0] addr_hit;
+  //   F[status_interrupt]: 1:1
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_interrupt_controler_status_interrupt (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (interrupt_controler_status_interrupt_we),
+    .wd     (interrupt_controler_status_interrupt_wd),
+
+    // from internal hardware
+    .de     (hw2reg.interrupt_controler.status_interrupt.de),
+    .d      (hw2reg.interrupt_controler.status_interrupt.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.interrupt_controler.status_interrupt.q ),
+
+    // to register interface (read)
+    .qs     (interrupt_controler_status_interrupt_qs)
+  );
+
+
+  // R[cb_heep_status]: V(False)
+
+  //   F[cores_sleep]: 2:0
+  prim_subreg #(
+    .DW      (3),
+    .SWACCESS("RO"),
+    .RESVAL  (3'h0)
+  ) u_cb_heep_status_cores_sleep (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.cb_heep_status.cores_sleep.de),
+    .d      (hw2reg.cb_heep_status.cores_sleep.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (cb_heep_status_cores_sleep_qs)
+  );
+
+
+  //   F[cores_debug_mode]: 5:3
+  prim_subreg #(
+    .DW      (3),
+    .SWACCESS("RO"),
+    .RESVAL  (3'h0)
+  ) u_cb_heep_status_cores_debug_mode (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.cb_heep_status.cores_debug_mode.de),
+    .d      (hw2reg.cb_heep_status.cores_debug_mode.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (cb_heep_status_cores_debug_mode_qs)
+  );
+
+
+
+
+  logic [8:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == CB_HEEP_CTRL_SAFE_CONFIGURATION_OFFSET);
@@ -292,6 +406,8 @@ module cb_heep_ctrl_reg_top #(
     addr_hit[4] = (reg_addr == CB_HEEP_CTRL_START_OFFSET);
     addr_hit[5] = (reg_addr == CB_HEEP_CTRL_BOOT_ADDRESS_OFFSET);
     addr_hit[6] = (reg_addr == CB_HEEP_CTRL_END_SW_ROUTINE_OFFSET);
+    addr_hit[7] = (reg_addr == CB_HEEP_CTRL_INTERRUPT_CONTROLER_OFFSET);
+    addr_hit[8] = (reg_addr == CB_HEEP_CTRL_CB_HEEP_STATUS_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -305,7 +421,9 @@ module cb_heep_ctrl_reg_top #(
                (addr_hit[3] & (|(CB_HEEP_CTRL_PERMIT[3] & ~reg_be))) |
                (addr_hit[4] & (|(CB_HEEP_CTRL_PERMIT[4] & ~reg_be))) |
                (addr_hit[5] & (|(CB_HEEP_CTRL_PERMIT[5] & ~reg_be))) |
-               (addr_hit[6] & (|(CB_HEEP_CTRL_PERMIT[6] & ~reg_be)))));
+               (addr_hit[6] & (|(CB_HEEP_CTRL_PERMIT[6] & ~reg_be))) |
+               (addr_hit[7] & (|(CB_HEEP_CTRL_PERMIT[7] & ~reg_be))) |
+               (addr_hit[8] & (|(CB_HEEP_CTRL_PERMIT[8] & ~reg_be)))));
   end
 
   assign safe_configuration_we = addr_hit[0] & reg_we & !reg_error;
@@ -328,6 +446,12 @@ module cb_heep_ctrl_reg_top #(
 
   assign end_sw_routine_we = addr_hit[6] & reg_we & !reg_error;
   assign end_sw_routine_wd = reg_wdata[0];
+
+  assign interrupt_controler_enable_interrupt_we = addr_hit[7] & reg_we & !reg_error;
+  assign interrupt_controler_enable_interrupt_wd = reg_wdata[0];
+
+  assign interrupt_controler_status_interrupt_we = addr_hit[7] & reg_we & !reg_error;
+  assign interrupt_controler_status_interrupt_wd = reg_wdata[1];
 
   // Read data return
   always_comb begin
@@ -361,6 +485,16 @@ module cb_heep_ctrl_reg_top #(
         reg_rdata_next[0] = end_sw_routine_qs;
       end
 
+      addr_hit[7]: begin
+        reg_rdata_next[0] = interrupt_controler_enable_interrupt_qs;
+        reg_rdata_next[1] = interrupt_controler_status_interrupt_qs;
+      end
+
+      addr_hit[8]: begin
+        reg_rdata_next[2:0] = cb_heep_status_cores_sleep_qs;
+        reg_rdata_next[5:3] = cb_heep_status_cores_debug_mode_qs;
+      end
+
       default: begin
         reg_rdata_next = '1;
       end
@@ -383,7 +517,7 @@ endmodule
 
 module cb_heep_ctrl_reg_top_intf
 #(
-  parameter int AW = 5,
+  parameter int AW = 6,
   localparam int DW = 32
 ) (
   input logic clk_i,

@@ -7,6 +7,7 @@ module periph_system
   import obi_pkg::*;
   import reg_pkg::*;
 #(
+  parameter NHARTS = 3
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -25,7 +26,14 @@ module periph_system
     output logic [1:0] safe_configuration_o,
     output logic critical_section_o,
     output logic Start_o,
-    output logic [31:0] boot_addr_o
+    output logic [31:0] boot_addr_o,
+
+    //***Safe CPU wrapper status ports***//
+    input logic [NHARTS-1 : 0] debug_mode_i,
+    input logic [NHARTS-1 : 0] sleep_i,
+
+    // Interrupt Interface
+    output logic interrupt_o
 );
 
   import cei_mochila_pkg::*;
@@ -110,6 +118,9 @@ module periph_system
     .safe_configuration_o,
     .critical_section_o,
     .Start_o,
-    .boot_addr_o
+    .boot_addr_o,
+    .debug_mode_i,
+    .sleep_i,
+    .interrupt_o
     );
 endmodule

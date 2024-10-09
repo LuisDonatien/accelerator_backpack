@@ -38,7 +38,12 @@ module safe_cpu_wrapper
     input logic [1:0] ext_safe_configuration_i,
     input logic ext_critical_section_i,
     input logic ext_Start_i,
-    input logic [31:0] boot_addr_i
+    input logic [31:0] boot_addr_i,
+
+    //Status Signals 
+    output logic [NHARTS-1 : 0] debug_mode_o,
+    output logic [NHARTS-1 : 0] sleep_o
+
 );
 
 localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
@@ -201,6 +206,8 @@ safe_wrapper_ctrl #(
     );
 
     assign ext_EndSw_o = End_sw_routine_s;
+    assign debug_mode_o = debug_mode_s;
+    assign sleep_o = sleep_s;
 
 //***Safe FSM***//
 

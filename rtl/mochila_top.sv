@@ -8,7 +8,7 @@ module mochila_top
   import core_v_mini_mcu_pkg::*;
   import cei_mochila_pkg::*;
 #(
-    parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50,
+    parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50,//*/core_v_mini_mcu_pkg::DEBUG_START_ADDRESS + 32'h00000800,//*/
     parameter NHARTS = 3,
     parameter HARTID = 32'h01,
     parameter N_BANKS = 2
@@ -35,7 +35,10 @@ module mochila_top
     // power manager signals that goes to the ASIC macros
     input  logic [N_BANKS-1:0] pwrgate_ni,
     output logic [N_BANKS-1:0] pwrgate_ack_no,
-    input  logic [N_BANKS-1:0] set_retentive_ni
+    input  logic [N_BANKS-1:0] set_retentive_ni,
+
+    // Interrupt Interface
+    output logic interrupt_o
 );
 
 
@@ -69,6 +72,8 @@ module mochila_top
     logic critical_section_s;
     logic start_S;
     logic [31:0] boot_addr_s; 
+    logic [NHARTS-1:0] status_debug_mode_s;
+    logic [NHARTS-1:0] status_sleep_s;
 
 //CPU_System
 safe_cpu_wrapper #(
@@ -99,7 +104,9 @@ safe_cpu_wrapper #(
     .ext_safe_configuration_i(safe_configuration_s),
     .ext_critical_section_i(critical_section_s),
     .ext_Start_i(start_S),
-    .boot_addr_i(boot_addr_s)
+    .boot_addr_i(boot_addr_s),
+    .debug_mode_o(status_debug_mode_s),
+    .sleep_o(status_sleep_s)
 );
 
 //Peripheral System
@@ -116,7 +123,10 @@ periph_system periph_system_i(
     .safe_configuration_o(safe_configuration_s),
     .critical_section_o(critical_section_s),
     .Start_o(start_S),
-    .boot_addr_o(boot_addr_s)
+    .boot_addr_o(boot_addr_s),
+    .debug_mode_i(status_debug_mode_s),
+    .sleep_i(status_sleep_s),
+    .interrupt_o
 );
 
 memory_sys memory_sys_i(

@@ -6,7 +6,8 @@
 
 module cb_heep_ctrl #(
     parameter type reg_req_t = logic,
-    parameter type reg_rsp_t = logic
+    parameter type reg_rsp_t = logic,
+    parameter NHARTS = 3
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -22,7 +23,12 @@ module cb_heep_ctrl #(
     output logic [1:0] safe_configuration_o,
     output logic critical_section_o,
     output logic Start_o,
-    output logic [31:0] boot_addr_o
+    output logic [31:0] boot_addr_o,
+
+    input logic [NHARTS-1 : 0] debug_mode_i,
+    input logic [NHARTS-1 : 0] sleep_i,
+
+    output logic interrupt_o
 
 );
 
@@ -42,7 +48,10 @@ module cb_heep_ctrl #(
       .devmode_i(1'b1)
   );
 
-  logic EndSw_Flag, en_sw_routineff;
+  logic /*EndSw_Flag,*/ en_sw_routineff;
+  logic /*EndSw_wfi_Flag,*/ en_sw_wfi__routineff;
+  logic enable_interrupt;
+  logic status_interrupt;
 
 //Reg2Hw read
   assign master_core_o = reg2hw.master_core.q;
@@ -52,31 +61,71 @@ module cb_heep_ctrl #(
   assign Start_o = reg2hw.start.q;
   assign boot_addr_o = reg2hw.boot_address.q;
  
+  assign enable_interrupt = reg2hw.interrupt_controler.enable_interrupt.q;
+  assign status_interrupt = reg2hw.interrupt_controler.status_interrupt.q;
+
   assign hw2reg.start.d = 1'b0;
-  assign hw2reg.start.de = EndSw_Flag;
+  assign hw2reg.start.de = enable_endSW;
 
-  assign hw2reg.end_sw_routine.d = EndSw_i;
-  assign hw2reg.end_sw_routine.de = 1'b1;
+  assign hw2reg.end_sw_routine.d = 1'b1;
+  assign hw2reg.end_sw_routine.de = enable_endSW_wfi;
 
-  //Generate Flip-Flop Bi-Stable
+  assign hw2reg.interrupt_controler.status_interrupt.d = 1'b1;
+  assign hw2reg.interrupt_controler.status_interrupt.de = enable_endSW_wfi;
+
+  assign hw2reg.cb_heep_status.cores_sleep.d = sleep_i;
+  assign hw2reg.cb_heep_status.cores_sleep.de = 1'b1;
+
+  assign hw2reg.cb_heep_status.cores_debug_mode.d = debug_mode_i;
+  assign hw2reg.cb_heep_status.cores_debug_mode.de = 1'b1;  
+ 
   // When pos edge End_Program switch off start. When start switch off positive En_Program
-  logic enable, clear;
+  logic enable_endSW;//, clear_endSW;
+  logic enable_endSW_wfi;// clear_endSW_wfi;
+  logic load_intc, clear_intc;
 
-  //synopsys sync_set_reset "enable"
-  assign enable = !en_sw_routineff && EndSw_i;
-  //synopsys sync_set_reset "clear"
-  assign clear = !enable;
-  //synopsys sync_set_reset "enable"
+  //synopsys sync_set_reset "enable_endSW"
+  assign enable_endSW = !en_sw_routineff & EndSw_i;
+  //synopsys sync_set_reset "clear_endSW"
+//  assign clear_endSW = !enable_endSW;
+
+  //synopsys sync_set_reset "enable_endSW_wfi"
+  assign enable_endSW_wfi = !en_sw_wfi__routineff & EndSw_i & sleep_i[0] & sleep_i[1] & sleep_i[2];
+  //synopsys sync_set_reset "clear_endSW_wfi"
+//  assign clear_endSW_wfi = !enable_endSW_wfi;
+
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       en_sw_routineff <= 1'b0;
-      EndSw_Flag <= 1'b0;
+//      EndSw_Flag <= 1'b0;
+    //  EndSw_wfi_Flag <= 1'b0;
+      en_sw_wfi__routineff <= 1'b0;
     end else begin
       en_sw_routineff <= EndSw_i;
-      if (clear)      
+/*      if (clear_endSW)      
         EndSw_Flag <= 1'b0;
-      else if(enable)   
+      else if(enable_endSW)   
         EndSw_Flag <= 1'b1;
+*/
+      en_sw_wfi__routineff <= EndSw_i & sleep_i[0] & sleep_i[1] & sleep_i[2];
+    end  
+  end
+
+
+  
+  //synopsys sync_set_reset "load_intc"
+  assign load_intc = enable_interrupt & status_interrupt;
+  //synopsys sync_set_reset "clear_intc"
+  assign clear_intc = !status_interrupt;
+
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+      interrupt_o <= 1'b0;
+    end else begin
+      if (clear_intc)      
+        interrupt_o <= 1'b0;
+      else if(load_intc)   
+        interrupt_o <= sleep_i[0] & sleep_i[1] & sleep_i[2] & EndSw_i;
       end
   end
 
