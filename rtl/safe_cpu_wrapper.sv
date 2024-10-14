@@ -93,8 +93,8 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic tmr_error_s;
     logic [2:0] tmr_errorid_s;
     logic tmr_voter_enable_s;
-    logic [2:0] tmr_dmr_config_s;
-    logic dual_mode_tmr_s;
+    logic [2:0] dmr_config_s;
+    logic dual_mode_s;
 
     // Compared CPU Signals
     obi_req_t  [NRCOMPARATORS-1:0] compared_core_instr_req_o;
@@ -234,8 +234,8 @@ safe_FSM safe_FSM_i (
     .Single_Bus_o(bus_config_s),
     .Tmr_voter_enable_o(tmr_voter_enable_s),
     .Dmr_comparator_enable_o(),
-    .Tmr_dmr_config_o(tmr_dmr_config_s),
-    .Dual_mode_tmr_o(dual_mode_tmr_s),
+    .Dmr_config_o(dmr_config_s),
+    .Dual_mode_o(dual_mode_s),
     .Start_Boot_o(Start_Boot_s),
     .Start_i(Start_s),
     .End_sw_routine_i(End_sw_routine_s),
@@ -276,9 +276,26 @@ safe_FSM safe_FSM_i (
             xbar_core_data_resp[2][0] = core_data_resp_i[2];
         end
         else begin
+                /////***///// Avoid latch
+                //Instruction
+                core_instr_req_o[0] = compared_core_instr_req_o[0];
+                core_instr_req_o[1] = '0;
+                core_instr_req_o[2] = '0;
+                core_instr_resp[0] = core_instr_resp_i[0];
+                core_instr_resp[1] = core_instr_resp_i[0];
+                core_instr_resp[2] = core_instr_resp_i[0];
+                        //Data
+                core_data_req_o[0] = compared_core_data_req_o[0];
+                core_data_req_o[1] = '0;
+                core_data_req_o[2] = '0;
+                xbar_core_data_resp[0][0] = core_data_resp_i[0]; 
+                xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
+                xbar_core_data_resp[2][0] = core_data_resp_i[0]; 
+                /////***/////
+
                 //TMR_Config_Default    //Todo Depends on FSM output
-            if (tmr_voter_enable_s == 1'b1) begin
-                if(dual_mode_tmr_s == 1'b0) begin
+//            if (tmr_voter_enable_s == 1'b1) begin
+                if(tmr_voter_enable_s == 1'b1 && dual_mode_s == 1'b0) begin
                     //Instruction
                     core_instr_req_o[0] = voted_core_instr_req_o;
                     core_instr_req_o[1] = '0;
@@ -321,8 +338,8 @@ safe_FSM safe_FSM_i (
                     xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
                     xbar_core_data_resp[2][0] = core_data_resp_i[0];    
                 end
-                else begin
-                    if (tmr_dmr_config_s == 3'b011) begin   //Comparator cpu0_cpu1
+                else if (dual_mode_s == 1'b1) begin
+                    if (dmr_config_s == 3'b011) begin   //Comparator cpu0_cpu1
                         //Instruction
                         core_instr_req_o[0] = compared_core_instr_req_o[0];
                         core_instr_req_o[1] = core_instr_req[2];
@@ -340,7 +357,7 @@ safe_FSM safe_FSM_i (
                         xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
                         xbar_core_data_resp[2][0] = core_data_resp_i[1];     
                     end
-                    else if (tmr_dmr_config_s == 3'b110) begin   //Comparator cpu1_cpu2
+                    else if (dmr_config_s == 3'b110) begin   //Comparator cpu1_cpu2
                     //Instruction
                     core_instr_req_o[0] = compared_core_instr_req_o[1];
                     core_instr_req_o[1] = core_instr_req[0];
@@ -377,7 +394,7 @@ safe_FSM safe_FSM_i (
                         xbar_core_data_resp[2][0] = core_data_resp_i[0];                         
                     end    
                 end
-            end
+/*            end
             else begin
                 //Instruction
                 core_instr_req_o[0] = compared_core_instr_req_o[0];
@@ -393,7 +410,7 @@ safe_FSM safe_FSM_i (
                 xbar_core_data_resp[0][0] = core_data_resp_i[0]; 
                 xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
                 xbar_core_data_resp[2][0] = core_data_resp_i[0]; 
-            end
+            end*/
         end
     end
 /**********************************************************/
@@ -462,8 +479,6 @@ end
     .compared_core_data_req_o(compared_core_data_req_o[i]),
     .error_o()
     );
-
-
 end
 
 

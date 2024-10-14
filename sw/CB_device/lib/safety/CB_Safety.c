@@ -454,8 +454,9 @@ void handler_tmr_dmcontext_copy(void){
         asm volatile("lw        t5,%0(t5)" :: "i" (SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_REG_OFFSET));
     //Machine Status
     //mstatus   0x300
- //       asm volatile("csrr t6, mstatus");
- //       asm volatile("sw    t6,0(t5)");
+        asm volatile("csrr t6, mstatus");
+        asm volatile("ori t6, t6,0x08;");       //Activate mstatus mie 
+        asm volatile("sw   t6,0(t5)");
 
     //Machine Interrupt Enable
     //mie       0x304

@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[]) 
 {
-        volatile unsigned int *P = FREE_LOCATION_POINTER;
+        volatile unsigned int *P = FREE_LOCATION_POINTER; 
         volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS |SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET; 
 
         //Entering Safe mode TMR 
@@ -32,9 +32,11 @@ int main(int argc, char *argv[])
 
       //  Check_RF();
 
-//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
+//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION); 
  
         Check_RF();
+
+        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
 
         TMR_Safe_Stop(MASTER_CORE0); 
 /*
@@ -81,7 +83,8 @@ int main(int argc, char *argv[])
 
  
 //       CSR_READ(CSR_REG_MHARTID,P); 
-        /******END PROGRAM******/    
+        /******END PROGRAM******/   
+        printf("[EROS-HEEP]: Hello :)\n"); 
         *END_SW = 0x1;
         asm volatile("fence");
         while(1){ 

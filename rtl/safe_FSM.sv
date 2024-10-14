@@ -27,8 +27,8 @@ module safe_FSM
     output logic [NHARTS-1:0] Interrupt_Halt_o,
     output logic [NHARTS-1:0][0:0] Select_wfi_core_o,
     output logic Single_Bus_o,
-    output logic [NHARTS-1:0] Tmr_dmr_config_o,
-    output logic Dual_mode_tmr_o,
+    output logic [NHARTS-1:0] Dmr_config_o,
+    output logic Dual_mode_o,
     output logic Tmr_voter_enable_o,
     output logic Dmr_comparator_enable_o,
     input logic [NHARTS-1:0] voter_id_error,
@@ -88,6 +88,7 @@ module safe_FSM
   logic [NHARTS-1:0] tmr_voter_enable_s;
   logic [NHARTS-1:0] dmr_comparator_enable_s;
   logic [NHARTS-1:0] dual_mode_tmr_s;
+  logic [NHARTS-1:0] tmr_dmr_config_s;
   logic [NHARTS-1:0] DMR_Mode_SHWFI_s;
 
       always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -97,9 +98,15 @@ module safe_FSM
           ctrl_safe_fsm_cs <= ctrl_safe_fsm_ns;
         end
       end
-  //////////////////////////////////////////////////////////////////////////////////////////////
-  //SAFE FSM    GENERAL FSM
-  //////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//    _____ ______ _   _ ______ _____            _       ______ _____ __  __  //
+//   / ____|  ____| \ | |  ____|  __ \     /\   | |     |  ____/ ____|  \/  | //
+//  | |  __| |__  |  \| | |__  | |__) |   /  \  | |     | |__ | (___ | \  / | // 
+//  | | |_ |  __| | . ` |  __| |  _  /   / /\ \ | |     |  __| \___ \| |\/| | //
+//  | |__| | |____| |\  | |____| | \ \  / ____ \| |____ | |    ____) | |  | | //
+//   \_____|______|_| \_|______|_|  \_\/_/    \_\______||_|   |_____/|_|  |_| //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
       always_comb begin
         
         ctrl_safe_fsm_ns = ctrl_safe_fsm_cs;
@@ -174,9 +181,15 @@ module safe_FSM
         endcase  
       end
 
-  //////////////////////////////////////////////////////////////////////////////////////////////
-  //SINGLE FSM    
-  //////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+//    _____ _____ _   _  _____ _      ______   ______ _____ __  __    //
+//   / ____|_   _| \ | |/ ____| |    |  ____| |  ____/ ____|  \/  |   //
+//  | (___   | | |  \| | |  __| |    | |__    | |__ | (___ | \  / |   //
+//   \___ \  | | | . ` | | |_ | |    |  __|   |  __| \___ \| |\/| |   //
+//   ____) |_| |_| |\  | |__| | |____| |____  | |    ____) | |  | |   //
+//  |_____/|_____|_| \_|\_____|______|______| |_|   |_____/|_|  |_|   //
+//                                                                    //
+////////////////////////////////////////////////////////////////////////
 
       always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
@@ -593,7 +606,7 @@ module safe_FSM
       dmr_comparator_enable_s[i] = 1'b0;
       enable_interrupt_tmr_halt_s[i] = 1'b0;
       enable_interrupt_tmr_SHhalt_s[i] = 1'b0;
-      Tmr_dmr_config_o[i] = 1'b0;
+      tmr_dmr_config_s[i] = 1'b0;
       dual_mode_tmr_s[i] = 1'b0;
       DMR_Mode_SHWFI_s[i] = 1'b0;
       Select_wfi_core_o[i] = 1'b0;
@@ -605,7 +618,7 @@ module safe_FSM
         TMR_REC_DMODE:
         begin
             dmr_comparator_enable_s[i] = 1'b1;  
-            Tmr_dmr_config_o[i] = 1'b1;
+            tmr_dmr_config_s[i] = 1'b1;
             dual_mode_tmr_s[i] = 1'b1;       
         end
         TMR_REC_SHSTP:
@@ -623,7 +636,7 @@ module safe_FSM
           Interrupt_CpyResync_o[i] = 1'b1;
           DMR_Mode_SHWFI_s[i] = 1'b1; 
           dmr_comparator_enable_s[i] = 1'b1;  
-          Tmr_dmr_config_o[i] = 1'b1;
+          tmr_dmr_config_s[i] = 1'b1;
           dual_mode_tmr_s[i] = 1'b1;              
         end
 
@@ -631,7 +644,7 @@ module safe_FSM
         begin
           DMR_Mode_SHWFI_s[i] = 1'b1; 
           dmr_comparator_enable_s[i] = 1'b1;  
-          Tmr_dmr_config_o[i] = 1'b1;
+          tmr_dmr_config_s[i] = 1'b1;
           dual_mode_tmr_s[i] = 1'b1;              
         end
 
@@ -640,7 +653,7 @@ module safe_FSM
           enable_interrupt_tmr_halt_s[i] = 1'b1;
           DMR_Mode_SHWFI_s[i] = 1'b1; 
           dmr_comparator_enable_s[i] = 1'b1;  
-          Tmr_dmr_config_o[i] = 1'b1;
+          tmr_dmr_config_s[i] = 1'b1;
           dual_mode_tmr_s[i] = 1'b1;  
         end
 
@@ -653,7 +666,7 @@ module safe_FSM
         begin
           DMR_Mode_SHWFI_s[i] = 1'b1; 
           dmr_comparator_enable_s[i] = 1'b1;  
-          Tmr_dmr_config_o[i] = 1'b1;
+          tmr_dmr_config_s[i] = 1'b1;
           dual_mode_tmr_s[i] = 1'b1;            
         end
 
@@ -683,7 +696,7 @@ assign halt_req_s = dbg_halt_req_s[0] || dbg_halt_req_s[1] || dbg_halt_req_s[2];
 assign Single_Bus_o = single_bus_s[0] || single_bus_s[1] || single_bus_s[2];
 assign Tmr_voter_enable_o = (tmr_voter_enable_s[0] || tmr_voter_enable_s[1] || tmr_voter_enable_s[2]);
 assign Dmr_comparator_enable_o = (dmr_comparator_enable_s[0] || dmr_comparator_enable_s[1] || dmr_comparator_enable_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
-assign Dual_mode_tmr_o = (dual_mode_tmr_s[0] || dual_mode_tmr_s[1] || dual_mode_tmr_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
+assign Dual_mode_o = (dual_mode_tmr_s[0] || dual_mode_tmr_s[1] || dual_mode_tmr_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
 
 always_comb begin
   dbg_halt_req_tmr_s = '0;
@@ -698,6 +711,8 @@ assign Interrupt_Halt_o = dbg_halt_req_general_s | dbg_halt_req_tmr_s |  enable_
 assign en_ext_debug_req_o = en_safe_ext_debug_req_s | en_single_ext_debug_req_s;
 
 assign Start_Boot_o = Single_Boot_s | TMR_Boot_s[0] | TMR_Boot_s[1] | TMR_Boot_s[2];
+
+assign Dmr_config_o = tmr_dmr_config_s;
 endmodule
 
 
