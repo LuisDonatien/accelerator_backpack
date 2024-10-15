@@ -195,9 +195,17 @@ volatile unsigned int *Priv_Reg = PRIVATE_REG_BASEADDRESS;
         asm volatile("auipc t6, 0");
         asm volatile("sw t6, 144(t5)");
 
-
+        //Todo Momentaneous solution
         asm volatile("fence");
-        asm volatile("wfi"); 
+//Todo pending implement DMR Recovery config
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+                asm volatile("wfi");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
 
         //Reset Values 
         asm volatile("li   t5, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
@@ -225,7 +233,15 @@ volatile unsigned int *Safe_config_reg= SAFE_WRAPPER_CTRL_BASEADDRESS;
                 *(Safe_config_reg+1) = 0x0;
                 *(Safe_config_reg) = 0x0;
                 asm volatile("fence");
+//Todo pending implement DMR Recovery config
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
                 asm volatile("wfi");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
+__asm__ volatile(".word 0x00000013");
         }
 }
 

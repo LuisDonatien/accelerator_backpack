@@ -39,7 +39,24 @@ int main(int argc, char *argv[])
         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
 
         TMR_Safe_Stop(MASTER_CORE0); 
+        
+        for(int j=0;j<10;j++)  
+                *i=j;
+         *i=0xdeadbeef;
+
+        //Entering Safe mode TMR 
+        TMR_Safe_Activate();
+
+        for(int j=0;j<10;j++)  
+                *i=j;
+         *i=0xdeadbeef;
+        
+        TMR_Safe_Stop(MASTER_CORE0); 
 /*
+        //Entering Safe mode TMR 
+        TMR_Safe_Activate(); 
+
+
         TMR_Safe_Activate(); 
         TMR_Set_Critical_Section(CRITICAL_SECTION); 
  

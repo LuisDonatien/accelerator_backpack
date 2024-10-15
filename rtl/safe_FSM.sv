@@ -119,11 +119,11 @@ module safe_FSM
           end
           IDLE:
           begin
-            if(Safe_mode_i==1'b1 && Safe_configuration_i==2'b01 && Start_i == 1'b1)
+            if(Safe_configuration_i==2'b01 && Start_i == 1'b1)
               ctrl_safe_fsm_ns = TMR_MODE;  
-            else if(Safe_mode_i==1'b1 && Safe_configuration_i==2'b10 && Start_i == 1'b1)
+            else if(Safe_configuration_i==2'b10 && Start_i == 1'b1)
               ctrl_safe_fsm_ns = DMR_MODE;
-            else if(Safe_mode_i==1'b0 && Safe_configuration_i==2'b00 && Start_i == 1'b1)
+            else if(Safe_configuration_i==2'b00 && Start_i == 1'b1)
               ctrl_safe_fsm_ns = SINGLE_MODE;
             else
               ctrl_safe_fsm_ns = IDLE;
@@ -132,9 +132,9 @@ module safe_FSM
           begin
             if(Start_i == 1'b0 && ctrl_single_fsm_cs == SINGLE_IDLE)
               ctrl_safe_fsm_ns = IDLE;
-            else if(Safe_mode_i==1'b1 && Safe_configuration_i==2'b01)
+            else if(Start_i == 1'b1 &&  Safe_configuration_i==2'b01)
               ctrl_safe_fsm_ns = TMR_MODE;             
-            else if(Safe_mode_i==1'b1 && Safe_configuration_i==2'b10)
+            else if(Start_i == 1'b1 &&  Safe_configuration_i==2'b10)
               ctrl_safe_fsm_ns = DMR_MODE;
             else
               ctrl_safe_fsm_ns = SINGLE_MODE;
@@ -151,7 +151,7 @@ module safe_FSM
           end
           DMR_MODE:
           begin
-            if(Safe_mode_i==1'b0)
+            if(Safe_configuration_i==2'b10)
               ctrl_safe_fsm_ns = IDLE;
             else
               ctrl_safe_fsm_ns = DMR_MODE;
@@ -314,9 +314,9 @@ module safe_FSM
   
           TMR_IDLE:
           begin
-            if (ctrl_safe_fsm_cs == TMR_MODE && Safe_mode_i == 1'b1 && Start_i == 1'b1 && Enable_Switch_s == 1'b0)
+            if (ctrl_safe_fsm_cs == TMR_MODE && Start_i == 1'b1 && Enable_Switch_s == 1'b0)
                 ctrl_tmr_fsm_ns[i] = TMR_START;              
-            else if (ctrl_safe_fsm_cs == TMR_MODE && Safe_mode_i == 1'b1 && Start_i == 1'b1 && Enable_Switch_s == 1'b1) begin
+            else if (ctrl_safe_fsm_cs == TMR_MODE && Start_i == 1'b1 && Enable_Switch_s == 1'b1) begin
               if (Master_Core_i[i] == 1'b1 && Initial_Sync_Master_i == 1'b1 && Start_i == 1'b1)
                 ctrl_tmr_fsm_ns[i] = TMR_SH_HALT;
               else if (Master_Core_i[i] == 1'b0 && (halt_req_s) == 1'b1 && Start_i == 1'b1)
@@ -376,7 +376,7 @@ module safe_FSM
           begin
             if (((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2])) && End_sw_routine_i ==1'b1)
               ctrl_tmr_fsm_ns[i] = TMR_IDLE;
-            else if ((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2]) == 1'b1 && Safe_mode_i==1'b0)
+            else if ((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2]) == 1'b1 && Safe_configuration_i!=2'b01)
               ctrl_tmr_fsm_ns[i] = TMR_END_SYNC;
             else
               ctrl_tmr_fsm_ns[i] = TMR_SYNC;
