@@ -67,7 +67,7 @@ module mochila_top
     // Safe CPU wrapper external control signals
     logic endSw_s;
     logic [2:0] master_core_s;
-    logic safe_mode_s;
+    logic [2:0] safe_mode_s;
     logic [1:0] safe_configuration_s;
     logic critical_section_s;
     logic start_S;

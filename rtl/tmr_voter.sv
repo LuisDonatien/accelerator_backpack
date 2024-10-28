@@ -90,7 +90,7 @@ always_comb begin
             (voted_core_instr_req_s.we != core_instr_req_i[i].we) ||
             (voted_core_instr_req_s.req != core_instr_req_i[i].req)) && enable_i) begin
             instr_error_s[i] = 1'b1;
-            error_s[i] = 1'b1;    
+            error_s[i] = 1'b1;
         end
     end
     

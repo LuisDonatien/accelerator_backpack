@@ -16,12 +16,12 @@
         { bits: "1:0", name: "Safe_configuration", desc: "Safe_configuration" }
       ]
     },
-    { name:     "Safe_mode",
-      desc:     "Activate Safe Mode",
+    { name:     "DMR_Mask",
+      desc:     "Select DMR_Mask *011* *110* *101*",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-        { bits: "0", name: "Safe_mode", desc: "Safe_mode" }
+        { bits: "2:0", name: "DMR_Mask", desc: "DMR_Mask" }
       ]
     },
     { name:     "Master_core",

@@ -18,28 +18,63 @@ int main(int argc, char *argv[])
         volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS |SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET; 
 
         //Entering Safe mode TMR 
-        TMR_Safe_Activate(); 
+        TMR_Safe_Activate(DMR_MODE); 
 //        TMR_Set_Critical_Section(CRITICAL_SECTION);
-
-
-        CSR_READ(CSR_REG_MHARTID,P);  
-
         volatile unsigned int *i = 0xF0028040; 
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+        Store_Checkpoint();
+
+//       CSR_READ(CSR_REG_MHARTID,P);  
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
 
         for(int j=0;j<10;j++)  
                 *i=j;
-         *i=0xdeadbeef;
+
+
+       CSR_READ(CSR_REG_MHARTID,P);  
+
+        //Reference for exit store_checkpoint 
+        asm volatile(".global _exit_Store_checkpoint");
+        asm volatile("_exit_Store_checkpoint:"); 
+
+      //  Check_RF();
+
+//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
+/* 
+        Check_RF();
+
+        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
+*/
+        TMR_Safe_Stop(MASTER_CORE1); 
+
+
+        //Entering Safe mode TMR 
+//        TMR_Safe_Activate(TMR_MODE); 
+//        TMR_Set_Critical_Section(CRITICAL_SECTION);
+
+
+//       CSR_READ(CSR_REG_MHARTID,P);   
+
+//       for(int j=0;j<10;j++)  
+//                *i=j;
+//         *i=0xdeadbeef;
 
       //  Check_RF();
 
 //        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION); 
- 
+/* 
         Check_RF();
 
         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
-
-        TMR_Safe_Stop(MASTER_CORE0); 
-        
+*/
+//        TMR_Safe_Stop(MASTER_CORE0); 
+/*        
         for(int j=0;j<10;j++)  
                 *i=j;
          *i=0xdeadbeef;

@@ -17,7 +17,7 @@ module safe_wrapper_ctrl #(
 
     // External safe_wrapper_cpu Control Signal
     input logic [2:0] ext_master_core_i,
-    input logic ext_safe_mode_i,
+    input logic [2:0] ext_safe_mode_i,
     input logic [1:0] ext_safe_configuration_i,
     input logic ext_critical_section_i,
     input logic ext_Start_i,
@@ -25,7 +25,7 @@ module safe_wrapper_ctrl #(
 
     // Safe wrapper Signal -> Internal FSM
     output logic [2:0] master_core_o,
-    output logic safe_mode_o,
+    output logic [2:0] safe_mode_o,
     output logic [1:0] safe_configuration_o,
     output logic critical_section_o,
     output logic Initial_Sync_Master_o,
@@ -72,8 +72,8 @@ module safe_wrapper_ctrl #(
         hw2reg.master_core.de = 1'b1;
         hw2reg.master_core.d = ext_master_core_i;
 
-        hw2reg.safe_mode.de = 1'b1;
-        hw2reg.safe_mode.d = ext_safe_mode_i;
+        hw2reg.dmr_mask.de = 1'b1;
+        hw2reg.dmr_mask.d = ext_safe_mode_i;
 
         hw2reg.safe_configuration.de = 1'b1;
         hw2reg.safe_configuration.d = ext_safe_configuration_i;
@@ -82,15 +82,15 @@ module safe_wrapper_ctrl #(
     end
     else begin //Reg2Hw read
       master_core_o = reg2hw.master_core.q;
-      safe_mode_o = reg2hw.safe_mode.q;
+      safe_mode_o = reg2hw.dmr_mask.q;
       safe_configuration_o = reg2hw.safe_configuration.q;
       critical_section_o = reg2hw.critical_section.q;
 
       hw2reg.master_core.de = 1'b0;
       hw2reg.master_core.d = '0;
 
-      hw2reg.safe_mode.de = 1'b0;
-      hw2reg.safe_mode.d = '0;
+      hw2reg.dmr_mask.de = 1'b0;
+      hw2reg.dmr_mask.d = '0;
 
       hw2reg.safe_configuration.de = 1'b0;
       hw2reg.safe_configuration.d = '0;

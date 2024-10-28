@@ -167,7 +167,7 @@ end
         .test_en_i(1'b0),
         .ram_cfg_i('0),
 
-        .hart_id_i  (HARTID),
+        .hart_id_i  (32'h12),
         .boot_addr_i(BOOT_ADDR),
 
         .instr_addr_o  (core_instr_req_o[2].addr),

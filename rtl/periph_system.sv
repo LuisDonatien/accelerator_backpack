@@ -22,7 +22,7 @@ module periph_system
     //***Safe CPU wrapper control ports***//
     input  logic EndSw_i,
     output logic [2:0] master_core_o,
-    output logic safe_mode_o,
+    output logic [2:0] safe_mode_o,
     output logic [1:0] safe_configuration_o,
     output logic critical_section_o,
     output logic Start_o,

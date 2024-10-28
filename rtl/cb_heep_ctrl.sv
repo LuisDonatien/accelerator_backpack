@@ -22,7 +22,7 @@ module cb_heep_ctrl
     //External Safe CPU wrapper control port
     input  logic EndSw_i,
     output logic [2:0] master_core_o,
-    output logic safe_mode_o,
+    output logic [2:0] safe_mode_o,
     output logic [1:0] safe_configuration_o,
     output logic critical_section_o,
     output logic Start_o,
@@ -56,7 +56,7 @@ module cb_heep_ctrl
 
 //Reg2Hw read
   assign master_core_o = reg2hw.master_core.q;
-  assign safe_mode_o = reg2hw.safe_mode.q;
+  assign safe_mode_o = reg2hw.dmr_mask.q;
   assign safe_configuration_o = reg2hw.safe_configuration.q;
   assign critical_section_o = reg2hw.critical_section.q;
   assign Start_o = reg2hw.start.q;

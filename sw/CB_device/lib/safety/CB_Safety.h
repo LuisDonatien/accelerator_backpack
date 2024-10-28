@@ -28,15 +28,20 @@ extern "C" {
 #define MASTER_CORE1	0x2	//0b010
 #define MASTER_CORE2	0x4	//0b100
 
+#define SINGLE_MODE     0x0
+#define TMR_MODE        0x1
+#define DMR_MODE        0x2
+
 //Functions
 #define INTERRUPT_HANDLER_ABI __attribute__((aligned(4), interrupt))
 
-__attribute__((aligned(4))) void TMR_Safe_Activate(void);
+__attribute__((aligned(4))) void TMR_Safe_Activate(unsigned int mode);
 __attribute__((aligned(4))) void TMR_Safe_Stop(unsigned int master);
 __attribute__((aligned(4),always_inline)) inline void TMR_Set_Critical_Section(unsigned int critical){
         volatile unsigned int *Priv_Reg = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_CRITICAL_SECTION_REG_OFFSET;
         *Priv_Reg = critical;}
         
+__attribute__((aligned(4))) void Store_Checkpoint(void);
 __attribute__((aligned(4))) void Check_RF(void);
 
 //Handlers

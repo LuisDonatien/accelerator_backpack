@@ -34,7 +34,7 @@ module safe_cpu_wrapper
     //Control Signals
     output logic ext_EndSw_o,
     input logic [2:0] ext_master_core_i,
-    input logic ext_safe_mode_i,
+    input logic [2:0] ext_safe_mode_i,
     input logic [1:0] ext_safe_configuration_i,
     input logic ext_critical_section_i,
     input logic ext_Start_i,
@@ -64,7 +64,7 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic [NHARTS-1:0] Interrupt_DMSH_Sync_s;
     logic [NHARTS-1:0][0:0] Select_wfi_core_s;
     logic [NHARTS-1:0] master_core_s;
-    logic safe_mode_s;
+    logic [2:0] safe_mode_s;
     logic [1:0] safe_configuration_s;
     logic critical_section_s;
     logic [NHARTS-1:0] intc_sync_s;
@@ -91,10 +91,12 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     obi_req_t  voted_core_instr_req_o;
     obi_req_t  voted_core_data_req_o; 
     logic tmr_error_s;
+    logic [2:0] dmr_error_s;
     logic [2:0] tmr_errorid_s;
     logic tmr_voter_enable_s;
     logic [2:0] dmr_config_s;
     logic dual_mode_s;
+    logic [NHARTS-1:0] dmr_wfi_s;
 
     // Compared CPU Signals
     obi_req_t  [NRCOMPARATORS-1:0] compared_core_instr_req_o;
@@ -115,6 +117,13 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     assign Core_ID[0] = {3'b001};
     assign Core_ID[1] = {3'b010};
     assign Core_ID[2] = {3'b100};
+
+    //Isolate val bus
+    // Instruction memory interface 
+    obi_resp_t [NHARTS-1 : 0] isolate_core_instr_resp;
+
+    // Data memory interface 
+    obi_resp_t [NHARTS-1 : 0] isolate_core_data_resp;
 
 
 //***Cores System***//
@@ -216,7 +225,7 @@ safe_FSM safe_FSM_i (
     .clk_i,
     .rst_ni,
     .tmr_critical_section_i (critical_section_s),
-    .Safe_mode_i          (safe_mode_s),
+    .DMR_Mask_i          (safe_mode_s),
     .Safe_configuration_i (safe_configuration_s),
     .Initial_Sync_Master_i(Initial_Sync_Master_s), 
     .Halt_ack_i(debug_mode_s), 
@@ -235,6 +244,8 @@ safe_FSM safe_FSM_i (
     .Tmr_voter_enable_o(tmr_voter_enable_s),
     .Dmr_comparator_enable_o(),
     .Dmr_config_o(dmr_config_s),
+    .dmr_error_i(dmr_error_s),
+    .wfi_dmr_o(dmr_wfi_s),
     .Dual_mode_o(dual_mode_s),
     .Start_Boot_o(Start_Boot_s),
     .Start_i(Start_s),
@@ -340,58 +351,103 @@ safe_FSM safe_FSM_i (
                 end
                 else if (dual_mode_s == 1'b1) begin
                     if (dmr_config_s == 3'b011) begin   //Comparator cpu0_cpu1
-                        //Instruction
-                        core_instr_req_o[0] = compared_core_instr_req_o[0];
-                        core_instr_req_o[1] = core_instr_req[2];
-                        core_instr_req_o[2] = '0;
-
+                        
+                    //Instruction
+                    core_instr_req_o[0] = compared_core_instr_req_o[0];
+                    core_instr_req_o[1] = core_instr_req[2];
+                    core_instr_req_o[2] = '0;
+                    if (dmr_wfi_s == 3'b011) begin
+                        core_instr_resp[2] = core_instr_resp_i[1];
+                        core_instr_resp[0] = isolate_core_instr_resp[0];
+                        core_instr_resp[1] = isolate_core_instr_resp[1];
+                    end else begin
                         core_instr_resp[0] = core_instr_resp_i[0];
                         core_instr_resp[1] = core_instr_resp_i[0];
                         core_instr_resp[2] = core_instr_resp_i[1];
-            
+                    end
                         //Data
                         core_data_req_o[0] = compared_core_data_req_o[0];
                         core_data_req_o[1] = xbar_core_data_req[2][0];
                         core_data_req_o[2] = '0;
+
+                    if (dmr_wfi_s == 3'b011) begin   
+                        xbar_core_data_resp[0][0] = isolate_core_data_resp[0]; 
+                        xbar_core_data_resp[1][0] = isolate_core_data_resp[1]; 
+                        xbar_core_data_resp[2][0] = core_data_resp_i[1];                          
+                    end else begin
                         xbar_core_data_resp[0][0] = core_data_resp_i[0]; 
                         xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
                         xbar_core_data_resp[2][0] = core_data_resp_i[1];     
                     end
+
+                    end
                     else if (dmr_config_s == 3'b110) begin   //Comparator cpu1_cpu2
+                    
                     //Instruction
                     core_instr_req_o[0] = compared_core_instr_req_o[1];
                     core_instr_req_o[1] = core_instr_req[0];
                     core_instr_req_o[2] = '0;
 
-                    core_instr_resp[0] = core_instr_resp_i[1];
-                    core_instr_resp[1] = core_instr_resp_i[0];
-                    core_instr_resp[2] = core_instr_resp_i[0];
-
+                    if (dmr_wfi_s == 3'b110) begin
+                        core_instr_resp[0] = core_instr_resp_i[1];
+                        core_instr_resp[1] = isolate_core_instr_resp[1];
+                        core_instr_resp[2] = isolate_core_instr_resp[2];
+                    end else begin
+                        core_instr_resp[0] = core_instr_resp_i[1];
+                        core_instr_resp[1] = core_instr_resp_i[0];
+                        core_instr_resp[2] = core_instr_resp_i[0];
+                    end;
 
                     //Data
                     core_data_req_o[0] = compared_core_data_req_o[1];
                     core_data_req_o[1] = xbar_core_data_req[0][0];
                     core_data_req_o[2] = '0;
+                    if (dmr_wfi_s == 3'b110) begin
+                    xbar_core_data_resp[0][0] = core_data_resp_i[1];
+                    xbar_core_data_resp[1][0] = isolate_core_data_resp[1]; 
+                    xbar_core_data_resp[2][0] = isolate_core_data_resp[2];
+                    end else begin  
                     xbar_core_data_resp[0][0] = core_data_resp_i[1];
                     xbar_core_data_resp[1][0] = core_data_resp_i[0]; 
                     xbar_core_data_resp[2][0] = core_data_resp_i[0];     
                     end
-                    else begin                              //Comparator cpu0_cpu2
+                    end else begin                              //Comparator cpu0_cpu2
                         //Instruction
                         core_instr_req_o[0] = compared_core_instr_req_o[2];
                         core_instr_req_o[1] = core_instr_req[1];
                         core_instr_req_o[2] = '0;
+
+                    if (dmr_wfi_s == 3'b101) begin
+                        core_instr_resp[1] = core_instr_resp_i[1];
+                        core_instr_resp[0] = isolate_core_instr_resp[0];
+                        core_instr_resp[2] = isolate_core_instr_resp[2];
+/*                        
+                        core_instr_resp[0].rvalid = 1'b1;
+                        core_instr_resp[0].gnt = 1'b1;
+                        core_instr_resp[0].rdata = 32'h10500073; //wfi instruction
+
+                        core_instr_resp[2].rvalid = 1'b1;
+                        core_instr_resp[2].gnt = 1'b1;
+                        core_instr_resp[2].rdata = 32'h10500073; //wfi instruction
+*/
+                    end else begin
                         core_instr_resp[0] = core_instr_resp_i[0];
                         core_instr_resp[1] = core_instr_resp_i[1];
                         core_instr_resp[2] = core_instr_resp_i[0];
-            
+                    end;
                         //Data
                         core_data_req_o[0] = compared_core_data_req_o[2];
                         core_data_req_o[1] = xbar_core_data_req[1][0];
                         core_data_req_o[2] = '0;
+                    if (dmr_wfi_s == 3'b101) begin
+                        xbar_core_data_resp[0][0] = isolate_core_data_resp[0]; 
+                        xbar_core_data_resp[1][0] = core_data_resp_i[1]; 
+                        xbar_core_data_resp[2][0] = isolate_core_data_resp[2];                         
+                    end else begin
                         xbar_core_data_resp[0][0] = core_data_resp_i[0]; 
                         xbar_core_data_resp[1][0] = core_data_resp_i[1]; 
-                        xbar_core_data_resp[2][0] = core_data_resp_i[0];                         
+                        xbar_core_data_resp[2][0] = core_data_resp_i[0]; 
+                    end
                     end    
                 end
 /*            end
@@ -414,8 +470,38 @@ safe_FSM safe_FSM_i (
         end
     end
 /**********************************************************/
+/************************Isolate BUS***************************/
 
+for(genvar i=0; i<NHARTS; i++) begin : isolate_obi_bus_instr
+    logic [NHARTS-1:0] isolate_valid_q;
 
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (!rst_ni) begin
+        isolate_valid_q[i] <= '0;
+      end else begin
+        isolate_valid_q[i] <= isolate_core_instr_resp[i].gnt;
+      end
+    end
+    assign isolate_core_instr_resp[i].gnt = core_instr_req[i].req;
+    assign isolate_core_instr_resp[i].rvalid = isolate_valid_q[i];
+    assign isolate_core_instr_resp[i].rdata = 32'h10500073; //wfi instruction
+end
+
+for(genvar i=0; i<NHARTS; i++) begin : isolate_obi_bus_data
+    logic [NHARTS-1:0] isolate_valid_q;
+
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (!rst_ni) begin
+        isolate_valid_q[i] <= '0;
+      end else begin
+        isolate_valid_q[i] <= isolate_core_data_resp[i].gnt;
+      end
+    end
+    assign isolate_core_data_resp[i].gnt = core_data_req[i].req;
+    assign isolate_core_data_resp[i].rvalid = isolate_valid_q[i];
+end
+
+/*********************************************************/
 //*********************Safety Voter***********************//
 assign xbar_core_data_req_s[0] = xbar_core_data_req[0][0];
 assign xbar_core_data_req_s[1] = xbar_core_data_req[1][0];
@@ -477,7 +563,7 @@ end
     .compared_core_instr_req_o(compared_core_instr_req_o[i]),
     .core_data_req_i(dmr_core_data_req_i),
     .compared_core_data_req_o(compared_core_data_req_o[i]),
-    .error_o()
+    .error_o(dmr_error_s[i])
     );
 end
 

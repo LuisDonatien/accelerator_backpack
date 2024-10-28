@@ -18,8 +18,8 @@ package safe_wrapper_ctrl_reg_pkg;
   } safe_wrapper_ctrl_reg2hw_safe_configuration_reg_t;
 
   typedef struct packed {
-    logic        q;
-  } safe_wrapper_ctrl_reg2hw_safe_mode_reg_t;
+    logic [2:0]  q;
+  } safe_wrapper_ctrl_reg2hw_dmr_mask_reg_t;
 
   typedef struct packed {
     logic [2:0]  q;
@@ -43,9 +43,9 @@ package safe_wrapper_ctrl_reg_pkg;
   } safe_wrapper_ctrl_hw2reg_safe_configuration_reg_t;
 
   typedef struct packed {
-    logic        d;
+    logic [2:0]  d;
     logic        de;
-  } safe_wrapper_ctrl_hw2reg_safe_mode_reg_t;
+  } safe_wrapper_ctrl_hw2reg_dmr_mask_reg_t;
 
   typedef struct packed {
     logic [2:0]  d;
@@ -74,8 +74,8 @@ package safe_wrapper_ctrl_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    safe_wrapper_ctrl_reg2hw_safe_configuration_reg_t safe_configuration; // [8:7]
-    safe_wrapper_ctrl_reg2hw_safe_mode_reg_t safe_mode; // [6:6]
+    safe_wrapper_ctrl_reg2hw_safe_configuration_reg_t safe_configuration; // [10:9]
+    safe_wrapper_ctrl_reg2hw_dmr_mask_reg_t dmr_mask; // [8:6]
     safe_wrapper_ctrl_reg2hw_master_core_reg_t master_core; // [5:3]
     safe_wrapper_ctrl_reg2hw_critical_section_reg_t critical_section; // [2:2]
     safe_wrapper_ctrl_reg2hw_initial_sync_master_reg_t initial_sync_master; // [1:1]
@@ -84,8 +84,8 @@ package safe_wrapper_ctrl_reg_pkg;
 
   // HW -> register type
   typedef struct packed {
-    safe_wrapper_ctrl_hw2reg_safe_configuration_reg_t safe_configuration; // [48:46]
-    safe_wrapper_ctrl_hw2reg_safe_mode_reg_t safe_mode; // [45:44]
+    safe_wrapper_ctrl_hw2reg_safe_configuration_reg_t safe_configuration; // [50:48]
+    safe_wrapper_ctrl_hw2reg_dmr_mask_reg_t dmr_mask; // [47:44]
     safe_wrapper_ctrl_hw2reg_master_core_reg_t master_core; // [43:40]
     safe_wrapper_ctrl_hw2reg_critical_section_reg_t critical_section; // [39:38]
     safe_wrapper_ctrl_hw2reg_external_debug_req_reg_t external_debug_req; // [37:35]
@@ -95,7 +95,7 @@ package safe_wrapper_ctrl_reg_pkg;
 
   // Register offsets
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET = 6'h 0;
-  parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_SAFE_MODE_OFFSET = 6'h 4;
+  parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_DMR_MASK_OFFSET = 6'h 4;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_MASTER_CORE_OFFSET = 6'h 8;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_CRITICAL_SECTION_OFFSET = 6'h c;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ_OFFSET = 6'h 10;
@@ -107,7 +107,7 @@ package safe_wrapper_ctrl_reg_pkg;
   // Register index
   typedef enum int {
     SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION,
-    SAFE_WRAPPER_CTRL_SAFE_MODE,
+    SAFE_WRAPPER_CTRL_DMR_MASK,
     SAFE_WRAPPER_CTRL_MASTER_CORE,
     SAFE_WRAPPER_CTRL_CRITICAL_SECTION,
     SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ,
@@ -120,7 +120,7 @@ package safe_wrapper_ctrl_reg_pkg;
   // Register width information to check illegal writes
   parameter logic [3:0] SAFE_WRAPPER_CTRL_PERMIT [9] = '{
     4'b 0001, // index[0] SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION
-    4'b 0001, // index[1] SAFE_WRAPPER_CTRL_SAFE_MODE
+    4'b 0001, // index[1] SAFE_WRAPPER_CTRL_DMR_MASK
     4'b 0001, // index[2] SAFE_WRAPPER_CTRL_MASTER_CORE
     4'b 0001, // index[3] SAFE_WRAPPER_CTRL_CRITICAL_SECTION
     4'b 0001, // index[4] SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ

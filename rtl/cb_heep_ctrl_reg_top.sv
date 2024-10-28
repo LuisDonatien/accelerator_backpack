@@ -71,9 +71,9 @@ module cb_heep_ctrl_reg_top #(
   logic [1:0] safe_configuration_qs;
   logic [1:0] safe_configuration_wd;
   logic safe_configuration_we;
-  logic safe_mode_qs;
-  logic safe_mode_wd;
-  logic safe_mode_we;
+  logic [2:0] dmr_mask_qs;
+  logic [2:0] dmr_mask_wd;
+  logic dmr_mask_we;
   logic [2:0] master_core_qs;
   logic [2:0] master_core_wd;
   logic master_core_we;
@@ -126,19 +126,19 @@ module cb_heep_ctrl_reg_top #(
   );
 
 
-  // R[safe_mode]: V(False)
+  // R[dmr_mask]: V(False)
 
   prim_subreg #(
-    .DW      (1),
+    .DW      (3),
     .SWACCESS("RW"),
-    .RESVAL  (1'h0)
-  ) u_safe_mode (
+    .RESVAL  (3'h0)
+  ) u_dmr_mask (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (safe_mode_we),
-    .wd     (safe_mode_wd),
+    .we     (dmr_mask_we),
+    .wd     (dmr_mask_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -146,10 +146,10 @@ module cb_heep_ctrl_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.safe_mode.q ),
+    .q      (reg2hw.dmr_mask.q ),
 
     // to register interface (read)
-    .qs     (safe_mode_qs)
+    .qs     (dmr_mask_qs)
   );
 
 
@@ -400,7 +400,7 @@ module cb_heep_ctrl_reg_top #(
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == CB_HEEP_CTRL_SAFE_CONFIGURATION_OFFSET);
-    addr_hit[1] = (reg_addr == CB_HEEP_CTRL_SAFE_MODE_OFFSET);
+    addr_hit[1] = (reg_addr == CB_HEEP_CTRL_DMR_MASK_OFFSET);
     addr_hit[2] = (reg_addr == CB_HEEP_CTRL_MASTER_CORE_OFFSET);
     addr_hit[3] = (reg_addr == CB_HEEP_CTRL_CRITICAL_SECTION_OFFSET);
     addr_hit[4] = (reg_addr == CB_HEEP_CTRL_START_OFFSET);
@@ -429,8 +429,8 @@ module cb_heep_ctrl_reg_top #(
   assign safe_configuration_we = addr_hit[0] & reg_we & !reg_error;
   assign safe_configuration_wd = reg_wdata[1:0];
 
-  assign safe_mode_we = addr_hit[1] & reg_we & !reg_error;
-  assign safe_mode_wd = reg_wdata[0];
+  assign dmr_mask_we = addr_hit[1] & reg_we & !reg_error;
+  assign dmr_mask_wd = reg_wdata[2:0];
 
   assign master_core_we = addr_hit[2] & reg_we & !reg_error;
   assign master_core_wd = reg_wdata[2:0];
@@ -462,7 +462,7 @@ module cb_heep_ctrl_reg_top #(
       end
 
       addr_hit[1]: begin
-        reg_rdata_next[0] = safe_mode_qs;
+        reg_rdata_next[2:0] = dmr_mask_qs;
       end
 
       addr_hit[2]: begin
