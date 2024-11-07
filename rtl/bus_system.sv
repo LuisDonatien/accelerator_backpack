@@ -54,7 +54,36 @@ module bus_system
     input  obi_resp_t  wrapper_csr_resp_i
 
 );
+/*
+  // Instruction
+  obi_pipelined_delay obi_delay0_i(
+      .clk_i,
+      .rst_ni,
+      .clear_pipeline(1'b0),
+      .core_instr_req_i     (core_instr_req_i[0]),
+      .core_instr_req_o     (int_master_req[cei_mochila_pkg::CORE0_INSTR_IDX]),
+      .core_instr_resp_gnt_i(int_master_resp[cei_mochila_pkg::CORE0_INSTR_IDX].gnt),
+      .core_instr_resp_gnt_o(core_instr_resp_o[0].gnt),
+      .core_instr_resp_rvalid_i(int_master_resp[cei_mochila_pkg::CORE0_INSTR_IDX].rvalid)
+    );
 
+  assign core_instr_resp_o[0].rvalid = int_master_resp[cei_mochila_pkg::CORE0_INSTR_IDX].rvalid;
+  assign core_instr_resp_o[0].rdata = int_master_resp[cei_mochila_pkg::CORE0_INSTR_IDX].rdata;
+
+  // Data
+  obi_pipelined_delay obi_delay1_i(
+      .clk_i,
+      .rst_ni,
+      .clear_pipeline(1'b0),
+      .core_instr_req_i     (core_data_req_i[0]),
+      .core_instr_req_o     (int_master_req[cei_mochila_pkg::CORE0_DATA_IDX]),
+      .core_instr_resp_gnt_i(int_master_resp[cei_mochila_pkg::CORE0_DATA_IDX].gnt),
+      .core_instr_resp_gnt_o(core_data_resp_o[0].gnt),
+      .core_instr_resp_rvalid_i(int_master_resp[cei_mochila_pkg::CORE0_DATA_IDX].rvalid)
+    );
+  assign core_data_resp_o[0].rvalid = int_master_resp[cei_mochila_pkg::CORE0_DATA_IDX].rvalid;
+  assign core_data_resp_o[0].rdata = int_master_resp[cei_mochila_pkg::CORE0_DATA_IDX].rdata;
+*/
   import cei_mochila_pkg::*;
 
   // Internal master ports
@@ -115,9 +144,4 @@ module bus_system
       .slave_req_o(int_slave_req),
       .slave_resp_i(int_slave_resp)
   );
-
-
-
-
-
 endmodule

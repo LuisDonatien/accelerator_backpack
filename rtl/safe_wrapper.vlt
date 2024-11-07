@@ -9,6 +9,9 @@ lint_off -rule WIDTH -file "*/safe_wrapper_ctrl_reg_top.sv" -match "Operator ASS
 
 lint_off -rule UNUSED -file "*/safe_cpu_wrapper.sv" -match "Signal is not driven: 'intc_core0'*"
 lint_off -rule UNUSED -file "*/safe_cpu_wrapper.sv" -match "Signal is not driven: 'intc_core1'*"
+lint_off -rule SELRANGE -file "*/safe_cpu_wrapper.sv" -match "*"
+
+lint_off -rule SELRANGE -file "*/obi_pipelined_delay.sv" -match "*"
 
 lint_off -rule UNUSED -file "*/cpu_system.sv" -match "Bits of signal are not used: 'intc_core0'[15:0]*"
 lint_off -rule UNUSED -file "*/cpu_system.sv" -match "Bits of signal are not used: 'intc_core1'[15:0]*"

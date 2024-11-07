@@ -59,11 +59,6 @@ module cpu_system
   assign core_instr_req_o[2].we    = '0;
   assign core_instr_req_o[2].be    = 4'b1111;  
 
-always_comb begin
-
-end
-
-
   
   // instantiate the core 0
     cve2_top #(

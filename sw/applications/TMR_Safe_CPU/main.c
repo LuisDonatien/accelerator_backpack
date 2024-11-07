@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
          *i=0xdeadbeef;
         Store_Checkpoint();
 
-//       CSR_READ(CSR_REG_MHARTID,P);  
+       CSR_READ(CSR_REG_MHARTID,P);  
          *i=0xdeadbeef;
          *i=0xdeadbeef;
          *i=0xdeadbeef;
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
                 *i=j;
 
 
-       CSR_READ(CSR_REG_MHARTID,P);  
+//       CSR_READ(CSR_REG_MHARTID,P);  
 
         //Reference for exit store_checkpoint 
         asm volatile(".global _exit_Store_checkpoint");
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
 */
-        TMR_Safe_Stop(MASTER_CORE1); 
+//        TMR_Safe_Stop(MASTER_CORE1); 
 
 
         //Entering Safe mode TMR 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
 */
-//        TMR_Safe_Stop(MASTER_CORE0); 
+        TMR_Safe_Stop(MASTER_CORE1); 
 /*        
         for(int j=0;j<10;j++)  
                 *i=j;

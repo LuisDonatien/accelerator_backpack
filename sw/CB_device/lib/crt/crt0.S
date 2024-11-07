@@ -32,6 +32,7 @@ _start:
 /* initialize stack pointer */
    la sp, _sp
 
+
 /* clear the bss segment */
 _init_bss:
     la     a0, __bss_start

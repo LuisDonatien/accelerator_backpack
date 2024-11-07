@@ -222,7 +222,7 @@ __asm__ volatile(".word 0x00000013");
 
 void TMR_Safe_Stop(unsigned int master){
 volatile unsigned int *Safe_config_reg= SAFE_WRAPPER_CTRL_BASEADDRESS;
-        if(*Safe_config_reg == 0x1 || *Safe_config_reg == 0x2){
+        if(*Safe_config_reg == 0x1 || *Safe_config_reg == 0x2 || *Safe_config_reg == 0x3){
                 if (*(Safe_config_reg+3) == 0x1)
                         TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
                 *(Safe_config_reg+2) = master;
