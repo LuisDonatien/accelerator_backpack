@@ -820,8 +820,8 @@ module safe_FSM
           end
   
           DMR_MS_INTRSYNC:
-          begin
-            if ((Hart_intc_ack_i == DMR_Mask_i))
+          begin //todo carefull wich type selected
+            if ((Hart_intc_ack_i[i] == 1'b1))
               ctrl_dmr_fsm_ns[i] = DMR_SYNC;
             else
               ctrl_dmr_fsm_ns[i] = DMR_MS_INTRSYNC;

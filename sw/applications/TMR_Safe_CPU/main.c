@@ -32,17 +32,20 @@ int main(int argc, char *argv[])
          *i=0xdeadbeef;
          *i=0xdeadbeef;
          *i=0xdeadbeef;
-
-        for(int j=0;j<10;j++)  
-                *i=j;
-
-
 //       CSR_READ(CSR_REG_MHARTID,P);  
 
         //Reference for exit store_checkpoint 
         asm volatile(".global _exit_Store_checkpoint");
         asm volatile("_exit_Store_checkpoint:"); 
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         *i=0xdeadbeef;
+         int var = (*i);
+        for(int j=0;j<100;j++)  
+                var+=j;
 
+        *i = var;
       //  Check_RF();
 
 //        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);

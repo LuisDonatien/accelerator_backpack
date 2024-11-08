@@ -10,7 +10,7 @@ module safe_cpu_wrapper
 #(
     parameter NHARTS = 3,
     parameter HARTID = 32'h01,
-    parameter NCYCLES = 1,
+    parameter NCYCLES = 4,
     parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50
 ) (
     // Clock and Reset
@@ -514,29 +514,60 @@ for(genvar i=0; i<NHARTS; i++) begin : Nharts_delayed_mux
 
 if (i==0) begin
   // Instruction
-  obi_pipelined_delay obi_pipelined_delay0_i(
-      .clk_i,
-      .rst_ni,
-      .clear_pipeline(~dual_mode_s),
-      .core_instr_req_i     (mux_core_instr_req_i[0]),
-      .core_instr_req_o     (core_instr_req_ff[0]),
-      .core_instr_resp_gnt_i(mux_core_instr_resp_i[0].gnt),
-      .core_instr_resp_gnt_o(pipe_instr_gnt),
-      .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
-    );
-
-  // Data
-  obi_pipelined_delay obi_pipelined_delay1_i(
-      .clk_i,
-      .rst_ni,
-      .clear_pipeline(~dual_mode_s),
-      .core_instr_req_i     (mux_core_data_req_i[0]),
-      .core_instr_req_o     (core_data_req_ff[0]),
-      .core_instr_resp_gnt_i(mux_core_data_resp_i[0].gnt),
-      .core_instr_resp_gnt_o(pipe_data_gnt),
-      .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
-    );
-end else if (i==1) begin
+      if (NCYCLES == 1) begin
+      // Instruction
+      obi_sngreg obi_sngreg0_i(
+          .clk_i,
+          .rst_ni,
+          .clear_pipeline(~dual_mode_s),
+          .core_instr_req_i     (mux_core_instr_req_i[0]),
+          .core_instr_req_o     (core_instr_req_ff[0]),
+          .core_instr_resp_gnt_i(mux_core_instr_resp_i[0].gnt),
+          .core_instr_resp_gnt_o(pipe_instr_gnt),
+          .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
+        );
+    
+      // Data
+      obi_sngreg obi_sngreg1_i(
+          .clk_i,
+          .rst_ni,
+          .clear_pipeline(~dual_mode_s),
+          .core_instr_req_i     (mux_core_data_req_i[0]),
+          .core_instr_req_o     (core_data_req_ff[0]),
+          .core_instr_resp_gnt_i(mux_core_data_resp_i[0].gnt),
+          .core_instr_resp_gnt_o(pipe_data_gnt),
+          .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
+        );  
+    
+    end else begin
+      obi_pipelined_delay #(
+        .NDELAY(NCYCLES)
+        )obi_pipelined_delay0_i(
+          .clk_i,
+          .rst_ni,
+          .clear_pipeline(~dual_mode_s),
+          .core_instr_req_i     (mux_core_instr_req_i[0]),
+          .core_instr_req_o     (core_instr_req_ff[0]),
+          .core_instr_resp_gnt_i(mux_core_instr_resp_i[0].gnt),
+          .core_instr_resp_gnt_o(pipe_instr_gnt),
+          .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
+        );
+    
+      // Data
+      obi_pipelined_delay #(
+        .NDELAY(NCYCLES)
+        )obi_pipelined_delay1_i(
+          .clk_i,
+          .rst_ni,
+          .clear_pipeline(~dual_mode_s),
+          .core_instr_req_i     (mux_core_data_req_i[0]),
+          .core_instr_req_o     (core_data_req_ff[0]),
+          .core_instr_resp_gnt_i(mux_core_data_resp_i[0].gnt),
+          .core_instr_resp_gnt_o(pipe_data_gnt),
+          .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
+        );
+    end
+end /*else if (i==1) begin
   // Instruction
   obi_sngreg obi_sngreg0_i(
       .clk_i,
@@ -562,7 +593,7 @@ end else if (i==1) begin
     );    
 
 end
-
+*/
 
 always_comb begin
     //bypass by default 
@@ -587,7 +618,7 @@ always_comb begin
 
             assign mux_intr_o[0]       = mux_intr_i[0];
             assign mux_debug_req_o[0]  = mux_debug_req_i[0];       
-        end else if(i==1) begin
+        end else if(i==1) begin/*
             assign mux_core_instr_req_o[1]   = core_instr_req_ff[1];
             assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
             assign mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
@@ -596,16 +627,21 @@ always_comb begin
             assign mux_core_data_resp_o[1].rdata   = core_data_resp_ff[NCYCLES-1].rdata;
             assign mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
             assign mux_core_data_resp_o[1].gnt   = reg_data_gnt;
-            /*
+            /**/
             assign mux_core_instr_req_o[1]   = mux_core_instr_req_i[1];
             assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
             assign mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
             assign mux_core_instr_resp_o[1].gnt  = mux_core_instr_resp_i[1].gnt;
-            assign mux_core_data_req_o[1]    = mux_core_data_req_i[1];
+            assign mux_core_data_req_o[1].addr    = mux_core_data_req_i[1].addr;
+            assign mux_core_data_req_o[1].req    = mux_core_data_req_i[1].req;
+            assign mux_core_data_req_o[1].be    = mux_core_data_req_i[1].be;
+            assign mux_core_data_req_o[1].wdata    = mux_core_data_req_i[1].wdata;
+            assign mux_core_data_req_o[1].we    = mux_core_data_req_i[1].we & mux_core_data_req_i[1].req; 
+                                                            
             assign mux_core_data_resp_o[1].rdata   = core_data_resp_ff[NCYCLES-1].rdata;
             assign mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
             assign mux_core_data_resp_o[1].gnt   = mux_core_data_resp_i[1].gnt;
-            */
+            /**/
             assign mux_intr_o[1]       = intr_ff[NCYCLES-1];
             assign mux_debug_req_o[1]  = debug_req_ff[NCYCLES-1];
         end else begin
