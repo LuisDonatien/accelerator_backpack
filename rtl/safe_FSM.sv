@@ -29,6 +29,7 @@ module safe_FSM
     output logic Single_Bus_o,
     output logic [NHARTS-1:0] Dmr_config_o,
     output logic Dual_mode_o,
+    output logic Delayed_o,
     output logic Tmr_voter_enable_o,
     output logic Dmr_comparator_enable_o,
     output logic [NHARTS-1:0]wfi_dmr_o,
@@ -42,7 +43,7 @@ module safe_FSM
 );
   // FSM state encoding
   typedef enum logic [3:0] {
-    RESET, IDLE, SINGLE_MODE, TMR_MODE, DMR_MODE 
+    RESET,BOOT, IDLE, SINGLE_MODE, TMR_MODE, DMR_MODE 
   } ctrl_safe_fsm_e;
 
     typedef enum logic [3:0] {
@@ -88,6 +89,7 @@ module safe_FSM
 
   logic  halt_req_s;
   logic Single_Boot_s;
+  logic General_boot_s;
   logic [NHARTS-1:0] TMR_Boot_s;
   logic en_safe_ext_debug_req_s, en_single_ext_debug_req_s;
   logic [NHARTS-1:0] dbg_halt_req_s;
@@ -114,6 +116,7 @@ module safe_FSM
   logic [NHARTS-1:0] Interrupt_Sync_DMR_s;
   logic [NHARTS-1:0] dbg_halt_dmr_recovery;
   logic dmr_error_s;
+  logic [NHARTS-1:0] dmr_delayed_s;
 
 
 
@@ -140,14 +143,23 @@ module safe_FSM
         unique case (ctrl_safe_fsm_cs)
 
           RESET:
+          //todo: momentaneous solution for power-on sequence
           begin
-            ctrl_safe_fsm_ns = IDLE;
+            ctrl_safe_fsm_ns = BOOT;
+          end
+
+          BOOT:
+          begin
+            if (Hart_wfi_i == 3'b111)
+              ctrl_safe_fsm_ns = IDLE;
+            else
+              ctrl_safe_fsm_ns = BOOT;
           end
           IDLE:
           begin
             if(Safe_configuration_i==2'b01 && Start_i == 1'b1)
               ctrl_safe_fsm_ns = TMR_MODE;  
-            else if(Safe_configuration_i==2'b10 && Start_i == 1'b1)
+            else if((Safe_configuration_i==2'b10 | Safe_configuration_i==2'b11) && Start_i == 1'b1)
               ctrl_safe_fsm_ns = DMR_MODE;
             else if(Safe_configuration_i==2'b00 && Start_i == 1'b1)
               ctrl_safe_fsm_ns = SINGLE_MODE;
@@ -160,7 +172,7 @@ module safe_FSM
               ctrl_safe_fsm_ns = IDLE;
             else if(Start_i == 1'b1 &&  Safe_configuration_i==2'b01)
               ctrl_safe_fsm_ns = TMR_MODE;             
-            else if(Start_i == 1'b1 &&  Safe_configuration_i==2'b10)
+            else if(Start_i == 1'b1 &&  (Safe_configuration_i==2'b10 | Safe_configuration_i==2'b11))
               ctrl_safe_fsm_ns = DMR_MODE;
             else
               ctrl_safe_fsm_ns = SINGLE_MODE;
@@ -194,12 +206,18 @@ module safe_FSM
       end
 
       always_comb begin
+
         en_safe_ext_debug_req_s = 1'b0;
         Single_Boot_s = 1'b0;
+        General_boot_s = 1'b0;
         unique case (ctrl_safe_fsm_cs)  
           IDLE:
           begin
             en_safe_ext_debug_req_s = 1'b1;          
+          end
+          BOOT:
+          begin
+            General_boot_s = 1'b1;
           end
           SINGLE_MODE: 
           begin
@@ -269,7 +287,7 @@ module safe_FSM
               ctrl_single_fsm_ns = SINGLE_SYNC_OFF;
             else if(Halt_ack_i == 3'b000 && Safe_configuration_i == 2'b01) //Switch to others mode TMR
               ctrl_single_fsm_ns = SINGLE_TO_TMR;
-            else if(Halt_ack_i == 3'b000 && Safe_configuration_i == 2'b10) //Switch to others mode DMR
+            else if(Halt_ack_i == 3'b000 && (Safe_configuration_i==2'b10 | Safe_configuration_i==2'b11)) //Switch to others mode DMR
               ctrl_single_fsm_ns = SINGLE_TO_DMR;
             else
               ctrl_single_fsm_ns = SINGLE_RUN;
@@ -831,7 +849,7 @@ module safe_FSM
           begin
             if (((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2]== 1'b1)) && End_sw_routine_i ==1'b1)
               ctrl_dmr_fsm_ns[i] = DMR_IDLE;
-            else if ((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2] == 1'b1) == 1'b1 && Safe_configuration_i!=2'b10)
+            else if ((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2] == 1'b1) == 1'b1 && (Safe_configuration_i!=2'b10 | Safe_configuration_i!=2'b11))
               ctrl_dmr_fsm_ns[i] = DMR_END_SYNC;
             else if (dmr_error_s == 1'b1)
               ctrl_dmr_fsm_ns[i] = DMR_STOP;
@@ -891,6 +909,7 @@ module safe_FSM
         Interrupt_Sync_DMR_s[i] = 1'b0;
         wfi_dmr_o[i] = 1'b0;
         dbg_halt_dmr_recovery[i] = 1'b0;
+        dmr_delayed_s[i] = 1'b0;
         unique case (ctrl_dmr_fsm_cs[i])
   
           DMR_IDLE:
@@ -904,6 +923,10 @@ module safe_FSM
             DMR_dbg_halt_req_general_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
             DMR_Boot_s[i] = 1'b1;
+
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1;         
+                 
           end
 
           DMR_BOOT:
@@ -911,6 +934,10 @@ module safe_FSM
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
             DMR_Boot_s[i] = 1'b1;
+            
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1;
+            
           end
 
           DMR_SH_HALT:
@@ -929,12 +956,18 @@ module safe_FSM
             Interrupt_Sync_DMR_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
             dual_mode_dmr_s[i] = 1'b1;
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1; 
+            
           end 
 
           DMR_SYNC:
           begin
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1; 
+            
           end
 
           DMR_END_SYNC:
@@ -957,11 +990,17 @@ module safe_FSM
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
             dbg_halt_dmr_recovery[i] = 1'b1;
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1; 
+            
           end
           DMR_RECOVERY:
           begin
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
+            if (Safe_configuration_i==2'b11) 
+              dmr_delayed_s[i] = 1'b1; 
+                      
           end
           default: begin  end 
         
@@ -975,12 +1014,35 @@ assign halt_req_s = dbg_halt_req_s[0] || dbg_halt_req_s[1] || dbg_halt_req_s[2] 
                     DMR_dbg_halt_req_s[0] || DMR_dbg_halt_req_s[1] || DMR_dbg_halt_req_s[2];
 
 // In-Out FSM Signals operation Todo: Can be found a more elegant solution
-assign Single_Bus_o = single_bus_s[0] | single_bus_s[1] | single_bus_s[2] | DMR_Single_s[0] | DMR_Single_s[1] | DMR_Single_s[2];
-assign Tmr_voter_enable_o = (tmr_voter_enable_s[0] || tmr_voter_enable_s[1] || tmr_voter_enable_s[2]);
+assign Single_Bus_o = (single_bus_s[0] | single_bus_s[1] | single_bus_s[2] | DMR_Single_s[0] | DMR_Single_s[1] | DMR_Single_s[2]) ||
+                       General_boot_s;
+assign Tmr_voter_enable_o = (tmr_voter_enable_s[0] || tmr_voter_enable_s[1] || tmr_voter_enable_s[2]) | General_boot_s;
 assign Dmr_comparator_enable_o = (dmr_comparator_enable_s[0] || dmr_comparator_enable_s[1] || dmr_comparator_enable_s[2]) && 
                                   (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]);
 assign Dual_mode_o = ((dual_mode_tmr_s[0] || dual_mode_tmr_s[1] || dual_mode_tmr_s[2]) && (DMR_Mode_SHWFI_s[0] || DMR_Mode_SHWFI_s[1] || DMR_Mode_SHWFI_s[2]))
                       || (dual_mode_dmr_s[0] || dual_mode_dmr_s[1] || dual_mode_dmr_s[2]);
+
+
+//FF for lockstep active
+logic set;
+assign set = dmr_delayed_s[0] | dmr_delayed_s[1] | dmr_delayed_s[2];
+
+logic clear;
+assign clear = (Hart_wfi_i[0]&Hart_wfi_i[1]&Hart_wfi_i[2]) & (~Safe_configuration_i[0] & ~Safe_configuration_i[1]); //Locsktep == '11'
+
+logic delay_ff;
+assign Delayed_o = delay_ff | dmr_delayed_s[0] | dmr_delayed_s[1] | dmr_delayed_s[2];
+always_ff @(posedge clk_i or negedge rst_ni) begin 
+  if(~rst_ni) begin
+    delay_ff <= 1'b0;
+  end else begin
+    if (clear == 1'b1)
+      delay_ff <= 1'b0;
+    else if (set == 1'b1)
+      delay_ff <= 1'b1;
+  end
+end
+
 
 always_comb begin
   dbg_halt_req_tmr_s = '0;

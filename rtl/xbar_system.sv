@@ -29,7 +29,7 @@ module xbar_system
 
 );
 
-  localparam int unsigned LOG_XBAR_NMASTER = XBAR_NMASTER > 1 ? $clog2(XBAR_NMASTER) : 32'd1;
+  //localparam int unsigned LOG_XBAR_NMASTER = XBAR_NMASTER > 1 ? $clog2(XBAR_NMASTER) : 32'd1;
   localparam int unsigned LOG_XBAR_NSLAVE = XBAR_NSLAVE > 1 ? $clog2(XBAR_NSLAVE) : 32'd1;
 
   //Aggregated Request Data (from Master -> slaves)
@@ -39,10 +39,6 @@ module xbar_system
 
   //Address Decoder
   logic [XBAR_NMASTER-1:0][LOG_XBAR_NSLAVE-1:0] port_sel;
-
-  // Neck crossbar
-  obi_req_t neck_req;
-  obi_resp_t neck_resp;
 
   logic [XBAR_NMASTER-1:0] master_req_req;
   logic [XBAR_NMASTER-1:0] master_resp_gnt;
@@ -139,7 +135,9 @@ module xbar_system
     );
 
   end else begin : gen_xbar_1toM
-
+  // Neck crossbar
+  obi_req_t neck_req;
+  obi_resp_t neck_resp;
     // N-to-1 crossbar
     xbar_varlat_n_to_one #(
         .XBAR_NMASTER(XBAR_NMASTER)

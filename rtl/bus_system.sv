@@ -131,10 +131,10 @@ module bus_system
   assign int_slave_resp[cei_mochila_pkg::EXTERNAL_PERIPHERAL_IDX] = ext_slave_resp_i;
   // Internal system crossbar
   // ------------------------
-  system_xbar #(
+  xbar_system #(
       .XBAR_NMASTER(cei_mochila_pkg::SYSTEM_XBAR_NMASTER),
       .XBAR_NSLAVE (cei_mochila_pkg::SYSTEM_XBAR_NSLAVE)
-  ) system_xbar_i (
+  ) xbar_system_i (
       .clk_i(clk_i),
       .rst_ni(rst_ni),
       .addr_map_i(cei_mochila_pkg::XBAR_ADDR_RULES),
@@ -144,4 +144,5 @@ module bus_system
       .slave_req_o(int_slave_req),
       .slave_resp_i(int_slave_resp)
   );
+
 endmodule

@@ -10,7 +10,7 @@ module safe_cpu_wrapper
 #(
     parameter NHARTS = 3,
     parameter HARTID = 32'h01,
-    parameter NCYCLES = 4,
+    parameter NCYCLES = 2,
     parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50
 ) (
     // Clock and Reset
@@ -116,6 +116,7 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic tmr_voter_enable_s;
     logic [2:0] dmr_config_s;
     logic dual_mode_s;
+    logic delayed_s;
     logic [NHARTS-1:0] dmr_wfi_s;
 
     // Compared CPU Signals
@@ -267,6 +268,7 @@ safe_FSM safe_FSM_i (
     .dmr_error_i(dmr_error_s),
     .wfi_dmr_o(dmr_wfi_s),
     .Dual_mode_o(dual_mode_s),
+    .Delayed_o(delayed_s),
     .Start_Boot_o(Start_Boot_s),
     .Start_i(Start_s),
     .End_sw_routine_i(End_sw_routine_s),
@@ -605,7 +607,7 @@ always_comb begin
     assign mux_intr_o[i]       = mux_intr_i[i];
     assign mux_debug_req_o[i]  = mux_debug_req_i[i];
 
-    if (Delay_en == 1'b1 && dual_mode_s == 1'b1) begin
+    if (delayed_s == 1'b1 && dual_mode_s == 1'b1) begin
         if(i==0) begin
             assign mux_core_instr_req_o[0]   =   core_instr_req_ff[0];
             assign mux_core_instr_resp_o[0].rdata  =   mux_core_instr_resp_i[0].rdata;

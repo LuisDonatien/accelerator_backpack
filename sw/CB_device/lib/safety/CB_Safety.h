@@ -16,21 +16,11 @@ extern "C" {
 #include "CPU_Private_regs.h"
 #include "CB_heep_ctrl_regs.h"
 #include "Safe_wrapper_ctrl_regs.h"
+#include "CB_Safety_Config.h"
 
 #define CHECK_RAM_ADDRESS       0xF002B000
 
 #define FREE_LOCATION_POINTER   0xF002A000
-
-#define CRITICAL_SECTION 	0x1
-#define NONE_CRITICAL_SECTION	0x0
-
-#define MASTER_CORE0	0x1	//0b001
-#define MASTER_CORE1	0x2	//0b010
-#define MASTER_CORE2	0x4	//0b100
-
-#define SINGLE_MODE     0x0
-#define TMR_MODE        0x1
-#define DMR_MODE        0x2
 
 //Functions
 #define INTERRUPT_HANDLER_ABI __attribute__((aligned(4), interrupt))

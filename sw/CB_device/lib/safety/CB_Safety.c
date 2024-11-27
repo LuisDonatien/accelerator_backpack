@@ -228,13 +228,7 @@ volatile unsigned int *Safe_config_reg= SAFE_WRAPPER_CTRL_BASEADDRESS;
                 *(Safe_config_reg+2) = master;
                 *(Safe_config_reg) = 0x0;
                 asm volatile("fence");
-//Todo pending implement DMR Recovery config
-__asm__ volatile(".word 0x00000013");
-__asm__ volatile(".word 0x00000013");
-__asm__ volatile(".word 0x00000013");
-__asm__ volatile(".word 0x00000013");
                 asm volatile("wfi");
-__asm__ volatile(".word 0x00000013");
 __asm__ volatile(".word 0x00000013");
 __asm__ volatile(".word 0x00000013");
         }
@@ -973,4 +967,21 @@ void Check_RF(void){
 
         asm volatile ("lw   t5,12(sp)"); //Restore t5
         asm volatile("addi      sp,sp,20"); //Restore stack pointer
+}
+
+
+//Todo adapt this exit to the exit syscall and exit_status
+__attribute__((aligned(4))) void _exit(int exit_status)
+{
+    volatile unsigned int *END_SW_P = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET;
+    *END_SW_P = 0x1;
+    asm volatile("wfi");
+/*    asm volatile("fence");
+    asm volatile("wfi");
+    asm volatile("fence.i");
+/**/
+    asm volatile(".word 0x00000013");
+    asm volatile(".word 0x00000013");
+    asm volatile(".word 0x00000013");
+/**/
 }

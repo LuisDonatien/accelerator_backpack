@@ -53,16 +53,16 @@ entry:
        nop
        nop
 wfi_entry:  
-       nop
-       nop
+       nop 
+       nop  
        wfi
        j wfi_entry
        nop
        nop
-single_boot:
+single_boot: 
        //Program Counter -> dpc Control & Status Register  
        lui   a0, %hi(SAFE_WRAPPER_CTRL_BASEADDRESS)  
-       lw    a0, SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_REG_OFFSET(a0)          //Base Address CPU Private Registers          
+       lw    a0, SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_REG_OFFSET(a0)          //Base Address CPU Private Registers        
        csrw dpc, a0
 
        //Resume//
@@ -107,7 +107,7 @@ debug_entry:
        //cycles
        beqz    a0, halt_boot      
        xori     a0 ,a0, 0x2 //Mask applied to see if its Single Debug boot
-       beqz     a0, single_boot
+       beqz     a0, reset_core
 
 //        j single_boot
         // This fence is required because the execution may have written something
@@ -336,6 +336,41 @@ halt_boot:
        nop
        nop
        jal zero, halt_boot
+
+reset_core:
+     li      sp, 0
+     li      gp, 0
+     li      tp, 0
+     li      ra, 0
+     li      t0, 0
+     li      t1, 0
+     li      t2, 0
+     li      s0, 0
+     li      s1, 0
+     li      a0, 0
+     li      a1, 0
+     li      a2, 0
+     li      a3, 0
+     li      a4, 0
+     li      a5, 0
+     li      a6, 0
+     li      a7, 0
+     li      s2, 0
+     li      s3, 0
+     li      s4, 0
+     li      s5, 0
+     li      s6, 0
+     li      s7, 0
+     li      s8, 0
+     li      s9, 0
+     li      s10, 0
+     li      s11, 0
+     li      t3, 0
+     li      t4, 0
+     li      t5, 0
+     li      t6, 0
+     j single_boot
+
 
 //Loop until HALT/*
 //.section .shadow_wfi

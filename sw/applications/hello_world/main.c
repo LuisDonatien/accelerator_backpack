@@ -23,25 +23,7 @@
 
 int main(int argc, char *argv[])
 {
-    volatile unsigned int *END_SW_P = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET;
-    volatile unsigned int *P = 0x9000;
-    volatile unsigned int *P1 = 0x9004;
-    *END_SW_P = 0x0;
-    *P=0xdeadbeef;
-    *P1=0xdeadbeef;
-    *P=0xdeadbeef;
-    *P1=0xdeadbeef;
-    *P=0xdeadbeef;
-    *P1=0xdeadbeef;
-    *P=0x5555beef;
-    *P1=0x5555beef;
-    *P=0x555beef;
-    *P1=0xdeadbeef;
-    *P=0xdeadbeef;
-    *P1=0xdeadbeef;
     printf("[IP_CB]: hello world...!\n");
-    *END_SW_P = 0x1;
-    while(1){asm volatile("wfi");}
     return 0;
     //return EXIT_SUCCESS;
 

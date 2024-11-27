@@ -15,137 +15,100 @@
 int main(int argc, char *argv[]) 
 {
         volatile unsigned int *P = FREE_LOCATION_POINTER; 
-        volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS |SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET; 
+        volatile unsigned int *END_SW = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET; 
+        volatile unsigned int *i = 0xF0028040; 
 
-        //Entering Safe mode TMR 
+//        printf("[EROS-HEEP]: Start Single :)\n");        
+
+        //Entering Safe DMR mode 
         TMR_Safe_Activate(DMR_MODE); 
 //        TMR_Set_Critical_Section(CRITICAL_SECTION);
-        volatile unsigned int *i = 0xF0028040; 
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
+         *i=0xdeadbee0;
+         *i=0xdeadbee1;
+         *i=0xdeadbee2;
+         *i=0xdeadbee3;
         Store_Checkpoint();
 
-       CSR_READ(CSR_REG_MHARTID,P);  
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-//       CSR_READ(CSR_REG_MHARTID,P);  
+        CSR_READ(CSR_REG_MHARTID,P);
+
+         *i=0xdeadbee4;
+         *i=0xdeadbee5;
+         *i=0xdeadbee6;
+         *i=0xdeadbee7; 
 
         //Reference for exit store_checkpoint 
         asm volatile(".global _exit_Store_checkpoint");
         asm volatile("_exit_Store_checkpoint:"); 
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         *i=0xdeadbeef;
-         int var = (*i);
-        for(int j=0;j<100;j++)  
-                var+=j;
 
-        *i = var;
-      //  Check_RF();
+//        printf("[EROS-HEEP]: Execute DMR_MODE :)\n"); 
 
-//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
-/* 
-        Check_RF();
+         *i=0xdeadbee8;
+         *i=0xdeadbee9;
+         *i=0xdeadbe10;
+         *i=0xdeadbe11;
 
-        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
-*/
-//        TMR_Safe_Stop(MASTER_CORE1); 
+        TMR_Safe_Stop(MASTER_CORE1); 
 
+//        printf("[EROS-HEEP]: Exit from DMR_MODE :)\n"); 
 
-        //Entering Safe mode TMR 
-//        TMR_Safe_Activate(TMR_MODE); 
+        //Entering Safe TMR mode
+        TMR_Safe_Activate(TMR_MODE); 
 //        TMR_Set_Critical_Section(CRITICAL_SECTION);
+         *i=0xdeadbee0;
+         *i=0xdeadbee1;
+         *i=0xdeadbee2;
+         *i=0xdeadbee3;
 
+        CSR_READ(CSR_REG_MHARTID,P);
 
-//       CSR_READ(CSR_REG_MHARTID,P);   
+         *i=0xdeadbee4;
+         *i=0xdeadbee5;
+         *i=0xdeadbee6;
+         *i=0xdeadbee7;
 
-//       for(int j=0;j<10;j++)  
-//                *i=j;
-//         *i=0xdeadbeef;
+//        printf("[EROS-HEEP]: Execute TMR_MODE :)\n");
 
-      //  Check_RF();
+         *i=0xdeadbee8;
+         *i=0xdeadbee9;
+         *i=0xdeadbe10;
+         *i=0xdeadbe11;
 
-//        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION); 
-/* 
-        Check_RF();
-
-        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
-*/
-        TMR_Safe_Stop(MASTER_CORE1); 
-/*        
-        for(int j=0;j<10;j++)  
-                *i=j;
-         *i=0xdeadbeef;
-
-        //Entering Safe mode TMR 
-        TMR_Safe_Activate();
-
-        for(int j=0;j<10;j++)  
-                *i=j;
-         *i=0xdeadbeef;
-        
         TMR_Safe_Stop(MASTER_CORE0); 
+
+//        printf("[EROS-HEEP]: Exit from TMR_MODE :)\n");
+
+        //Entering Safe LOCKSTEP mode 
+        TMR_Safe_Activate(LOCKSTEP_MODE); 
+//        TMR_Set_Critical_Section(CRITICAL_SECTION);
+         *i=0xdeadbee0;
+         *i=0xdeadbee1;
+         *i=0xdeadbee2;
+         *i=0xdeadbee3;
+//        Store_Checkpoint();
+
+         *i=0xdeadbee4;
+         *i=0xdeadbee5;
+         *i=0xdeadbee6;
+         *i=0xdeadbee7; 
 /*
-        //Entering Safe mode TMR 
-        TMR_Safe_Activate(); 
-
-
-        TMR_Safe_Activate(); 
-        TMR_Set_Critical_Section(CRITICAL_SECTION); 
- 
- 
-        CSR_READ(CSR_REG_MHARTID,P);  
-
- 
-        for(int j=0;j<10;j++)   
-                *i=j;  
-         *i=0xdeadbeef;
-
-        Check_RF();
-
-        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
- 
-        Check_RF();
-
-        TMR_Safe_Stop(MASTER_CORE2);   
- 
-        TMR_Safe_Activate();  
-        TMR_Set_Critical_Section(CRITICAL_SECTION);
-  
-
-        CSR_READ(CSR_REG_MHARTID,P);  
-
-
-        for(int j=0;j<10;j++)  
-                *i=j;
-         *i=0xdeadbeef;
- 
-        Check_RF();
-
-        TMR_Set_Critical_Section(NONE_CRITICAL_SECTION);
- 
-        Check_RF();
-
-        TMR_Safe_Stop(MASTER_CORE1); 
-
+        //Reference for exit store_checkpoint 
+        asm volatile(".global _exit_Store_checkpoint");
+        asm volatile("_exit_Store_checkpoint:"); 
 */
 
+        printf("[EROS-HEEP]: Execute LOCKSTEP_MODE :)\n");
 
- 
-//       CSR_READ(CSR_REG_MHARTID,P); 
-        /******END PROGRAM******/   
-        printf("[EROS-HEEP]: Hello :)\n"); 
-        *END_SW = 0x1;
-        asm volatile("fence");
-        while(1){ 
-        asm volatile("wfi");
-        }        
+
+         *i=0xdeadbee8;
+         *i=0xdeadbee9;
+         *i=0xdeadbe10;
+         *i=0xdeadbe11;
+
+        TMR_Safe_Stop(MASTER_CORE0); 
+
+        printf("[EROS-HEEP]: Exit from LOCKSTEP_MODE :)\n");
+         
         /******END PROGRAM******/
     
-//        return EXIT_SUCCESS;
+        return 0;
 }

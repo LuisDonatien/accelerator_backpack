@@ -83,9 +83,10 @@ always_comb begin
     error_s = '0;
 
     //Instruction
+    //Added check for req addr or wdata
     for(int i=0; i<NHARTS;i++) begin : instr_bus_checker 
-        if (((voted_core_instr_req_s.addr != core_instr_req_i[i].addr) ||
-            (voted_core_instr_req_s.wdata != core_instr_req_i[i].wdata) ||
+        if ((((voted_core_instr_req_s.addr != core_instr_req_i[i].addr) & core_instr_req_i[i].req) ||
+            ((voted_core_instr_req_s.wdata != core_instr_req_i[i].wdata) & core_instr_req_i[i].we) ||
             (voted_core_instr_req_s.be != core_instr_req_i[i].be) ||
             (voted_core_instr_req_s.we != core_instr_req_i[i].we) ||
             (voted_core_instr_req_s.req != core_instr_req_i[i].req)) && enable_i) begin
@@ -95,9 +96,10 @@ always_comb begin
     end
     
     //Data
+    //Added check for req addr or wdata
     for(int i=0; i<NHARTS;i++) begin : data_bus_checker 
-        if (((voted_core_data_req_s.addr != core_data_req_i[i].addr) ||
-            (voted_core_data_req_s.wdata != core_data_req_i[i].wdata) ||
+        if ((((voted_core_data_req_s.addr != core_data_req_i[i].addr) & core_data_req_i[i].req) ||
+            ((voted_core_data_req_s.wdata != core_data_req_i[i].wdata) & core_data_req_i[i].we) ||
             (voted_core_data_req_s.be != core_data_req_i[i].be) ||
             (voted_core_data_req_s.we != core_data_req_i[i].we) ||
             (voted_core_data_req_s.req != core_data_req_i[i].req)) && enable_i) begin
