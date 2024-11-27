@@ -13,31 +13,11 @@ module periph_system
     input logic rst_ni,
 
     input  obi_req_t  slave_req_i,
-    output obi_resp_t slave_resp_o,
-
-    //External MM CSR ports 
-    input  obi_req_t    csr_reg_req_i,
-    output obi_resp_t   csr_reg_resp_o, 
-
-    //***Safe CPU wrapper control ports***//
-    input  logic EndSw_i,
-    output logic [2:0] master_core_o,
-    output logic [2:0] safe_mode_o,
-    output logic [1:0] safe_configuration_o,
-    output logic critical_section_o,
-    output logic Start_o,
-    output logic [31:0] boot_addr_o,
-
-    //***Safe CPU wrapper status ports***//
-    input logic [NHARTS-1 : 0] debug_mode_i,
-    input logic [NHARTS-1 : 0] sleep_i,
-
-    // Interrupt Interface
-    output logic interrupt_o
+    output obi_resp_t slave_resp_o
 );
-
+  
+  
   import cei_mochila_pkg::*;
-
 
   reg_pkg::reg_req_t peripheral_req;
   reg_pkg::reg_rsp_t peripheral_rsp;
@@ -102,25 +82,4 @@ module periph_system
       .reg_req_i(peripheral_slv_req[cei_mochila_pkg::DEBUG_BOOTROM_IDX]),
       .reg_rsp_o(peripheral_slv_rsp[cei_mochila_pkg::DEBUG_BOOTROM_IDX])
   );
-
-  cb_heep_ctrl #(
-    .reg_req_t(reg_pkg::reg_req_t),
-    .reg_rsp_t(reg_pkg::reg_rsp_t)
-    )cb_heep_ctrl_i(
-    .clk_i,
-    .rst_ni,
-    // Bus Interface
-    .reg_req_i(csr_reg_req_i),
-    .reg_rsp_o(csr_reg_resp_o),
-    .EndSw_i,
-    .master_core_o,
-    .safe_mode_o,
-    .safe_configuration_o,
-    .critical_section_o,
-    .Start_o,
-    .boot_addr_o,
-    .debug_mode_i,
-    .sleep_i,
-    .interrupt_o
-    );
 endmodule

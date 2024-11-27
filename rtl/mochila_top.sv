@@ -5,6 +5,7 @@
 
 module mochila_top
   import obi_pkg::*;
+  import reg_pkg::*;
   import core_v_mini_mcu_pkg::*;
   import cei_mochila_pkg::*;
 #(
@@ -26,8 +27,8 @@ module mochila_top
     input  obi_resp_t   ext_slave_resp_i,
 
     //CSR 
-    input  obi_req_t    csr_reg_req_i,
-    output obi_resp_t   csr_reg_resp_o,
+    input  reg_req_t   csr_reg_req_i,
+    output reg_rsp_t   csr_reg_resp_o,
 
     // Debug Interface
     input logic         debug_req_i,
@@ -53,8 +54,8 @@ module mochila_top
     obi_resp_t [NHARTS-1 : 0] core_data_resp;
 
     // Safe Wrapper Control/Status Register
-    obi_req_t  wrapper_csr_req;
-    obi_resp_t wrapper_csr_resp;    
+    reg_req_t  wrapper_csr_req;
+    reg_rsp_t  wrapper_csr_resp;    
 
     // Internal slave ports
     obi_req_t  peripheral_slave_req;
@@ -64,16 +65,6 @@ module mochila_top
     obi_req_t  [N_BANKS-1:0]ram_req;
     obi_resp_t [N_BANKS-1:0]ram_resp;   
 
-    // Safe CPU wrapper external control signals
-    logic endSw_s;
-    logic [2:0] master_core_s;
-    logic [2:0] safe_mode_s;
-    logic [1:0] safe_configuration_s;
-    logic critical_section_s;
-    logic start_S;
-    logic [31:0] boot_addr_s; 
-    logic [NHARTS-1:0] status_debug_mode_s;
-    logic [NHARTS-1:0] status_sleep_s;
 
 //CPU_System
 safe_cpu_wrapper #(
@@ -92,41 +83,22 @@ safe_cpu_wrapper #(
     .core_data_resp_i(core_data_resp),
 
     // Wrapper Control & Status Rgister
-    .wrapper_csr_req_i(wrapper_csr_req),
+    .wrapper_csr_req_i(wrapper_csr_req), 
     .wrapper_csr_resp_o(wrapper_csr_resp),
 
     // Debug Interface
     .debug_req_i,
 
-    .ext_EndSw_o(endSw_s),
-    .ext_master_core_i(master_core_s),
-    .ext_safe_mode_i(safe_mode_s),
-    .ext_safe_configuration_i(safe_configuration_s),
-    .ext_critical_section_i(critical_section_s),
-    .ext_Start_i(start_S),
-    .boot_addr_i(boot_addr_s),
-    .debug_mode_o(status_debug_mode_s),
-    .sleep_o(status_sleep_s)
+    // Interrupt Interface
+    .interrupt_o
 );
 
 //Peripheral System
 periph_system periph_system_i(
     .clk_i,
     .rst_ni,
-    .csr_reg_req_i,
-    .csr_reg_resp_o,
     .slave_req_i(peripheral_slave_req),
-    .slave_resp_o(peripheral_slave_resp),
-    .EndSw_i(endSw_s),
-    .master_core_o(master_core_s),
-    .safe_mode_o(safe_mode_s),
-    .safe_configuration_o(safe_configuration_s),
-    .critical_section_o(critical_section_s),
-    .Start_o(start_S),
-    .boot_addr_o(boot_addr_s),
-    .debug_mode_i(status_debug_mode_s),
-    .sleep_i(status_sleep_s),
-    .interrupt_o
+    .slave_resp_o(peripheral_slave_resp)
 );
 
 memory_sys memory_sys_i(
@@ -140,9 +112,6 @@ memory_sys memory_sys_i(
     .pwrgate_ack_no,
     .set_retentive_ni
 );
-
-
-
 
 //Bus System
 bus_system #(
@@ -163,6 +132,9 @@ bus_system #(
     .ext_slave_req_o,
     .ext_slave_resp_i,
 
+    .ext_csr_reg_req_i(csr_reg_req_i),
+    .ext_csr_reg_resp_o(csr_reg_resp_o),
+
     // Internal slave ports
     .peripheral_slave_req_o(peripheral_slave_req),
     .peripheral_slave_resp_i(peripheral_slave_resp),
@@ -171,8 +143,8 @@ bus_system #(
     .ram_resp_i(ram_resp),
 
     // Control Status Register Output 
-    .wrapper_csr_req_o(wrapper_csr_req),
-    .wrapper_csr_resp_i(wrapper_csr_resp)
+    .wrapper_csr_req_o(wrapper_csr_req), 
+    .wrapper_csr_rsp_i(wrapper_csr_resp)
 );
 
 endmodule

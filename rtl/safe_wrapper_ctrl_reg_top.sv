@@ -80,6 +80,12 @@ module safe_wrapper_ctrl_reg_top #(
   logic critical_section_qs;
   logic critical_section_wd;
   logic critical_section_we;
+  logic start_qs;
+  logic start_wd;
+  logic start_we;
+  logic [31:0] boot_address_qs;
+  logic [31:0] boot_address_wd;
+  logic boot_address_we;
   logic [1:0] external_debug_req_qs;
   logic initial_sync_master_qs;
   logic initial_sync_master_wd;
@@ -88,9 +94,19 @@ module safe_wrapper_ctrl_reg_top #(
   logic end_sw_routine_wd;
   logic end_sw_routine_we;
   logic [31:0] entry_address_qs;
+  logic [31:0] entry_address_wd;
+  logic entry_address_we;
   logic [31:0] safe_copy_address_qs;
   logic [31:0] safe_copy_address_wd;
   logic safe_copy_address_we;
+  logic interrupt_controler_enable_interrupt_qs;
+  logic interrupt_controler_enable_interrupt_wd;
+  logic interrupt_controler_enable_interrupt_we;
+  logic interrupt_controler_status_interrupt_qs;
+  logic interrupt_controler_status_interrupt_wd;
+  logic interrupt_controler_status_interrupt_we;
+  logic [2:0] cb_heep_status_cores_sleep_qs;
+  logic [2:0] cb_heep_status_cores_debug_mode_qs;
 
   // Register instances
   // R[safe_configuration]: V(False)
@@ -108,8 +124,8 @@ module safe_wrapper_ctrl_reg_top #(
     .wd     (safe_configuration_wd),
 
     // from internal hardware
-    .de     (hw2reg.safe_configuration.de),
-    .d      (hw2reg.safe_configuration.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
@@ -135,8 +151,8 @@ module safe_wrapper_ctrl_reg_top #(
     .wd     (dmr_mask_wd),
 
     // from internal hardware
-    .de     (hw2reg.dmr_mask.de),
-    .d      (hw2reg.dmr_mask.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
@@ -162,8 +178,8 @@ module safe_wrapper_ctrl_reg_top #(
     .wd     (master_core_wd),
 
     // from internal hardware
-    .de     (hw2reg.master_core.de),
-    .d      (hw2reg.master_core.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
@@ -189,8 +205,8 @@ module safe_wrapper_ctrl_reg_top #(
     .wd     (critical_section_wd),
 
     // from internal hardware
-    .de     (hw2reg.critical_section.de),
-    .d      (hw2reg.critical_section.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
@@ -198,6 +214,60 @@ module safe_wrapper_ctrl_reg_top #(
 
     // to register interface (read)
     .qs     (critical_section_qs)
+  );
+
+
+  // R[start]: V(False)
+
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_start (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (start_we),
+    .wd     (start_wd),
+
+    // from internal hardware
+    .de     (hw2reg.start.de),
+    .d      (hw2reg.start.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.start.q ),
+
+    // to register interface (read)
+    .qs     (start_qs)
+  );
+
+
+  // R[boot_address]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RW"),
+    .RESVAL  (32'h0)
+  ) u_boot_address (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (boot_address_we),
+    .wd     (boot_address_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (boot_address_qs)
   );
 
 
@@ -285,18 +355,19 @@ module safe_wrapper_ctrl_reg_top #(
 
   prim_subreg #(
     .DW      (32),
-    .SWACCESS("RO"),
+    .SWACCESS("RW"),
     .RESVAL  (32'h0)
   ) u_entry_address (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
-    .we     (1'b0),
-    .wd     ('0  ),
+    // from register interface
+    .we     (entry_address_we),
+    .wd     (entry_address_wd),
 
     // from internal hardware
-    .de     (hw2reg.entry_address.de),
-    .d      (hw2reg.entry_address.d ),
+    .de     (1'b0),
+    .d      ('0  ),
 
     // to internal hardware
     .qe     (),
@@ -334,20 +405,130 @@ module safe_wrapper_ctrl_reg_top #(
   );
 
 
+  // R[interrupt_controler]: V(False)
+
+  //   F[enable_interrupt]: 0:0
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_interrupt_controler_enable_interrupt (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (interrupt_controler_enable_interrupt_we),
+    .wd     (interrupt_controler_enable_interrupt_wd),
+
+    // from internal hardware
+    .de     (hw2reg.interrupt_controler.enable_interrupt.de),
+    .d      (hw2reg.interrupt_controler.enable_interrupt.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.interrupt_controler.enable_interrupt.q ),
+
+    // to register interface (read)
+    .qs     (interrupt_controler_enable_interrupt_qs)
+  );
 
 
-  logic [8:0] addr_hit;
+  //   F[status_interrupt]: 1:1
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_interrupt_controler_status_interrupt (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (interrupt_controler_status_interrupt_we),
+    .wd     (interrupt_controler_status_interrupt_wd),
+
+    // from internal hardware
+    .de     (hw2reg.interrupt_controler.status_interrupt.de),
+    .d      (hw2reg.interrupt_controler.status_interrupt.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.interrupt_controler.status_interrupt.q ),
+
+    // to register interface (read)
+    .qs     (interrupt_controler_status_interrupt_qs)
+  );
+
+
+  // R[cb_heep_status]: V(False)
+
+  //   F[cores_sleep]: 2:0
+  prim_subreg #(
+    .DW      (3),
+    .SWACCESS("RO"),
+    .RESVAL  (3'h0)
+  ) u_cb_heep_status_cores_sleep (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.cb_heep_status.cores_sleep.de),
+    .d      (hw2reg.cb_heep_status.cores_sleep.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (cb_heep_status_cores_sleep_qs)
+  );
+
+
+  //   F[cores_debug_mode]: 5:3
+  prim_subreg #(
+    .DW      (3),
+    .SWACCESS("RO"),
+    .RESVAL  (3'h0)
+  ) u_cb_heep_status_cores_debug_mode (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.cb_heep_status.cores_debug_mode.de),
+    .d      (hw2reg.cb_heep_status.cores_debug_mode.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (cb_heep_status_cores_debug_mode_qs)
+  );
+
+
+
+
+  logic [12:0] addr_hit;
   always_comb begin
     addr_hit = '0;
-    addr_hit[0] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET);
-    addr_hit[1] = (reg_addr == SAFE_WRAPPER_CTRL_DMR_MASK_OFFSET);
-    addr_hit[2] = (reg_addr == SAFE_WRAPPER_CTRL_MASTER_CORE_OFFSET);
-    addr_hit[3] = (reg_addr == SAFE_WRAPPER_CTRL_CRITICAL_SECTION_OFFSET);
-    addr_hit[4] = (reg_addr == SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ_OFFSET);
-    addr_hit[5] = (reg_addr == SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_OFFSET);
-    addr_hit[6] = (reg_addr == SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET);
-    addr_hit[7] = (reg_addr == SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_OFFSET);
-    addr_hit[8] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET);
+    addr_hit[ 0] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET);
+    addr_hit[ 1] = (reg_addr == SAFE_WRAPPER_CTRL_DMR_MASK_OFFSET);
+    addr_hit[ 2] = (reg_addr == SAFE_WRAPPER_CTRL_MASTER_CORE_OFFSET);
+    addr_hit[ 3] = (reg_addr == SAFE_WRAPPER_CTRL_CRITICAL_SECTION_OFFSET);
+    addr_hit[ 4] = (reg_addr == SAFE_WRAPPER_CTRL_START_OFFSET);
+    addr_hit[ 5] = (reg_addr == SAFE_WRAPPER_CTRL_BOOT_ADDRESS_OFFSET);
+    addr_hit[ 6] = (reg_addr == SAFE_WRAPPER_CTRL_EXTERNAL_DEBUG_REQ_OFFSET);
+    addr_hit[ 7] = (reg_addr == SAFE_WRAPPER_CTRL_INITIAL_SYNC_MASTER_OFFSET);
+    addr_hit[ 8] = (reg_addr == SAFE_WRAPPER_CTRL_END_SW_ROUTINE_OFFSET);
+    addr_hit[ 9] = (reg_addr == SAFE_WRAPPER_CTRL_ENTRY_ADDRESS_OFFSET);
+    addr_hit[10] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET);
+    addr_hit[11] = (reg_addr == SAFE_WRAPPER_CTRL_INTERRUPT_CONTROLER_OFFSET);
+    addr_hit[12] = (reg_addr == SAFE_WRAPPER_CTRL_CB_HEEP_STATUS_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -355,15 +536,19 @@ module safe_wrapper_ctrl_reg_top #(
   // Check sub-word write is permitted
   always_comb begin
     wr_err = (reg_we &
-              ((addr_hit[0] & (|(SAFE_WRAPPER_CTRL_PERMIT[0] & ~reg_be))) |
-               (addr_hit[1] & (|(SAFE_WRAPPER_CTRL_PERMIT[1] & ~reg_be))) |
-               (addr_hit[2] & (|(SAFE_WRAPPER_CTRL_PERMIT[2] & ~reg_be))) |
-               (addr_hit[3] & (|(SAFE_WRAPPER_CTRL_PERMIT[3] & ~reg_be))) |
-               (addr_hit[4] & (|(SAFE_WRAPPER_CTRL_PERMIT[4] & ~reg_be))) |
-               (addr_hit[5] & (|(SAFE_WRAPPER_CTRL_PERMIT[5] & ~reg_be))) |
-               (addr_hit[6] & (|(SAFE_WRAPPER_CTRL_PERMIT[6] & ~reg_be))) |
-               (addr_hit[7] & (|(SAFE_WRAPPER_CTRL_PERMIT[7] & ~reg_be))) |
-               (addr_hit[8] & (|(SAFE_WRAPPER_CTRL_PERMIT[8] & ~reg_be)))));
+              ((addr_hit[ 0] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 0] & ~reg_be))) |
+               (addr_hit[ 1] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 1] & ~reg_be))) |
+               (addr_hit[ 2] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 2] & ~reg_be))) |
+               (addr_hit[ 3] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 3] & ~reg_be))) |
+               (addr_hit[ 4] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 4] & ~reg_be))) |
+               (addr_hit[ 5] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 5] & ~reg_be))) |
+               (addr_hit[ 6] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 6] & ~reg_be))) |
+               (addr_hit[ 7] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 7] & ~reg_be))) |
+               (addr_hit[ 8] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 8] & ~reg_be))) |
+               (addr_hit[ 9] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 9] & ~reg_be))) |
+               (addr_hit[10] & (|(SAFE_WRAPPER_CTRL_PERMIT[10] & ~reg_be))) |
+               (addr_hit[11] & (|(SAFE_WRAPPER_CTRL_PERMIT[11] & ~reg_be))) |
+               (addr_hit[12] & (|(SAFE_WRAPPER_CTRL_PERMIT[12] & ~reg_be)))));
   end
 
   assign safe_configuration_we = addr_hit[0] & reg_we & !reg_error;
@@ -378,14 +563,29 @@ module safe_wrapper_ctrl_reg_top #(
   assign critical_section_we = addr_hit[3] & reg_we & !reg_error;
   assign critical_section_wd = reg_wdata[0];
 
-  assign initial_sync_master_we = addr_hit[5] & reg_we & !reg_error;
+  assign start_we = addr_hit[4] & reg_we & !reg_error;
+  assign start_wd = reg_wdata[0];
+
+  assign boot_address_we = addr_hit[5] & reg_we & !reg_error;
+  assign boot_address_wd = reg_wdata[31:0];
+
+  assign initial_sync_master_we = addr_hit[7] & reg_we & !reg_error;
   assign initial_sync_master_wd = reg_wdata[0];
 
-  assign end_sw_routine_we = addr_hit[6] & reg_we & !reg_error;
+  assign end_sw_routine_we = addr_hit[8] & reg_we & !reg_error;
   assign end_sw_routine_wd = reg_wdata[0];
 
-  assign safe_copy_address_we = addr_hit[8] & reg_we & !reg_error;
+  assign entry_address_we = addr_hit[9] & reg_we & !reg_error;
+  assign entry_address_wd = reg_wdata[31:0];
+
+  assign safe_copy_address_we = addr_hit[10] & reg_we & !reg_error;
   assign safe_copy_address_wd = reg_wdata[31:0];
+
+  assign interrupt_controler_enable_interrupt_we = addr_hit[11] & reg_we & !reg_error;
+  assign interrupt_controler_enable_interrupt_wd = reg_wdata[0];
+
+  assign interrupt_controler_status_interrupt_we = addr_hit[11] & reg_we & !reg_error;
+  assign interrupt_controler_status_interrupt_wd = reg_wdata[1];
 
   // Read data return
   always_comb begin
@@ -408,23 +608,41 @@ module safe_wrapper_ctrl_reg_top #(
       end
 
       addr_hit[4]: begin
-        reg_rdata_next[1:0] = external_debug_req_qs;
+        reg_rdata_next[0] = start_qs;
       end
 
       addr_hit[5]: begin
-        reg_rdata_next[0] = initial_sync_master_qs;
+        reg_rdata_next[31:0] = boot_address_qs;
       end
 
       addr_hit[6]: begin
-        reg_rdata_next[0] = end_sw_routine_qs;
+        reg_rdata_next[1:0] = external_debug_req_qs;
       end
 
       addr_hit[7]: begin
-        reg_rdata_next[31:0] = entry_address_qs;
+        reg_rdata_next[0] = initial_sync_master_qs;
       end
 
       addr_hit[8]: begin
+        reg_rdata_next[0] = end_sw_routine_qs;
+      end
+
+      addr_hit[9]: begin
+        reg_rdata_next[31:0] = entry_address_qs;
+      end
+
+      addr_hit[10]: begin
         reg_rdata_next[31:0] = safe_copy_address_qs;
+      end
+
+      addr_hit[11]: begin
+        reg_rdata_next[0] = interrupt_controler_enable_interrupt_qs;
+        reg_rdata_next[1] = interrupt_controler_status_interrupt_qs;
+      end
+
+      addr_hit[12]: begin
+        reg_rdata_next[2:0] = cb_heep_status_cores_sleep_qs;
+        reg_rdata_next[5:3] = cb_heep_status_cores_debug_mode_qs;
       end
 
       default: begin

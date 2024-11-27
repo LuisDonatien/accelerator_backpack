@@ -18,7 +18,7 @@ Disassembly of section .text:
 
 00000020 <single_boot>:
   20:	f0012537          	lui	a0,0xf0012
-  24:	01c52503          	lw	a0,28(a0) # f001201c <reset_core+0xf0011ec8>
+  24:	02452503          	lw	a0,36(a0) # f0012024 <reset_core+0xf0011ed0>
   28:	7b151073          	csrw	dpc,a0
   2c:	7b200073          	dret
   30:	0000                	unimp
@@ -42,7 +42,7 @@ Disassembly of section .text:
   50:	7b351073          	csrw	dscratch1,a0
   54:	7b241073          	csrw	dscratch0,s0
   58:	f0012537          	lui	a0,0xf0012
-  5c:	01052503          	lw	a0,16(a0) # f0012010 <reset_core+0xf0011ebc>
+  5c:	01852503          	lw	a0,24(a0) # f0012018 <reset_core+0xf0011ec4>
   60:	02050263          	beqz	a0,84 <halt_boot>
   64:	00254513          	xori	a0,a0,2
   68:	0e050663          	beqz	a0,154 <reset_core>
@@ -55,7 +55,7 @@ Disassembly of section .text:
 
 00000084 <halt_boot>:
   84:	f0012f37          	lui	t5,0xf0012
-  88:	020f2f03          	lw	t5,32(t5) # f0012020 <reset_core+0xf0011ecc>
+  88:	028f2f03          	lw	t5,40(t5) # f0012028 <reset_core+0xf0011ed4>
   8c:	000f2f83          	lw	t6,0(t5)
   90:	300f9073          	csrw	mstatus,t6
   94:	004f2f83          	lw	t6,4(t5)

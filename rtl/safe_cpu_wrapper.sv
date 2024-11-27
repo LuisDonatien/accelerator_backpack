@@ -26,25 +26,14 @@ module safe_cpu_wrapper
     input  obi_resp_t [NHARTS-1 : 0] core_data_resp_i,
 
     // OBI -> Memory mapped register control Safe CPU
-    input  obi_req_t    wrapper_csr_req_i,
-    output obi_resp_t   wrapper_csr_resp_o,
+    input  reg_req_t    wrapper_csr_req_i,
+    output reg_rsp_t   wrapper_csr_resp_o,
 
     // Debug Interface
     input logic       debug_req_i,
 
-    //Control Signals
-    output logic ext_EndSw_o,
-    input logic [2:0] ext_master_core_i,
-    input logic [2:0] ext_safe_mode_i,
-    input logic [1:0] ext_safe_configuration_i,
-    input logic ext_critical_section_i,
-    input logic ext_Start_i,
-    input logic [31:0] boot_addr_i,
-
-    //Status Signals 
-    output logic [NHARTS-1 : 0] debug_mode_o,
-    output logic [NHARTS-1 : 0] sleep_o
-
+    //External Interrupt
+    output logic      interrupt_o
 );
 
 localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
@@ -180,30 +169,6 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     .debug_mode_o(debug_mode_s)
 );
 
-//***OBI Slave[1] -> Safe CPU Wrapper Register***//
-    periph_to_reg #(
-        .req_t(reg_pkg::reg_req_t),
-        .rsp_t(reg_pkg::reg_rsp_t),
-        .IW(1)
-    ) cpu_periph_to_reg_i (
-        .clk_i,
-        .rst_ni,
-        .req_i(wrapper_csr_req_i.req),
-        .add_i(wrapper_csr_req_i.addr),
-        .wen_i(~wrapper_csr_req_i.we),
-        .wdata_i(wrapper_csr_req_i.wdata),
-        .be_i(wrapper_csr_req_i.be),
-        .id_i('0),
-        .gnt_o(wrapper_csr_resp_o.gnt),
-        .r_rdata_o(wrapper_csr_resp_o.rdata),
-        .r_opc_o(),
-        .r_id_o(),
-        .r_valid_o(wrapper_csr_resp_o.rvalid),
-        .reg_req_o(safe_cpu_wrapper_reg_req),
-        .reg_rsp_i(safe_cpu_wrapper_reg_rsp)
-  );
-//***Safe CPU Wrapper Register***//
-
 safe_wrapper_ctrl #(
     .reg_req_t(reg_pkg::reg_req_t),
     .reg_rsp_t(reg_pkg::reg_rsp_t)
@@ -212,16 +177,8 @@ safe_wrapper_ctrl #(
     .rst_ni,
 
     // Bus Interface
-    .reg_req_i(safe_cpu_wrapper_reg_req),
-    .reg_rsp_o(safe_cpu_wrapper_reg_rsp),
-
-    // External Control Signal
-    .ext_master_core_i,
-    .ext_safe_mode_i,
-    .ext_safe_configuration_i,
-    .ext_critical_section_i,
-    .ext_Start_i,
-    .boot_addr_i,
+    .reg_req_i(wrapper_csr_req_i),
+    .reg_rsp_o(wrapper_csr_resp_o),
 
     .master_core_o(master_core_s),
     .safe_mode_o         (safe_mode_s),
@@ -230,14 +187,14 @@ safe_wrapper_ctrl #(
     .Initial_Sync_Master_o(Initial_Sync_Master_s),
     .Start_o              (Start_s),
     .End_sw_routine_o       (End_sw_routine_s),
+    .interrupt_o            (interrupt_o),
+    .debug_mode_i           (debug_mode_s),
+    .sleep_i                (sleep_s),
     .Start_Boot_i        (Start_Boot_s),
     //.Debug_ext_req_i(debug_req_i), //Check if debug_req comes from FSM or external debug Todo: change to 1 the extenal req
     .en_ext_debug_i(en_ext_debug_s) //Todo: other more elegant solution for debugging
     );
 
-    assign ext_EndSw_o = End_sw_routine_s;
-    assign debug_mode_o = debug_mode_s;
-    assign sleep_o = sleep_s;
 
 //***Safe FSM***//
 
