@@ -9,9 +9,7 @@ module mochila_top
   import core_v_mini_mcu_pkg::*;
   import cei_mochila_pkg::*;
 #(
-    parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50,//*/core_v_mini_mcu_pkg::DEBUG_START_ADDRESS + 32'h00000800,//*/
     parameter NHARTS = 3,
-    parameter HARTID = 32'h01,
     parameter N_BANKS = 2
 ) (
     // Clock and Reset
@@ -67,10 +65,7 @@ module mochila_top
 
 
 //CPU_System
-safe_cpu_wrapper #(
-        .HARTID(HARTID),
-        .DM_HALTADDRESS  (DM_HALTADDRESS)
-    )safe_cpu_wrapper_i(
+safe_cpu_wrapper safe_cpu_wrapper_i(
     .clk_i,
     .rst_ni,
 

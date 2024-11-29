@@ -9,9 +9,7 @@ module safe_cpu_wrapper
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
-    parameter HARTID = 32'h01,
-    parameter NCYCLES = 2,
-    parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50
+    parameter NCYCLES = 2
 ) (
     // Clock and Reset
     input logic clk_i,
@@ -138,10 +136,7 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
 
 //***Cores System***//
 
-    cpu_system #(
-        .HARTID        (HARTID),
-        .DM_HALTADDRESS  (DM_HALTADDRESS)
-    )cpu_system_i(
+    cpu_system cpu_system_i(
     .clk_i,
     .rst_ni,
     // Instruction memory interface
