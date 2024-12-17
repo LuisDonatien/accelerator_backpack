@@ -52,7 +52,7 @@ module safe_FSM
 
   typedef enum logic [3:0] {
     TMR_RESET, TMR_IDLE, TMR_START, TMR_BOOT, TMR_SH_HALT, 
-    TMR_WAIT_SH, TMR_MS_INTRSYNC, TMR_SYNC, TMR_END_SYNC, TMR_TO_SINGLE
+    TMR_WAIT_SH, TMR_MS_INTRSYNC, TMR_SYNC, TMR_END_SYNC, TMR_TO_SINGLE,TMR_SYNCINTC,TMR_SWSYNC
   } ctrl_tmr_fsm_e;
 
   typedef enum logic [3:0] {
@@ -103,6 +103,8 @@ module safe_FSM
   logic [NHARTS-1:0] tmr_dmr_config_s;
   logic [NHARTS-1:0] DMR_Mode_SHWFI_s;
   logic [NHARTS-1:0] Interrupt_Sync_TMR_s;
+  logic [NHARTS-1:0] Interrupt_sw_TMR_Resync_s;
+  logic [NHARTS-1:0] Interrupt_swResync_s;
  
 //DMR SIGNALS
   logic [NHARTS-1:0] DMR_Boot_s;
@@ -445,6 +447,8 @@ module safe_FSM
               ctrl_tmr_fsm_ns[i] = TMR_IDLE;
             else if ((Hart_wfi_i[0] == 1'b1 && Hart_wfi_i[1] == 1'b1 && Hart_wfi_i[2]) == 1'b1 && Safe_configuration_i!=2'b01)
               ctrl_tmr_fsm_ns[i] = TMR_END_SYNC;
+            else if (tmr_error == 1'b1) 
+              ctrl_tmr_fsm_ns[i] = TMR_SYNCINTC;
             else
               ctrl_tmr_fsm_ns[i] = TMR_SYNC;
           end
@@ -458,6 +462,23 @@ module safe_FSM
             else
               ctrl_tmr_fsm_ns[i] = TMR_END_SYNC;
           end
+
+          //***SW TMR Recovery***//
+          TMR_SYNCINTC:
+          begin
+            if (Hart_intc_ack_i[0] && Hart_intc_ack_i[1] && Hart_intc_ack_i[2])
+              ctrl_tmr_fsm_ns[i]= TMR_SWSYNC; 
+            else
+              ctrl_tmr_fsm_ns[i]= TMR_SYNCINTC;               
+          end
+          TMR_SWSYNC:
+          begin
+            if(~Hart_intc_ack_i[0] && ~Hart_intc_ack_i[1] && ~Hart_intc_ack_i[2] /*&& tmr_error == 1'b0*/)
+              ctrl_tmr_fsm_ns[i] = TMR_SYNC;
+            else
+              ctrl_tmr_fsm_ns[i] = TMR_SWSYNC;
+          end
+          //*********************//
 
           default: begin
             ctrl_tmr_fsm_ns[i] = TMR_IDLE;
@@ -476,6 +497,7 @@ module safe_FSM
         TMR_Boot_s[i] = 1'b0;
         Switch_SingletoTMR_s[i] = 1'b0;
         Switch_TMRtoSingle_s[i] = 1'b0;
+        Interrupt_sw_TMR_Resync_s[i] = 1'b0;
         unique case (ctrl_tmr_fsm_cs[i])
   
           TMR_START:
@@ -524,6 +546,22 @@ module safe_FSM
               Switch_TMRtoSingle_s[i] = 1'b1;       
             end
           end
+
+        //Software Recovery Routine
+        TMR_SYNCINTC:
+        begin
+          Interrupt_sw_TMR_Resync_s[i] = 1'b1;
+          single_bus_s[i]  = 1'b1;
+          tmr_voter_enable_s[i] = 1'b1;
+        end
+
+        TMR_SWSYNC: 
+        begin
+          Interrupt_sw_TMR_Resync_s[i] = 1'b1;
+          single_bus_s[i]  = 1'b1;
+          tmr_voter_enable_s[i] = 1'b1;          
+        end
+
           default: begin  end 
         
         endcase
@@ -558,7 +596,7 @@ module safe_FSM
 
           TMR_REC_IDLE:
           begin
-            if( tmr_error == 1'b1 && ctrl_tmr_fsm_cs[i] == TMR_SYNC && End_sw_routine_i == 1'b0) begin
+            if( tmr_error == 1'b1 && ctrl_tmr_fsm_cs[i] == TMR_SYNC && End_sw_routine_i == 1'b1) begin //Todo Patch End_sw_routine_i '0'->'1'
               if (tmr_critical_section_i == 1'b0)
                 ctrl_tmr_rec_fsm_ns[i] = TMR_REC_SYNCINTC;                
               else begin
@@ -677,7 +715,7 @@ module safe_FSM
       dual_mode_tmr_s[i] = 1'b0;
       DMR_Mode_SHWFI_s[i] = 1'b0;
       Select_wfi_core_o[i] = 1'b0;
-      Interrupt_swResync_o[i] = 1'b0;
+      Interrupt_swResync_s[i] = 1'b0;
       Interrupt_CpyResync_o[i] = 1'b0;
       Interrupt_DMSH_Sync_o[i] = 1'b0;
       unique case (ctrl_tmr_rec_fsm_cs[i])
@@ -745,7 +783,7 @@ module safe_FSM
         //Software Recovery Routine
         TMR_REC_SYNCINTC:
         begin
-          Interrupt_swResync_o[i] = 1'b1;
+          Interrupt_swResync_s[i] = 1'b1;
         end
 
 
@@ -1072,6 +1110,8 @@ assign Start_Boot_o = Single_Boot_s | TMR_Boot_s[0] | TMR_Boot_s[1] | TMR_Boot_s
                       DMR_Boot_s[0] | DMR_Boot_s[1] | DMR_Boot_s[2];
 
 assign Dmr_config_o = tmr_dmr_config_s | dmr_dmr_config_s;
+
+assign Interrupt_swResync_o = Interrupt_swResync_s | Interrupt_sw_TMR_Resync_s;
 endmodule
 
 
