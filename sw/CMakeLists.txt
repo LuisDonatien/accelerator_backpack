@@ -137,6 +137,9 @@ FOREACH(file_path IN LISTS new_list)
         if(${file_path} MATCHES "/safety/") # Add it if its in Safety
           SET(add 1)
         endif()
+        if(${file_path} MATCHES "/AES/") # Add it if its in AES
+          SET(add 1)
+        endif()
     endif()
   elseif( ( ${file_path} MATCHES "/${PROJECT}/" ) AND ( NOT ${file_path} MATCHES ${MAINFILE} ) )
     SET(add 1)

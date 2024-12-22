@@ -39,6 +39,7 @@ module safe_FSM
     input logic Start_i,
     output logic Start_Boot_o,
     input logic End_sw_routine_i,
+    output logic DMR_Rec_o,
     output logic en_ext_debug_req_o
 );
   // FSM state encoding
@@ -119,6 +120,7 @@ module safe_FSM
   logic [NHARTS-1:0] dbg_halt_dmr_recovery;
   logic dmr_error_s;
   logic [NHARTS-1:0] dmr_delayed_s;
+  logic [NHARTS-1:0] DMR_Rec_s;
 
 
 
@@ -948,6 +950,7 @@ module safe_FSM
         wfi_dmr_o[i] = 1'b0;
         dbg_halt_dmr_recovery[i] = 1'b0;
         dmr_delayed_s[i] = 1'b0;
+        DMR_Rec_s[i] = 1'b0;
         unique case (ctrl_dmr_fsm_cs[i])
   
           DMR_IDLE:
@@ -1028,6 +1031,7 @@ module safe_FSM
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
             dbg_halt_dmr_recovery[i] = 1'b1;
+            DMR_Rec_s[i] = 1'b1; 
             if (Safe_configuration_i==2'b11) 
               dmr_delayed_s[i] = 1'b1; 
             
@@ -1036,6 +1040,7 @@ module safe_FSM
           begin
             dual_mode_dmr_s[i] = 1'b1;
             DMR_Single_s[i]  = 1'b1;
+            DMR_Rec_s[i] = 1'b1;
             if (Safe_configuration_i==2'b11) 
               dmr_delayed_s[i] = 1'b1; 
                       
@@ -1110,6 +1115,7 @@ assign Start_Boot_o = Single_Boot_s | TMR_Boot_s[0] | TMR_Boot_s[1] | TMR_Boot_s
                       DMR_Boot_s[0] | DMR_Boot_s[1] | DMR_Boot_s[2];
 
 assign Dmr_config_o = tmr_dmr_config_s | dmr_dmr_config_s;
+assign DMR_Rec_o = DMR_Rec_s[0] | DMR_Rec_s[1] | DMR_Rec_s[2];
 
 assign Interrupt_swResync_o = Interrupt_swResync_s | Interrupt_sw_TMR_Resync_s;
 endmodule

@@ -127,6 +127,27 @@
           desc: "Status of halted cores"
         }
       ]
+    },
+    { name:     "DMR_REC",
+      desc:     "DMR_REC",
+      swaccess: "ro",
+      hwaccess: "hwo",
+      fields: [
+        { bits: "0", name: "DMR_REC", resval: "0",
+          desc: "Status DMR_REC"
+        }
+      ]
     }
+    { name:     "Initial_Stack_Addr",
+      desc:     "DMR_REC",
+      swaccess: "rw",
+      hwaccess: "none",
+      fields: [
+        { bits: "31:0", name: "DMR_REC", resval: "0",
+          desc: "Initial_Stack_Addr"
+        }
+      ]
+    }
+
   ]
 }

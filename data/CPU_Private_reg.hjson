@@ -24,5 +24,14 @@
         { bits: "0", name: "Hart_intc_ack", desc: "Hart_intc_ack" }
       ]
     }
+    { name:     "Breakpoint_Sim",
+      desc:     "Breakpoint_Sim",
+      swaccess: "rw",
+      hwaccess: "none",
+      fields: [
+        { bits: "0", name: "Breakpoint", desc: "Breakpoint" }
+      ]
+    }   
+
    ]
 }

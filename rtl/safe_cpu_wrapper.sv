@@ -9,7 +9,7 @@ module safe_cpu_wrapper
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
-    parameter NCYCLES = 2
+    parameter NCYCLES = 1
 ) (
     // Clock and Reset
     input logic clk_i,
@@ -68,6 +68,7 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     logic End_sw_routine_s;
     logic Start_s;
     logic Start_Boot_s;
+    logic DMR_Rec_s;
 
     // CPU ports
     obi_req_t  [NHARTS-1 : 0] core_instr_req;
@@ -186,6 +187,7 @@ safe_wrapper_ctrl #(
     .debug_mode_i           (debug_mode_s),
     .sleep_i                (sleep_s),
     .Start_Boot_i        (Start_Boot_s),
+    .DMR_Rec_i            (DMR_Rec_s),
     //.Debug_ext_req_i(debug_req_i), //Check if debug_req comes from FSM or external debug Todo: change to 1 the extenal req
     .en_ext_debug_i(en_ext_debug_s) //Todo: other more elegant solution for debugging
     );
@@ -224,6 +226,7 @@ safe_FSM safe_FSM_i (
     .Start_Boot_o(Start_Boot_s),
     .Start_i(Start_s),
     .End_sw_routine_i(End_sw_routine_s),
+    .DMR_Rec_o              (DMR_Rec_s),
     .en_ext_debug_req_o(en_ext_debug_s)
 );
       assign intr[0] = {
@@ -549,29 +552,29 @@ end /*else if (i==1) begin
 end
 */
 
-always_comb begin
+always @(*) begin
     //bypass by default 
-    assign mux_core_instr_req_o[i]   =   mux_core_instr_req_i[i];
-    assign mux_core_instr_resp_o[i]  =   mux_core_instr_resp_i[i];
-    assign mux_core_data_req_o[i]    =   mux_core_data_req_i[i];
-    assign mux_core_data_resp_o[i]   =   mux_core_data_resp_i[i];
+     mux_core_instr_req_o[i]   =   mux_core_instr_req_i[i];
+     mux_core_instr_resp_o[i]  =   mux_core_instr_resp_i[i];
+     mux_core_data_req_o[i]    =   mux_core_data_req_i[i];
+     mux_core_data_resp_o[i]   =   mux_core_data_resp_i[i];
 
-    assign mux_intr_o[i]       = mux_intr_i[i];
-    assign mux_debug_req_o[i]  = mux_debug_req_i[i];
+     mux_intr_o[i]       = mux_intr_i[i];
+     mux_debug_req_o[i]  = mux_debug_req_i[i];
 
     if (delayed_s == 1'b1 && dual_mode_s == 1'b1) begin
         if(i==0) begin
-            assign mux_core_instr_req_o[0]   =   core_instr_req_ff[0];
-            assign mux_core_instr_resp_o[0].rdata  =   mux_core_instr_resp_i[0].rdata;
-            assign mux_core_instr_resp_o[0].rvalid  =   mux_core_instr_resp_i[0].rvalid;
-            assign mux_core_instr_resp_o[0].gnt     = pipe_instr_gnt;
-            assign mux_core_data_req_o[0]    =   core_data_req_ff[0];
-            assign mux_core_data_resp_o[0].rdata   =   mux_core_data_resp_i[0].rdata;
-            assign mux_core_data_resp_o[0].rvalid   =   mux_core_data_resp_i[0].rvalid;
-            assign mux_core_data_resp_o[0].gnt     = pipe_data_gnt;
+             mux_core_instr_req_o[0]   =   core_instr_req_ff[0];
+             mux_core_instr_resp_o[0].rdata  =   mux_core_instr_resp_i[0].rdata;
+             mux_core_instr_resp_o[0].rvalid  =   mux_core_instr_resp_i[0].rvalid;
+             mux_core_instr_resp_o[0].gnt     = pipe_instr_gnt;
+             mux_core_data_req_o[0]    =   core_data_req_ff[0];
+             mux_core_data_resp_o[0].rdata   =   mux_core_data_resp_i[0].rdata;
+             mux_core_data_resp_o[0].rvalid   =   mux_core_data_resp_i[0].rvalid;
+             mux_core_data_resp_o[0].gnt     = pipe_data_gnt;
 
-            assign mux_intr_o[0]       = mux_intr_i[0];
-            assign mux_debug_req_o[0]  = mux_debug_req_i[0];       
+             mux_intr_o[0]       = mux_intr_i[0];
+             mux_debug_req_o[0]  = mux_debug_req_i[0];       
         end else if(i==1) begin/*
             assign mux_core_instr_req_o[1]   = core_instr_req_ff[1];
             assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
@@ -582,31 +585,32 @@ always_comb begin
             assign mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
             assign mux_core_data_resp_o[1].gnt   = reg_data_gnt;
             /**/
-            assign mux_core_instr_req_o[1]   = mux_core_instr_req_i[1];
-            assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
-            assign mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
-            assign mux_core_instr_resp_o[1].gnt  = mux_core_instr_resp_i[1].gnt;
-            assign mux_core_data_req_o[1].addr    = mux_core_data_req_i[1].addr;
-            assign mux_core_data_req_o[1].req    = mux_core_data_req_i[1].req;
-            assign mux_core_data_req_o[1].be    = mux_core_data_req_i[1].be;
-            assign mux_core_data_req_o[1].wdata    = mux_core_data_req_i[1].wdata;
-            assign mux_core_data_req_o[1].we    = mux_core_data_req_i[1].we & mux_core_data_req_i[1].req; 
+             mux_core_instr_req_o[1]   = mux_core_instr_req_i[1];
+             mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
+             mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
+             mux_core_instr_resp_o[1].gnt  = mux_core_instr_resp_i[1].gnt;
+             mux_core_data_req_o[1].addr    = mux_core_data_req_i[1].addr;
+             mux_core_data_req_o[1].req    = mux_core_data_req_i[1].req;
+             mux_core_data_req_o[1].be    = mux_core_data_req_i[1].be;
+             mux_core_data_req_o[1].wdata    = mux_core_data_req_i[1].wdata;
+             mux_core_data_req_o[1].we    = mux_core_data_req_i[1].we & mux_core_data_req_i[1].req; 
                                                             
-            assign mux_core_data_resp_o[1].rdata   = core_data_resp_ff[NCYCLES-1].rdata;
-            assign mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
-            assign mux_core_data_resp_o[1].gnt   = mux_core_data_resp_i[1].gnt;
+             mux_core_data_resp_o[1].rdata   = core_data_resp_ff[NCYCLES-1].rdata;
+             mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
+             mux_core_data_resp_o[1].gnt   = mux_core_data_resp_i[1].gnt;
             /**/
-            assign mux_intr_o[1]       = intr_ff[NCYCLES-1];
-            assign mux_debug_req_o[1]  = debug_req_ff[NCYCLES-1];
+             mux_intr_o[1]       = intr_ff[NCYCLES-1];
+             mux_debug_req_o[1]  = debug_req_ff[NCYCLES-1];
         end else begin
 
-            assign mux_core_instr_req_o[i]   =   mux_core_instr_req_i[i];
-            assign mux_core_instr_resp_o[i]  =   mux_core_instr_resp_i[i];
-            assign mux_core_data_req_o[i]    =   mux_core_data_req_i[i];
-            assign mux_core_data_resp_o[i]   =   mux_core_data_resp_i[i];
+             mux_core_instr_req_o[i]   =   mux_core_instr_req_i[i];
+             mux_core_instr_resp_o[i]  =   mux_core_instr_resp_i[i];
+             mux_core_data_req_o[i]    =   mux_core_data_req_i[i];
+             mux_core_data_resp_o[i]   =   mux_core_data_resp_i[i];
         
-            assign mux_intr_o[i]       = mux_intr_i[i];
-            assign mux_debug_req_o[i]  = mux_debug_req_i[i];    
+            
+             mux_intr_o[i]       = mux_intr_i[i];
+             mux_debug_req_o[i]  = mux_debug_req_i[i];    
 
         end
     end
@@ -615,7 +619,7 @@ end
     // Delayed Signals CPU ports
         always_ff @(posedge clk_i or negedge rst_ni) begin : proc_ndelay
             if(~rst_ni) begin
-                intr_ff             <= '0;
+                intr_ff[i]          <= '0;
                 debug_req_ff        <= '0;
                 if (i==1) begin
                 core_instr_resp_ff  <= '0;
@@ -765,6 +769,7 @@ for(genvar i=0; i<NHARTS; i++) begin : isolate_obi_bus_data
     end
     assign isolate_core_data_resp[i].gnt = mux_core_data_req_o[i].req;
     assign isolate_core_data_resp[i].rvalid = isolate_valid_q[i];
+    assign isolate_core_data_resp[i].rdata = 32'h0; //0 data val
 end
 
 /*********************************************************/

@@ -10,7 +10,7 @@
 module cpu_private_reg_top #(
   parameter type reg_req_t = logic,
   parameter type reg_rsp_t = logic,
-  parameter int AW = 3
+  parameter int AW = 4
 ) (
   input logic clk_i,
   input logic rst_ni,
@@ -72,6 +72,9 @@ module cpu_private_reg_top #(
   logic hart_intc_ack_qs;
   logic hart_intc_ack_wd;
   logic hart_intc_ack_we;
+  logic breakpoint_sim_qs;
+  logic breakpoint_sim_wd;
+  logic breakpoint_sim_we;
 
   // Register instances
   // R[core_id]: V(False)
@@ -127,13 +130,41 @@ module cpu_private_reg_top #(
   );
 
 
+  // R[breakpoint_sim]: V(False)
+
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h0)
+  ) u_breakpoint_sim (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (breakpoint_sim_we),
+    .wd     (breakpoint_sim_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (breakpoint_sim_qs)
+  );
 
 
-  logic [1:0] addr_hit;
+
+
+  logic [2:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == CPU_PRIVATE_CORE_ID_OFFSET);
     addr_hit[1] = (reg_addr == CPU_PRIVATE_HART_INTC_ACK_OFFSET);
+    addr_hit[2] = (reg_addr == CPU_PRIVATE_BREAKPOINT_SIM_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -142,11 +173,15 @@ module cpu_private_reg_top #(
   always_comb begin
     wr_err = (reg_we &
               ((addr_hit[0] & (|(CPU_PRIVATE_PERMIT[0] & ~reg_be))) |
-               (addr_hit[1] & (|(CPU_PRIVATE_PERMIT[1] & ~reg_be)))));
+               (addr_hit[1] & (|(CPU_PRIVATE_PERMIT[1] & ~reg_be))) |
+               (addr_hit[2] & (|(CPU_PRIVATE_PERMIT[2] & ~reg_be)))));
   end
 
   assign hart_intc_ack_we = addr_hit[1] & reg_we & !reg_error;
   assign hart_intc_ack_wd = reg_wdata[0];
+
+  assign breakpoint_sim_we = addr_hit[2] & reg_we & !reg_error;
+  assign breakpoint_sim_wd = reg_wdata[0];
 
   // Read data return
   always_comb begin
@@ -158,6 +193,10 @@ module cpu_private_reg_top #(
 
       addr_hit[1]: begin
         reg_rdata_next[0] = hart_intc_ack_qs;
+      end
+
+      addr_hit[2]: begin
+        reg_rdata_next[0] = breakpoint_sim_qs;
       end
 
       default: begin
@@ -182,7 +221,7 @@ endmodule
 
 module cpu_private_reg_top_intf
 #(
-  parameter int AW = 3,
+  parameter int AW = 4,
   localparam int DW = 32
 ) (
   input logic clk_i,

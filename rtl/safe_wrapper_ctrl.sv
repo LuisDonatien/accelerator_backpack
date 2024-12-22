@@ -28,7 +28,7 @@ module safe_wrapper_ctrl #(
 
     input logic Start_Boot_i,
     input logic en_ext_debug_i,
-
+    input logic DMR_Rec_i,
     input logic [NHARTS-1 : 0] debug_mode_i,
     input logic [NHARTS-1 : 0] sleep_i,
 
@@ -41,7 +41,6 @@ module safe_wrapper_ctrl #(
   safe_wrapper_ctrl_reg2hw_t reg2hw;
   safe_wrapper_ctrl_hw2reg_t hw2reg;
 
-  assign interrupt_o= enable_interrupt;
 
   safe_wrapper_ctrl_reg_top #(
       .reg_req_t(reg_req_t),
@@ -57,8 +56,10 @@ module safe_wrapper_ctrl #(
   );
   logic enable_interrupt;
   assign enable_interrupt = reg2hw.interrupt_controler.enable_interrupt.q;
+  assign interrupt_o= enable_interrupt;
   logic Start_Flag, Startff;
   logic en_sw_routineff;
+  logic enable_endSW;
 
     assign  master_core_o = reg2hw.master_core.q;
     assign  safe_mode_o = reg2hw.dmr_mask.q;
@@ -92,6 +93,11 @@ module safe_wrapper_ctrl #(
    assign hw2reg.interrupt_controler.status_interrupt.d = '0;
    assign hw2reg.interrupt_controler.status_interrupt.de = '0;
 
+
+   //DMR_Recov
+   assign hw2reg.dmr_rec.d = DMR_Rec_i;
+   assign hw2reg.dmr_rec.de = 1'b1;
+
   //Generate Flip-Flop Bi-Stable
   // When pos edge End_Program switch off start. When start switch off positive En_Program
   logic enable, clear;
@@ -115,7 +121,7 @@ module safe_wrapper_ctrl #(
   end
 
    // When pos edge End_Program switch off start. When start switch off positive En_Program
-  logic enable_endSW;//, clear_endSW;
+   //, clear_endSW;
 
   assign enable_endSW = !en_sw_routineff & reg2hw.end_sw_routine.q;
 

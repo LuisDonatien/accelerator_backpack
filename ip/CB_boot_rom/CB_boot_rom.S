@@ -107,7 +107,7 @@ debug_entry:
        //cycles
        beqz    a0, halt_boot      
        xori     a0 ,a0, 0x2 //Mask applied to see if its Single Debug boot
-       beqz     a0, reset_core
+       beqz     a0, single_boot
 
 //        j single_boot
         // This fence is required because the execution may have written something
@@ -232,7 +232,14 @@ halt_boot:
 
        //x4
        lw   tp, 32(t5)     
-       
+
+       //**Recovery STACK**/
+
+       lui  t0, %hi(SAFE_WRAPPER_CTRL_BASEADDRESS)     //if not equal a 0 restore de actual stack
+       lw   t1, SAFE_WRAPPER_CTRL_DMR_REC_REG_OFFSET(t0)
+       fence
+       bnez t1,  store_stack
+load_register:
        //x5
        lw   t0, 36(t5)
 
@@ -314,8 +321,7 @@ halt_boot:
        //x31
        lw   t6, 140(t5) 
 
-
-       //
+       //PC
        //Program Counter//
        lw   t6, 144(t5)
 
@@ -337,39 +343,28 @@ halt_boot:
        nop
        jal zero, halt_boot
 
-reset_core:
-     li      sp, 0
-     li      gp, 0
-     li      tp, 0
-     li      ra, 0
-     li      t0, 0
-     li      t1, 0
-     li      t2, 0
-     li      s0, 0
-     li      s1, 0
-     li      a0, 0
-     li      a1, 0
-     li      a2, 0
-     li      a3, 0
-     li      a4, 0
-     li      a5, 0
-     li      a6, 0
-     li      a7, 0
-     li      s2, 0
-     li      s3, 0
-     li      s4, 0
-     li      s5, 0
-     li      s6, 0
-     li      s7, 0
-     li      s8, 0
-     li      s9, 0
-     li      s10, 0
-     li      s11, 0
-     li      t3, 0
-     li      t4, 0
-     li      t5, 0
-     li      t6, 0
-     j single_boot
+store_stack:
+                                                                           //Actual Base Stack Pointer from checkpoint store in sp
+       lw   t1, SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_REG_OFFSET(t0)        //Base Stack Pointer from the begining of the Program main
+       fence
+       beq  sp, t1, load_register  //Compare addr stack value for sp and base intial sp
+       addi t2, t5, 148 //Store addr from beginng of the stack store in the secure place
+load_stack:       
+       lw   t4, 0(t2)
+       sw   t4, 0(sp)
+       beq  sp, t1, restore_sp  //Compare addr stack value for sp and base intial sp
+       addi t2, t2, 4    //Upload 1 position
+       addi sp, sp, 4    //Upload 1 position
+       j    load_stack
+       nop
+       nop
+restore_sp:
+       lw   sp, 24(t5)  
+       j    load_register
+       nop 
+       nop
+
+
 
 
 //Loop until HALT/*

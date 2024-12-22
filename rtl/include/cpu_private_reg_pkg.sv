@@ -7,7 +7,7 @@
 package cpu_private_reg_pkg;
 
   // Address widths within the block
-  parameter int BlockAw = 3;
+  parameter int BlockAw = 4;
 
   ////////////////////////////
   // Typedefs for registers //
@@ -33,19 +33,22 @@ package cpu_private_reg_pkg;
   } cpu_private_hw2reg_t;
 
   // Register offsets
-  parameter logic [BlockAw-1:0] CPU_PRIVATE_CORE_ID_OFFSET = 3'h 0;
-  parameter logic [BlockAw-1:0] CPU_PRIVATE_HART_INTC_ACK_OFFSET = 3'h 4;
+  parameter logic [BlockAw-1:0] CPU_PRIVATE_CORE_ID_OFFSET = 4'h 0;
+  parameter logic [BlockAw-1:0] CPU_PRIVATE_HART_INTC_ACK_OFFSET = 4'h 4;
+  parameter logic [BlockAw-1:0] CPU_PRIVATE_BREAKPOINT_SIM_OFFSET = 4'h 8;
 
   // Register index
   typedef enum int {
     CPU_PRIVATE_CORE_ID,
-    CPU_PRIVATE_HART_INTC_ACK
+    CPU_PRIVATE_HART_INTC_ACK,
+    CPU_PRIVATE_BREAKPOINT_SIM
   } cpu_private_id_e;
 
   // Register width information to check illegal writes
-  parameter logic [3:0] CPU_PRIVATE_PERMIT [2] = '{
+  parameter logic [3:0] CPU_PRIVATE_PERMIT [3] = '{
     4'b 0001, // index[0] CPU_PRIVATE_CORE_ID
-    4'b 0001  // index[1] CPU_PRIVATE_HART_INTC_ACK
+    4'b 0001, // index[1] CPU_PRIVATE_HART_INTC_ACK
+    4'b 0001  // index[2] CPU_PRIVATE_BREAKPOINT_SIM
   };
 
 endpackage

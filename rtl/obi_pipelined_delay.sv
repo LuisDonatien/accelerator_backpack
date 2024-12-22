@@ -33,12 +33,11 @@ assign clear = (core_instr_req_i.req == 1'b0 & core_instr_resp_gnt_i == 1'b1)   
 
 
 logic or_ff;
+assign or_ff = |core_instr_req_ff;
 
 for (genvar i = 0 ; i<NDELAY ; i++) begin
 
-//todo error or_ff
-assign  or_ff = or_ff | core_instr_req_ff[i].req;
-    
+  
 always_comb begin
   if (i == 0) begin
     if ((core_instr_req_i.req & core_instr_req_ff[0].req == 1'b0) |

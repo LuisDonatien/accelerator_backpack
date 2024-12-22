@@ -27,6 +27,10 @@ extern "C" {
 #define CPU_PRIVATE_HART_INTC_ACK_REG_OFFSET 0x4
 #define CPU_PRIVATE_HART_INTC_ACK_HART_INTC_ACK_BIT 0
 
+// Breakpoint_Sim
+#define CPU_PRIVATE_BREAKPOINT_SIM_REG_OFFSET 0x8
+#define CPU_PRIVATE_BREAKPOINT_SIM_BREAKPOINT_BIT 0
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

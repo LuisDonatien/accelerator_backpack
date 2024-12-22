@@ -107,6 +107,10 @@ module safe_wrapper_ctrl_reg_top #(
   logic interrupt_controler_status_interrupt_we;
   logic [2:0] cb_heep_status_cores_sleep_qs;
   logic [2:0] cb_heep_status_cores_debug_mode_qs;
+  logic dmr_rec_qs;
+  logic [31:0] initial_stack_addr_qs;
+  logic [31:0] initial_stack_addr_wd;
+  logic initial_stack_addr_we;
 
   // Register instances
   // R[safe_configuration]: V(False)
@@ -511,9 +515,62 @@ module safe_wrapper_ctrl_reg_top #(
   );
 
 
+  // R[dmr_rec]: V(False)
+
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RO"),
+    .RESVAL  (1'h0)
+  ) u_dmr_rec (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.dmr_rec.de),
+    .d      (hw2reg.dmr_rec.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (dmr_rec_qs)
+  );
 
 
-  logic [12:0] addr_hit;
+  // R[initial_stack_addr]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RW"),
+    .RESVAL  (32'h0)
+  ) u_initial_stack_addr (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (initial_stack_addr_we),
+    .wd     (initial_stack_addr_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (),
+
+    // to register interface (read)
+    .qs     (initial_stack_addr_qs)
+  );
+
+
+
+
+  logic [14:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[ 0] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION_OFFSET);
@@ -529,6 +586,8 @@ module safe_wrapper_ctrl_reg_top #(
     addr_hit[10] = (reg_addr == SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET);
     addr_hit[11] = (reg_addr == SAFE_WRAPPER_CTRL_INTERRUPT_CONTROLER_OFFSET);
     addr_hit[12] = (reg_addr == SAFE_WRAPPER_CTRL_CB_HEEP_STATUS_OFFSET);
+    addr_hit[13] = (reg_addr == SAFE_WRAPPER_CTRL_DMR_REC_OFFSET);
+    addr_hit[14] = (reg_addr == SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -548,7 +607,9 @@ module safe_wrapper_ctrl_reg_top #(
                (addr_hit[ 9] & (|(SAFE_WRAPPER_CTRL_PERMIT[ 9] & ~reg_be))) |
                (addr_hit[10] & (|(SAFE_WRAPPER_CTRL_PERMIT[10] & ~reg_be))) |
                (addr_hit[11] & (|(SAFE_WRAPPER_CTRL_PERMIT[11] & ~reg_be))) |
-               (addr_hit[12] & (|(SAFE_WRAPPER_CTRL_PERMIT[12] & ~reg_be)))));
+               (addr_hit[12] & (|(SAFE_WRAPPER_CTRL_PERMIT[12] & ~reg_be))) |
+               (addr_hit[13] & (|(SAFE_WRAPPER_CTRL_PERMIT[13] & ~reg_be))) |
+               (addr_hit[14] & (|(SAFE_WRAPPER_CTRL_PERMIT[14] & ~reg_be)))));
   end
 
   assign safe_configuration_we = addr_hit[0] & reg_we & !reg_error;
@@ -586,6 +647,9 @@ module safe_wrapper_ctrl_reg_top #(
 
   assign interrupt_controler_status_interrupt_we = addr_hit[11] & reg_we & !reg_error;
   assign interrupt_controler_status_interrupt_wd = reg_wdata[1];
+
+  assign initial_stack_addr_we = addr_hit[14] & reg_we & !reg_error;
+  assign initial_stack_addr_wd = reg_wdata[31:0];
 
   // Read data return
   always_comb begin
@@ -643,6 +707,14 @@ module safe_wrapper_ctrl_reg_top #(
       addr_hit[12]: begin
         reg_rdata_next[2:0] = cb_heep_status_cores_sleep_qs;
         reg_rdata_next[5:3] = cb_heep_status_cores_debug_mode_qs;
+      end
+
+      addr_hit[13]: begin
+        reg_rdata_next[0] = dmr_rec_qs;
+      end
+
+      addr_hit[14]: begin
+        reg_rdata_next[31:0] = initial_stack_addr_qs;
       end
 
       default: begin

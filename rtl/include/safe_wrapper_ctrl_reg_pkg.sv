@@ -87,6 +87,11 @@ package safe_wrapper_ctrl_reg_pkg;
     } cores_debug_mode;
   } safe_wrapper_ctrl_hw2reg_cb_heep_status_reg_t;
 
+  typedef struct packed {
+    logic        d;
+    logic        de;
+  } safe_wrapper_ctrl_hw2reg_dmr_rec_reg_t;
+
   // Register -> HW type
   typedef struct packed {
     safe_wrapper_ctrl_reg2hw_safe_configuration_reg_t safe_configuration; // [13:12]
@@ -101,11 +106,12 @@ package safe_wrapper_ctrl_reg_pkg;
 
   // HW -> register type
   typedef struct packed {
-    safe_wrapper_ctrl_hw2reg_start_reg_t start; // [18:17]
-    safe_wrapper_ctrl_hw2reg_external_debug_req_reg_t external_debug_req; // [16:14]
-    safe_wrapper_ctrl_hw2reg_end_sw_routine_reg_t end_sw_routine; // [13:12]
-    safe_wrapper_ctrl_hw2reg_interrupt_controler_reg_t interrupt_controler; // [11:8]
-    safe_wrapper_ctrl_hw2reg_cb_heep_status_reg_t cb_heep_status; // [7:0]
+    safe_wrapper_ctrl_hw2reg_start_reg_t start; // [20:19]
+    safe_wrapper_ctrl_hw2reg_external_debug_req_reg_t external_debug_req; // [18:16]
+    safe_wrapper_ctrl_hw2reg_end_sw_routine_reg_t end_sw_routine; // [15:14]
+    safe_wrapper_ctrl_hw2reg_interrupt_controler_reg_t interrupt_controler; // [13:10]
+    safe_wrapper_ctrl_hw2reg_cb_heep_status_reg_t cb_heep_status; // [9:2]
+    safe_wrapper_ctrl_hw2reg_dmr_rec_reg_t dmr_rec; // [1:0]
   } safe_wrapper_ctrl_hw2reg_t;
 
   // Register offsets
@@ -122,6 +128,8 @@ package safe_wrapper_ctrl_reg_pkg;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS_OFFSET = 6'h 28;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_INTERRUPT_CONTROLER_OFFSET = 6'h 2c;
   parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_CB_HEEP_STATUS_OFFSET = 6'h 30;
+  parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_DMR_REC_OFFSET = 6'h 34;
+  parameter logic [BlockAw-1:0] SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_OFFSET = 6'h 38;
 
   // Register index
   typedef enum int {
@@ -137,11 +145,13 @@ package safe_wrapper_ctrl_reg_pkg;
     SAFE_WRAPPER_CTRL_ENTRY_ADDRESS,
     SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS,
     SAFE_WRAPPER_CTRL_INTERRUPT_CONTROLER,
-    SAFE_WRAPPER_CTRL_CB_HEEP_STATUS
+    SAFE_WRAPPER_CTRL_CB_HEEP_STATUS,
+    SAFE_WRAPPER_CTRL_DMR_REC,
+    SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR
   } safe_wrapper_ctrl_id_e;
 
   // Register width information to check illegal writes
-  parameter logic [3:0] SAFE_WRAPPER_CTRL_PERMIT [13] = '{
+  parameter logic [3:0] SAFE_WRAPPER_CTRL_PERMIT [15] = '{
     4'b 0001, // index[ 0] SAFE_WRAPPER_CTRL_SAFE_CONFIGURATION
     4'b 0001, // index[ 1] SAFE_WRAPPER_CTRL_DMR_MASK
     4'b 0001, // index[ 2] SAFE_WRAPPER_CTRL_MASTER_CORE
@@ -154,7 +164,9 @@ package safe_wrapper_ctrl_reg_pkg;
     4'b 1111, // index[ 9] SAFE_WRAPPER_CTRL_ENTRY_ADDRESS
     4'b 1111, // index[10] SAFE_WRAPPER_CTRL_SAFE_COPY_ADDRESS
     4'b 0001, // index[11] SAFE_WRAPPER_CTRL_INTERRUPT_CONTROLER
-    4'b 0001  // index[12] SAFE_WRAPPER_CTRL_CB_HEEP_STATUS
+    4'b 0001, // index[12] SAFE_WRAPPER_CTRL_CB_HEEP_STATUS
+    4'b 0001, // index[13] SAFE_WRAPPER_CTRL_DMR_REC
+    4'b 1111  // index[14] SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR
   };
 
 endpackage
