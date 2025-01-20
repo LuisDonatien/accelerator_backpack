@@ -42,8 +42,8 @@ unsigned int PP=0;
 int main(void)
 {
       volatile unsigned int *Private_reg = PRIVATE_REG_BASEADDRESS | CPU_PRIVATE_BREAKPOINT_SIM_REG_OFFSET;
-        asm volatile("li   t6, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
-        asm volatile("sw        sp, %0(t6)" :: "i" (SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_REG_OFFSET));
+//        asm volatile("li   t6, %0" : : "i" (SAFE_WRAPPER_CTRL_BASEADDRESS));
+//        asm volatile("sw        sp, %0(t6)" :: "i" (SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_REG_OFFSET));
     int exit;
 
 #if defined(AES256)
@@ -129,6 +129,8 @@ static void test_encrypt_ecb_verbose(void)
 
 static int test_encrypt_ecb(void)
 {
+            volatile unsigned int *P = 0x9000;
+            *P=0x0;
   /*
   /*Modification to trigger
   /**/  
@@ -152,16 +154,10 @@ static int test_encrypt_ecb(void)
 
 
 //Store_Checkpoint();
-//Store_Checkpoint();
 //    Store_Checkpoint();
 //    AES_init_ctx(&ctx, key);
     AES_init_ctx(&ctx, key);
-
- //     if(*Private_reg==0x1){
- //         Private_reg=0x0;
- //        CSR_READ(CSR_REG_MHARTID,&PP);
- //       }
-
+    Store_Checkpoint();
 
     AES_ECB_encrypt(&ctx, in);
 //    *Private_reg = 0x1;

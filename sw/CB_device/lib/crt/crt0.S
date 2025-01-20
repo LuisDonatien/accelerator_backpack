@@ -14,6 +14,10 @@
 #include "core_v_mini_mcu.h"
 #include "soc_ctrl_regs.h"
 
+#include "base_address.h"
+#include "CPU_Private_regs.h"
+#include "Safe_wrapper_ctrl_regs.h"
+
 #define RAMSIZE_COPIEDBY_BOOTROM 2048
 
 /* Entry point for bare metal programs */
@@ -76,6 +80,8 @@ _init_bss:
     call __libc_init_array
 */
 /* call main */
+    li a0, SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_INITIAL_STACK_ADDR_REG_OFFSET
+    sw sp, 0(a0)
     lw a0, 0(sp)                    /* a0 = argc */
     addi a1, sp, __SIZEOF_POINTER__ /* a1 = argv */
     li a2, 0                        /* a2 = envp = NULL */

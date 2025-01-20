@@ -102,11 +102,11 @@ Disassembly of section .text:
  130:	07cf2d83          	lw	s11,124(t5)
  134:	080f2e03          	lw	t3,128(t5)
  138:	084f2e83          	lw	t4,132(t5)
- 13c:	088f2f03          	lw	t5,136(t5)
- 140:	08cf2f83          	lw	t6,140(t5)
- 144:	090f2f83          	lw	t6,144(t5)
- 148:	0ff0000f          	fence
- 14c:	7b1f9073          	csrw	dpc,t6
+ 13c:	090f2f83          	lw	t6,144(t5)
+ 140:	0ff0000f          	fence
+ 144:	7b1f9073          	csrw	dpc,t6
+ 148:	08cf2f83          	lw	t6,140(t5)
+ 14c:	088f2f03          	lw	t5,136(t5)
  150:	7b200073          	dret
  154:	00000013          	nop
  158:	00000013          	nop

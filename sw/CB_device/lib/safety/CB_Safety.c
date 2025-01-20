@@ -667,9 +667,9 @@ void Store_Checkpoint(void){
 
 asm volatile(".global _checkpoint_store_stack");
 asm volatile("_checkpoint_store_stack:");
-       asm volatile("lw   t6, 0(t3)");
-       asm volatile("sw   t6, 0(t2)");
-       asm volatile("beq  t2, t1, _checkpoint_store_reg");  //Compare addr stack value for sp and base intial sp
+       asm volatile("lw   t6, 0(t2)");
+       asm volatile("sw   t6, 0(t3)");
+       asm volatile("beq  t2, t4, _checkpoint_store_reg");  //Compare addr stack value for sp and base intial sp
        asm volatile("addi t3, t3, 4");    //Upload 1 position
        asm volatile("addi t2, t2, 4");    //Upload 1 position        
        asm volatile("j          _checkpoint_store_stack");
@@ -828,24 +828,24 @@ asm volatile("_checkpoint_store_reg:");
         asm volatile("sw t6, 144(t5)");
         //x30   t5  
 //        asm volatile("li t6, 0xC874");
-        asm volatile("sw t5, 136(t5)"); 
+        asm volatile ("lw   t6,12(sp)");
+        asm volatile("sw t6, 136(t5)"); 
 
         //x31   t6 
 //        asm volatile("li t6, 0xC878");
+        asm volatile ("lw   t6,8(sp)");
         asm volatile("sw t6, 140(t5)");
 
-
-        asm volatile("addi      sp,sp,28"); //Restore stack pointer
         asm volatile ("lw   t2,24(sp)"); 
         asm volatile ("lw   t3,20(sp)"); 
         asm volatile ("lw   t4,16(sp)"); 
         asm volatile ("lw   t5,12(sp)");
         asm volatile ("lw   t6,8(sp)");
+        asm volatile("addi      sp,sp,28"); //Restore stack pointer
 
         //Reference for exit store_checkpoint 
         asm volatile(".global _exit_Store_checkpoint");
         asm volatile("_exit_Store_checkpoint:");      
-
 }
 
 

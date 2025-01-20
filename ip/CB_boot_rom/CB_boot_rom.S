@@ -315,12 +315,6 @@ load_register:
        //x29
        lw   t4, 132(t5)
 
-       //x30
-       lw   t5, 136(t5)
-
-       //x31
-       lw   t6, 140(t5) 
-
        //PC
        //Program Counter//
        lw   t6, 144(t5)
@@ -329,7 +323,13 @@ load_register:
        fence 
        //Program Counter -> dpc Control & Status Register            
        csrw dpc, t6
+       
+       //x31
+       lw   t6, 140(t5) 
 
+       //x30
+       lw   t5, 136(t5)
+       
        //Resume//
        dret
        

@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     unsigned int *P=PRIVATE_REG_BASEADDRESS;
     *(P+2) = 0x1;  
-    printf("[IP_CB]: hello world...!\n");
+    printf("[IP_CEI]: hello world...!\n");
     *(P+2) = 0x3; 
     return 0;
     //return EXIT_SUCCESS;
