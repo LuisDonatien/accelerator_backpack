@@ -1002,11 +1002,13 @@ __attribute__((aligned(4))) void _exit(int exit_status)
 {
     volatile unsigned int *END_SW_P = SAFE_WRAPPER_CTRL_BASEADDRESS | SAFE_WRAPPER_CTRL_END_SW_ROUTINE_REG_OFFSET;
     *END_SW_P = 0x1;
+    asm volatile("fence");
     asm volatile("wfi");
 /*    asm volatile("fence");
     asm volatile("wfi");
     asm volatile("fence.i");
 /**/
+    while(1)
     asm volatile(".word 0x00000013");
     asm volatile(".word 0x00000013");
     asm volatile(".word 0x00000013");

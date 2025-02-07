@@ -10,7 +10,7 @@ module cpu_system
     parameter BOOT_ADDR = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS,
     parameter NHARTS = 3,
     parameter HARTID = 32'h01,
-    parameter CPU = 10,
+    parameter CPU = 2,
     parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50
 ) (
     // Clock and Reset
@@ -201,6 +201,254 @@ if (CPU==1) begin
         .fetch_enable_i(fetch_enable),
         .core_sleep_o(sleep_o[2])
     );
+
+end else if (CPU==2) begin : gen_cv32e40px
+
+//    import cv32e40px_core_v_xif_pkg::*;
+
+    // instantiate the core 0
+    cv32e40px_top #(
+        .COREV_X_IF      (0),
+        .COREV_PULP      (0),
+        .COREV_CLUSTER   (0),
+        .FPU             (0),
+        .ZFINX           (0),
+        .NUM_MHPMCOUNTERS(1)
+    ) cv32e40px_core0_i (
+        .clk_i (clk_i),
+        .rst_ni(rst_ni),
+
+        .pulp_clock_en_i(1'b1),
+        .scan_cg_en_i   (1'b0),
+
+        .boot_addr_i        (BOOT_ADDR),
+        .mtvec_addr_i       (32'h0),
+        .dm_halt_addr_i     (DM_HALTADDRESS),
+        .hart_id_i          (HARTID),
+        .dm_exception_addr_i(32'h0),
+
+        .instr_addr_o  (core_instr_req_o[0].addr),
+        .instr_req_o   (core_instr_req_o[0].req),
+        .instr_rdata_i (core_instr_resp_i[0].rdata),
+        .instr_gnt_i   (core_instr_resp_i[0].gnt),
+        .instr_rvalid_i(core_instr_resp_i[0].rvalid),
+
+        .data_addr_o  (core_data_req_o[0].addr),
+        .data_wdata_o (core_data_req_o[0].wdata),
+        .data_we_o    (core_data_req_o[0].we),
+        .data_req_o   (core_data_req_o[0].req),
+        .data_be_o    (core_data_req_o[0].be),
+        .data_rdata_i (core_data_resp_i[0].rdata),
+        .data_gnt_i   (core_data_resp_i[0].gnt),
+        .data_rvalid_i(core_data_resp_i[0].rvalid),
+
+        // CORE-V-XIF
+        // Compressed interface
+        .x_compressed_valid_o(),
+        .x_compressed_ready_i('0),
+        .x_compressed_req_o  (),
+        .x_compressed_resp_i ('0),
+
+        // Issue Interface
+        .x_issue_valid_o(),
+        .x_issue_ready_i('0),
+        .x_issue_req_o  (),
+        .x_issue_resp_i ('0),
+
+        // Commit Interface
+        .x_commit_valid_o(),
+        .x_commit_o(),
+
+        // Memory Request/Response Interface
+        .x_mem_valid_i('0),
+        .x_mem_ready_o(),
+        .x_mem_req_i  ('0),
+        .x_mem_resp_o (),
+
+        // Memory Result Interface
+        .x_mem_result_valid_o(),
+        .x_mem_result_o(),
+
+        // Result Interface
+        .x_result_valid_i('0),
+        .x_result_ready_o(),
+        .x_result_i('0),
+
+        .irq_i    (intc_core0),
+        .irq_ack_o(),
+        .irq_id_o (),
+
+        .debug_req_i      (debug_req_i[0]),
+        .debug_havereset_o(),
+        .debug_running_o  (),
+        .debug_halted_o   (debug_mode_o[0]),
+
+        .fetch_enable_i(fetch_enable),
+        .core_sleep_o(sleep_o[0])
+    );
+
+    // instantiate the core 1
+    cv32e40px_top #(
+        .COREV_X_IF      (0),
+        .COREV_PULP      (0),
+        .COREV_CLUSTER   (0),
+        .FPU             (0),
+        .ZFINX           (0),
+        .NUM_MHPMCOUNTERS(1)
+    ) cv32e40px_core1_i (
+        .clk_i (clk_i),
+        .rst_ni(rst_ni),
+
+        .pulp_clock_en_i(1'b1),
+        .scan_cg_en_i   (1'b0),
+
+        .boot_addr_i        (BOOT_ADDR),
+        .mtvec_addr_i       (32'h0),
+        .dm_halt_addr_i     (DM_HALTADDRESS),
+        .hart_id_i          (HARTID),
+        .dm_exception_addr_i(32'h0),
+
+        .instr_addr_o  (core_instr_req_o[1].addr),
+        .instr_req_o   (core_instr_req_o[1].req),
+        .instr_rdata_i (core_instr_resp_i[1].rdata),
+        .instr_gnt_i   (core_instr_resp_i[1].gnt),
+        .instr_rvalid_i(core_instr_resp_i[1].rvalid),
+
+        .data_addr_o  (core_data_req_o[1].addr),
+        .data_wdata_o (core_data_req_o[1].wdata),
+        .data_we_o    (core_data_req_o[1].we),
+        .data_req_o   (core_data_req_o[1].req),
+        .data_be_o    (core_data_req_o[1].be),
+        .data_rdata_i (core_data_resp_i[1].rdata),
+        .data_gnt_i   (core_data_resp_i[1].gnt),
+        .data_rvalid_i(core_data_resp_i[1].rvalid),
+
+        // CORE-V-XIF
+        // Compressed interface
+        .x_compressed_valid_o(),
+        .x_compressed_ready_i('0),
+        .x_compressed_req_o  (),
+        .x_compressed_resp_i ('0),
+
+        // Issue Interface
+        .x_issue_valid_o(),
+        .x_issue_ready_i('0),
+        .x_issue_req_o  (),
+        .x_issue_resp_i ('0),
+
+        // Commit Interface
+        .x_commit_valid_o(),
+        .x_commit_o(),
+
+        // Memory Request/Response Interface
+        .x_mem_valid_i('0),
+        .x_mem_ready_o(),
+        .x_mem_req_i  ('0),
+        .x_mem_resp_o (),
+
+        // Memory Result Interface
+        .x_mem_result_valid_o(),
+        .x_mem_result_o(),
+
+        // Result Interface
+        .x_result_valid_i('0),
+        .x_result_ready_o(),
+        .x_result_i('0),
+
+        .irq_i    (intc_core1),
+        .irq_ack_o(),
+        .irq_id_o (),
+
+        .debug_req_i      (debug_req_i[1]),
+        .debug_havereset_o(),
+        .debug_running_o  (),
+        .debug_halted_o   (debug_mode_o[1]),
+
+        .fetch_enable_i(fetch_enable),
+        .core_sleep_o(sleep_o[1])
+    ); 
+
+    // instantiate the core 2
+    cv32e40px_top #(
+        .COREV_X_IF      (0),
+        .COREV_PULP      (0),
+        .COREV_CLUSTER   (0),
+        .FPU             (0),
+        .ZFINX           (0),
+        .NUM_MHPMCOUNTERS(1)
+    ) cv32e40px_core2_i (
+        .clk_i (clk_i),
+        .rst_ni(rst_ni),
+
+        .pulp_clock_en_i(1'b1),
+        .scan_cg_en_i   (1'b0),
+
+        .boot_addr_i        (BOOT_ADDR),
+        .mtvec_addr_i       (32'h0),
+        .dm_halt_addr_i     (DM_HALTADDRESS),
+        .hart_id_i          (HARTID),
+        .dm_exception_addr_i(32'h0),
+
+        .instr_addr_o  (core_instr_req_o[2].addr),
+        .instr_req_o   (core_instr_req_o[2].req),
+        .instr_rdata_i (core_instr_resp_i[2].rdata),
+        .instr_gnt_i   (core_instr_resp_i[2].gnt),
+        .instr_rvalid_i(core_instr_resp_i[2].rvalid),
+
+        .data_addr_o  (core_data_req_o[2].addr),
+        .data_wdata_o (core_data_req_o[2].wdata),
+        .data_we_o    (core_data_req_o[2].we),
+        .data_req_o   (core_data_req_o[2].req),
+        .data_be_o    (core_data_req_o[2].be),
+        .data_rdata_i (core_data_resp_i[2].rdata),
+        .data_gnt_i   (core_data_resp_i[2].gnt),
+        .data_rvalid_i(core_data_resp_i[2].rvalid),
+
+        // CORE-V-XIF
+        // Compressed interface
+        .x_compressed_valid_o(),
+        .x_compressed_ready_i('0),
+        .x_compressed_req_o  (),
+        .x_compressed_resp_i ('0),
+
+        // Issue Interface
+        .x_issue_valid_o(),
+        .x_issue_ready_i('0),
+        .x_issue_req_o  (),
+        .x_issue_resp_i ('0),
+
+        // Commit Interface
+        .x_commit_valid_o(),
+        .x_commit_o(),
+
+        // Memory Request/Response Interface
+        .x_mem_valid_i('0),
+        .x_mem_ready_o(),
+        .x_mem_req_i  ('0),
+        .x_mem_resp_o (),
+
+        // Memory Result Interface
+        .x_mem_result_valid_o(),
+        .x_mem_result_o(),
+
+        // Result Interface
+        .x_result_valid_i('0),
+        .x_result_ready_o(),
+        .x_result_i('0),
+
+        .irq_i    (intc_core2),
+        .irq_ack_o(),
+        .irq_id_o (),
+
+        .debug_req_i      (debug_req_i[2]),
+        .debug_havereset_o(),
+        .debug_running_o  (),
+        .debug_halted_o   (debug_mode_o[2]),
+
+        .fetch_enable_i(fetch_enable),
+        .core_sleep_o(sleep_o[2])
+    ); 
+
 
 end else begin
   

@@ -480,8 +480,8 @@ if (i==0) begin
           .core_instr_req_i     (mux_core_instr_req_i[0]),
           .core_instr_req_o     (core_instr_req_ff[0]),
           .core_instr_resp_gnt_i(mux_core_instr_resp_i[0].gnt),
-          .core_instr_resp_gnt_o(pipe_instr_gnt),
-          .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
+          .core_instr_resp_gnt_o(pipe_instr_gnt)
+        //  .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
         );
     
       // Data
@@ -492,8 +492,8 @@ if (i==0) begin
           .core_instr_req_i     (mux_core_data_req_i[0]),
           .core_instr_req_o     (core_data_req_ff[0]),
           .core_instr_resp_gnt_i(mux_core_data_resp_i[0].gnt),
-          .core_instr_resp_gnt_o(pipe_data_gnt),
-          .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
+          .core_instr_resp_gnt_o(pipe_data_gnt)
+        //  .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
         );  
     
     end else begin
