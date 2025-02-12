@@ -20,14 +20,20 @@
 #include <stdlib.h>
 #include "CB_Safety.h"
 
+float __attribute__((noinline)) floatMul(float A, float B) { 
+    return A * B; 
+}
 
 int main(int argc, char *argv[])
 {
 
-//    unsigned int *P=0x90000;
+//    float *P=0x90000;
+//    (*P) * 2.0;
 //    *(P+2) = 0x1;  
-    printf("[IP_CEI]: hello world...!\n");
+//    printf("[IP_CEI]: hello world...!\n");
 //    *(P+2) = 0x3; 
+    printf("[IP_CEI]: Hello F-HEEP! %x\n", floatMul(0.1f, 0.4f));
+
     return 0;
     //return EXIT_SUCCESS;
      

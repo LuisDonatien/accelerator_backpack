@@ -574,7 +574,7 @@ always @(*) begin
              mux_core_data_resp_o[0].gnt     = pipe_data_gnt;
 
              mux_intr_o[0]       = mux_intr_i[0];
-             mux_debug_req_o[0]  = mux_debug_req_i[0];       
+             mux_debug_req_o[0]  = mux_debug_req_i[0];
         end else if(i==1) begin/*
             assign mux_core_instr_req_o[1]   = core_instr_req_ff[1];
             assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;

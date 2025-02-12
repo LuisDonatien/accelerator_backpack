@@ -54,9 +54,7 @@ module safe_wrapper_ctrl #(
       .hw2reg,
       .devmode_i(1'b1)
   );
-  logic enable_interrupt;
-  assign enable_interrupt = reg2hw.interrupt_controler.enable_interrupt.q;
-  assign interrupt_o= enable_interrupt;
+
   logic Start_Flag, Startff;
   logic en_sw_routineff;
   logic enable_endSW;
@@ -88,11 +86,6 @@ module safe_wrapper_ctrl #(
 
   assign hw2reg.cb_heep_status.cores_debug_mode.d = debug_mode_i;
   assign hw2reg.cb_heep_status.cores_debug_mode.de = 1'b1;  
-
-  //Interrupt 
-   assign hw2reg.interrupt_controler.status_interrupt.d = '0;
-   assign hw2reg.interrupt_controler.status_interrupt.de = '0;
-
 
    //DMR_Recov
    assign hw2reg.dmr_rec.d = DMR_Rec_i;
@@ -133,4 +126,38 @@ module safe_wrapper_ctrl #(
     end  
   end 
 
+
+  logic enable_interrupt;
+  
+  //Interrupt 
+  assign hw2reg.interrupt_controler.status_interrupt.d = '1;
+  assign hw2reg.interrupt_controler.status_interrupt.de = enable_endSW;
+  assign enable_interrupt = reg2hw.interrupt_controler.enable_interrupt.q;
+
+
+    logic status_interrupt;
+    logic load_intc, clear_intc;
+    logic flag_intc;
+
+    assign status_interrupt = reg2hw.interrupt_controler.status_interrupt.q;
+    //synopsys sync_set_reset "load_intc"
+    assign load_intc = enable_interrupt & status_interrupt & sleep_i[0] & sleep_i[1] & sleep_i[2] & en_sw_routineff & ~flag_intc ;
+    //synopsys sync_set_reset "clear_intc"
+    assign clear_intc = ~status_interrupt;
+  
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+      if (!rst_ni) begin
+        interrupt_o <= 1'b0;
+          flag_intc <= 1'b0;
+      end else begin
+        interrupt_o <= 1'b0;
+        if (clear_intc) begin     
+          interrupt_o <= 1'b0;
+          flag_intc <= 1'b0;
+        end else if(load_intc)  begin
+          interrupt_o <= 1'b1;
+          flag_intc <= 1'b1;
+        end
+      end  
+    end
 endmodule : safe_wrapper_ctrl
