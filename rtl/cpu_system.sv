@@ -206,10 +206,10 @@ if (CPU==1) begin
 end else if (CPU==2) begin : gen_cv32e40px
 
 //    import cv32e40px_core_v_xif_pkg::*;
-
+  localparam ZFINX = 0;
     // instantiate the core 0
     cv32e40px_top #(
-        .COREV_X_IF      (0),
+        .COREV_X_IF      (1),
         .COREV_PULP      (0),
         .COREV_CLUSTER   (0),
         .FPU             (0),
@@ -245,35 +245,35 @@ end else if (CPU==2) begin : gen_cv32e40px
 
         // CORE-V-XIF
         // Compressed interface
-        .x_compressed_valid_o(ext_if.compressed_valid),
-        .x_compressed_ready_i(ext_if.compressed_ready),
-        .x_compressed_req_o  (ext_if.compressed_req),
-        .x_compressed_resp_i (ext_if.compressed_resp),
+        .x_compressed_valid_o(ext_if_core0.compressed_valid),
+        .x_compressed_ready_i(ext_if_core0.compressed_ready),
+        .x_compressed_req_o  (ext_if_core0.compressed_req),
+        .x_compressed_resp_i (ext_if_core0.compressed_resp),
 
         // Issue Interface
-        .x_issue_valid_o(ext_if.issue_valid),
-        .x_issue_ready_i(ext_if.issue_ready),
-        .x_issue_req_o  (ext_if.issue_req),
-        .x_issue_resp_i (ext_if.issue_resp),
+        .x_issue_valid_o(ext_if_core0.issue_valid),
+        .x_issue_ready_i(ext_if_core0.issue_ready),
+        .x_issue_req_o  (ext_if_core0.issue_req),
+        .x_issue_resp_i (ext_if_core0.issue_resp),
 
         // Commit Interface
-        .x_commit_valid_o(ext_if.commit_valid),
-        .x_commit_o(ext_if.commit),
+        .x_commit_valid_o(ext_if_core0.commit_valid),
+        .x_commit_o(ext_if_core0.commit),
 
         // Memory Request/Response Interface
-        .x_mem_valid_i(ext_if.mem_valid),
-        .x_mem_ready_o(ext_if.mem_ready),
-        .x_mem_req_i  (ext_if.mem_req),
-        .x_mem_resp_o (ext_if.mem_resp),
+        .x_mem_valid_i(ext_if_core0.mem_valid),
+        .x_mem_ready_o(ext_if_core0.mem_ready),
+        .x_mem_req_i  (ext_if_core0.mem_req),
+        .x_mem_resp_o (ext_if_core0.mem_resp),
 
         // Memory Result Interface
-        .x_mem_result_valid_o(ext_if.mem_result_valid),
-        .x_mem_result_o(ext_if.mem_result),
+        .x_mem_result_valid_o(ext_if_core0.mem_result_valid),
+        .x_mem_result_o(ext_if_core0.mem_result),
 
         // Result Interface
-        .x_result_valid_i(ext_if.result_valid),
-        .x_result_ready_o(ext_if.result_ready),
-        .x_result_i(ext_if.result),
+        .x_result_valid_i(ext_if_core0.result_valid),
+        .x_result_ready_o(ext_if_core0.result_ready),
+        .x_result_i(ext_if_core0.result),
 
         .irq_i    (intc_core0),
         .irq_ack_o(),
@@ -296,9 +296,8 @@ end else if (CPU==2) begin : gen_cv32e40px
     .X_RFR_WIDTH(fpu_ss_pkg::X_RFR_WIDTH),
     .X_RFW_WIDTH(fpu_ss_pkg::X_RFW_WIDTH),
     .X_MISA(fpu_ss_pkg::X_MISA)
-  ) ext_if ();
+  ) ext_if_core0 ();
 
-  localparam ZFINX = 0;
   fpu_ss_wrapper #(
     .PULP_ZFINX(ZFINX),
     .INPUT_BUFFER_DEPTH(1),
@@ -306,24 +305,24 @@ end else if (CPU==2) begin : gen_cv32e40px
     .FORWARDING(1),
     .FPU_FEATURES(fpu_ss_pkg::FPU_FEATURES),
     .FPU_IMPLEMENTATION(fpu_ss_pkg::FPU_IMPLEMENTATION)
-  ) fpu_ss_wrapper_i (
+  ) fpu_ss_wrapper_core0_i (
     // Clock and reset
     .clk_i,
     .rst_ni,
 
     // eXtension Interface
-    .xif_compressed_if(ext_if),
-    .xif_issue_if(ext_if),
-    .xif_commit_if(ext_if),
-    .xif_mem_if(ext_if),
-    .xif_mem_result_if(ext_if),
-    .xif_result_if(ext_if)
+    .xif_compressed_if(ext_if_core0),
+    .xif_issue_if(ext_if_core0),
+    .xif_commit_if(ext_if_core0),
+    .xif_mem_if(ext_if_core0),
+    .xif_mem_result_if(ext_if_core0),
+    .xif_result_if(ext_if_core0)
   );
 
 
     // instantiate the core 1
     cv32e40px_top #(
-        .COREV_X_IF      (0),
+        .COREV_X_IF      (1),
         .COREV_PULP      (0),
         .COREV_CLUSTER   (0),
         .FPU             (0),
@@ -359,35 +358,35 @@ end else if (CPU==2) begin : gen_cv32e40px
 
         // CORE-V-XIF
         // Compressed interface
-        .x_compressed_valid_o(),
-        .x_compressed_ready_i('0),
-        .x_compressed_req_o  (),
-        .x_compressed_resp_i ('0),
+        .x_compressed_valid_o(ext_if_core1.compressed_valid),
+        .x_compressed_ready_i(ext_if_core1.compressed_ready),
+        .x_compressed_req_o  (ext_if_core1.compressed_req),
+        .x_compressed_resp_i (ext_if_core1.compressed_resp),
 
         // Issue Interface
-        .x_issue_valid_o(),
-        .x_issue_ready_i('0),
-        .x_issue_req_o  (),
-        .x_issue_resp_i ('0),
+        .x_issue_valid_o(ext_if_core1.issue_valid),
+        .x_issue_ready_i(ext_if_core1.issue_ready),
+        .x_issue_req_o  (ext_if_core1.issue_req),
+        .x_issue_resp_i (ext_if_core1.issue_resp),
 
         // Commit Interface
-        .x_commit_valid_o(),
-        .x_commit_o(),
+        .x_commit_valid_o(ext_if_core1.commit_valid),
+        .x_commit_o(ext_if_core1.commit),
 
         // Memory Request/Response Interface
-        .x_mem_valid_i('0),
-        .x_mem_ready_o(),
-        .x_mem_req_i  ('0),
-        .x_mem_resp_o (),
+        .x_mem_valid_i(ext_if_core1.mem_valid),
+        .x_mem_ready_o(ext_if_core1.mem_ready),
+        .x_mem_req_i  (ext_if_core1.mem_req),
+        .x_mem_resp_o (ext_if_core1.mem_resp),
 
         // Memory Result Interface
-        .x_mem_result_valid_o(),
-        .x_mem_result_o(),
+        .x_mem_result_valid_o(ext_if_core1.mem_result_valid),
+        .x_mem_result_o(ext_if_core1.mem_result),
 
         // Result Interface
-        .x_result_valid_i('0),
-        .x_result_ready_o(),
-        .x_result_i('0),
+        .x_result_valid_i(ext_if_core1.result_valid),
+        .x_result_ready_o(ext_if_core1.result_ready),
+        .x_result_i(ext_if_core1.result),
 
         .irq_i    (intc_core1),
         .irq_ack_o(),
@@ -402,9 +401,40 @@ end else if (CPU==2) begin : gen_cv32e40px
         .core_sleep_o(sleep_o[1])
     ); 
 
+  // eXtension Interface
+  if_xif #(
+    .X_NUM_RS(fpu_ss_pkg::X_NUM_RS),
+    .X_ID_WIDTH(fpu_ss_pkg::X_ID_WIDTH),
+    .X_MEM_WIDTH(fpu_ss_pkg::X_MEM_WIDTH),
+    .X_RFR_WIDTH(fpu_ss_pkg::X_RFR_WIDTH),
+    .X_RFW_WIDTH(fpu_ss_pkg::X_RFW_WIDTH),
+    .X_MISA(fpu_ss_pkg::X_MISA)
+  ) ext_if_core1 ();
+
+  fpu_ss_wrapper #(
+    .PULP_ZFINX(ZFINX),
+    .INPUT_BUFFER_DEPTH(1),
+    .OUT_OF_ORDER(0),
+    .FORWARDING(1),
+    .FPU_FEATURES(fpu_ss_pkg::FPU_FEATURES),
+    .FPU_IMPLEMENTATION(fpu_ss_pkg::FPU_IMPLEMENTATION)
+  ) fpu_ss_wrapper_core1_i (
+    // Clock and reset
+    .clk_i,
+    .rst_ni,
+
+    // eXtension Interface
+    .xif_compressed_if(ext_if_core1),
+    .xif_issue_if(ext_if_core1),
+    .xif_commit_if(ext_if_core1),
+    .xif_mem_if(ext_if_core1),
+    .xif_mem_result_if(ext_if_core1),
+    .xif_result_if(ext_if_core1)
+  );
+
     // instantiate the core 2
     cv32e40px_top #(
-        .COREV_X_IF      (0),
+        .COREV_X_IF      (1),
         .COREV_PULP      (0),
         .COREV_CLUSTER   (0),
         .FPU             (0),
@@ -440,35 +470,35 @@ end else if (CPU==2) begin : gen_cv32e40px
 
         // CORE-V-XIF
         // Compressed interface
-        .x_compressed_valid_o(),
-        .x_compressed_ready_i('0),
-        .x_compressed_req_o  (),
-        .x_compressed_resp_i ('0),
+        .x_compressed_valid_o(ext_if_core2.compressed_valid),
+        .x_compressed_ready_i(ext_if_core2.compressed_ready),
+        .x_compressed_req_o  (ext_if_core2.compressed_req),
+        .x_compressed_resp_i (ext_if_core2.compressed_resp),
 
         // Issue Interface
-        .x_issue_valid_o(),
-        .x_issue_ready_i('0),
-        .x_issue_req_o  (),
-        .x_issue_resp_i ('0),
+        .x_issue_valid_o(ext_if_core2.issue_valid),
+        .x_issue_ready_i(ext_if_core2.issue_ready),
+        .x_issue_req_o  (ext_if_core2.issue_req),
+        .x_issue_resp_i (ext_if_core2.issue_resp),
 
         // Commit Interface
-        .x_commit_valid_o(),
-        .x_commit_o(),
+        .x_commit_valid_o(ext_if_core2.commit_valid),
+        .x_commit_o(ext_if_core2.commit),
 
         // Memory Request/Response Interface
-        .x_mem_valid_i('0),
-        .x_mem_ready_o(),
-        .x_mem_req_i  ('0),
-        .x_mem_resp_o (),
+        .x_mem_valid_i(ext_if_core2.mem_valid),
+        .x_mem_ready_o(ext_if_core2.mem_ready),
+        .x_mem_req_i  (ext_if_core2.mem_req),
+        .x_mem_resp_o (ext_if_core2.mem_resp),
 
         // Memory Result Interface
-        .x_mem_result_valid_o(),
-        .x_mem_result_o(),
+        .x_mem_result_valid_o(ext_if_core2.mem_result_valid),
+        .x_mem_result_o(ext_if_core2.mem_result),
 
         // Result Interface
-        .x_result_valid_i('0),
-        .x_result_ready_o(),
-        .x_result_i('0),
+        .x_result_valid_i(ext_if_core2.result_valid),
+        .x_result_ready_o(ext_if_core2.result_ready),
+        .x_result_i(ext_if_core2.result),
 
         .irq_i    (intc_core2),
         .irq_ack_o(),
@@ -482,6 +512,37 @@ end else if (CPU==2) begin : gen_cv32e40px
         .fetch_enable_i(fetch_enable),
         .core_sleep_o(sleep_o[2])
     );
+
+  // eXtension Interface
+  if_xif #(
+    .X_NUM_RS(fpu_ss_pkg::X_NUM_RS),
+    .X_ID_WIDTH(fpu_ss_pkg::X_ID_WIDTH),
+    .X_MEM_WIDTH(fpu_ss_pkg::X_MEM_WIDTH),
+    .X_RFR_WIDTH(fpu_ss_pkg::X_RFR_WIDTH),
+    .X_RFW_WIDTH(fpu_ss_pkg::X_RFW_WIDTH),
+    .X_MISA(fpu_ss_pkg::X_MISA)
+  ) ext_if_core2 ();
+
+  fpu_ss_wrapper #(
+    .PULP_ZFINX(ZFINX),
+    .INPUT_BUFFER_DEPTH(1),
+    .OUT_OF_ORDER(0),
+    .FORWARDING(1),
+    .FPU_FEATURES(fpu_ss_pkg::FPU_FEATURES),
+    .FPU_IMPLEMENTATION(fpu_ss_pkg::FPU_IMPLEMENTATION)
+  ) fpu_ss_wrapper_core2_i (
+    // Clock and reset
+    .clk_i,
+    .rst_ni,
+
+    // eXtension Interface
+    .xif_compressed_if(ext_if_core2),
+    .xif_issue_if(ext_if_core2),
+    .xif_commit_if(ext_if_core2),
+    .xif_mem_if(ext_if_core2),
+    .xif_mem_result_if(ext_if_core2),
+    .xif_result_if(ext_if_core2)
+  );
 end else begin
   
   // instantiate the core 0

@@ -9,7 +9,7 @@ module safe_cpu_wrapper
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
-    parameter NCYCLES = 1
+    parameter NCYCLES = 3
 ) (
     // Clock and Reset
     input logic clk_i,
@@ -506,8 +506,7 @@ if (i==0) begin
           .core_instr_req_i     (mux_core_instr_req_i[0]),
           .core_instr_req_o     (core_instr_req_ff[0]),
           .core_instr_resp_gnt_i(mux_core_instr_resp_i[0].gnt),
-          .core_instr_resp_gnt_o(pipe_instr_gnt),
-          .core_instr_resp_rvalid_i(mux_core_instr_resp_i[0].rvalid)
+          .core_instr_resp_gnt_o(pipe_instr_gnt)
         );
     
       // Data
@@ -520,8 +519,7 @@ if (i==0) begin
           .core_instr_req_i     (mux_core_data_req_i[0]),
           .core_instr_req_o     (core_data_req_ff[0]),
           .core_instr_resp_gnt_i(mux_core_data_resp_i[0].gnt),
-          .core_instr_resp_gnt_o(pipe_data_gnt),
-          .core_instr_resp_rvalid_i(mux_core_data_resp_i[0].rvalid)
+          .core_instr_resp_gnt_o(pipe_data_gnt)
         );
     end
 end /*else if (i==1) begin
