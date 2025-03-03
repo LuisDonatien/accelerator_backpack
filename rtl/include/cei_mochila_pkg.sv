@@ -20,7 +20,7 @@ package cei_mochila_pkg;
 
 //System Bus
   typedef enum logic {
-    NtoM,
+    NtoM
   //  onetoM //Not implemented
   } bus_type_e;
 

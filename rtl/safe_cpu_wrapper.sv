@@ -9,7 +9,7 @@ module safe_cpu_wrapper
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
-    parameter NCYCLES = 3
+    parameter NCYCLES = 2
 ) (
     // Clock and Reset
     input logic clk_i,
@@ -522,33 +522,7 @@ if (i==0) begin
           .core_instr_resp_gnt_o(pipe_data_gnt)
         );
     end
-end /*else if (i==1) begin
-  // Instruction
-  obi_sngreg obi_sngreg0_i(
-      .clk_i,
-      .rst_ni,
-      .clear_pipeline(~dual_mode_s),
-      .core_instr_req_i     (mux_core_instr_req_i[1]),
-      .core_instr_req_o     (core_instr_req_ff[1]),
-      .core_instr_resp_gnt_i(mux_core_instr_resp_i[1].gnt),
-      .core_instr_resp_gnt_o(reg_instr_gnt),
-      .core_instr_resp_rvalid_i(mux_core_instr_resp_i[1].rvalid)
-    );
-
-  // Data
-  obi_sngreg obi_sngreg1_i(
-      .clk_i,
-      .rst_ni,
-      .clear_pipeline(~dual_mode_s),
-      .core_instr_req_i     (mux_core_data_req_i[1]),
-      .core_instr_req_o     (core_data_req_ff[1]),
-      .core_instr_resp_gnt_i(mux_core_data_resp_i[1].gnt),
-      .core_instr_resp_gnt_o(reg_data_gnt),
-      .core_instr_resp_rvalid_i(mux_core_data_resp_i[1].rvalid)
-    );    
-
-end
-*/
+end 
 
 always @(*) begin
     //bypass by default 
