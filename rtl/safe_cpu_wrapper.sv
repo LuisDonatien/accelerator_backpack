@@ -295,12 +295,31 @@ safe_FSM safe_FSM_i (
                         core_instr_req_o[2] = voted_core_instr_req_o[2];  
                     end
 
+
+                    if (master_core_s == 3'b001) begin                    
+                        mux_core_instr_resp_i[0] = core_instr_resp_i[0];
+                        mux_core_instr_resp_i[1] = core_instr_resp_i[0];
+                        mux_core_instr_resp_i[2] = core_instr_resp_i[0]; 
+                    end else if (master_core_s == 3'b010) begin
+                        mux_core_instr_resp_i[0] = core_instr_resp_i[1];
+                        mux_core_instr_resp_i[1] = core_instr_resp_i[1];
+                        mux_core_instr_resp_i[2] = core_instr_resp_i[1];
+                    end else begin
+                        mux_core_instr_resp_i[0] = core_instr_resp_i[2];
+                        mux_core_instr_resp_i[1] = core_instr_resp_i[2];
+                        mux_core_instr_resp_i[2] = core_instr_resp_i[2];
+                    end
+
+                    //Dynamic isolation from TCLS, not ready yet
+                    /*
                     if (Select_wfi_core_s == 3'b001) begin
                         mux_core_instr_resp_i[0].rvalid = 1'b1;
                         mux_core_instr_resp_i[0].gnt = 1'b1;
                         mux_core_instr_resp_i[0].rdata = 32'h10500073; //wfi instruction
 
+                        if (master_core_s == 3'b001) begin
                         mux_core_instr_resp_i[1] = core_instr_resp_i[0];
+                        end else if (master_core_s == 3'b010) begin
                         mux_core_instr_resp_i[2] = core_instr_resp_i[0];
                     end 
                     else if (Select_wfi_core_s == 3'b010) begin
@@ -324,6 +343,7 @@ safe_FSM safe_FSM_i (
                         mux_core_instr_resp_i[1] = core_instr_resp_i[0];
                         mux_core_instr_resp_i[2] = core_instr_resp_i[0];  
                     end
+                    */
                     //Data
                     if (master_core_s == 3'b001) begin
                         core_data_req_o[0] = voted_core_data_req_o[0];
@@ -496,7 +516,6 @@ for(genvar i=0; i<NHARTS; i++) begin : Nharts_delayed_mux
     assign xbar_core_data_resp[i][0] = mux_core_data_resp_o[i];   
 
 if (i==0) begin
-  // Instruction
       if (NCYCLES == 1) begin
       // Instruction
       obi_sngreg obi_sngreg0_i(
@@ -573,16 +592,7 @@ always @(*) begin
 
              mux_intr_o[0]       = mux_intr_i[0];
              mux_debug_req_o[0]  = mux_debug_req_i[0];
-        end else if(i==1) begin/*
-            assign mux_core_instr_req_o[1]   = core_instr_req_ff[1];
-            assign mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
-            assign mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
-            assign mux_core_instr_resp_o[1].gnt  = reg_instr_gnt;
-            assign mux_core_data_req_o[1]    = core_data_req_ff[1];
-            assign mux_core_data_resp_o[1].rdata   = core_data_resp_ff[NCYCLES-1].rdata;
-            assign mux_core_data_resp_o[1].rvalid   = core_data_resp_ff[NCYCLES-1].rvalid;
-            assign mux_core_data_resp_o[1].gnt   = reg_data_gnt;
-            /**/
+        end else if(i==1) begin
              mux_core_instr_req_o[1]   = mux_core_instr_req_i[1];
              mux_core_instr_resp_o[1].rdata  = core_instr_resp_ff[NCYCLES-1].rdata;
              mux_core_instr_resp_o[1].rvalid  = core_instr_resp_ff[NCYCLES-1].rvalid;
