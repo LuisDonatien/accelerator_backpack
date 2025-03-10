@@ -11,7 +11,8 @@ module cpu_system
     parameter BOOT_ADDR = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS,
     parameter NHARTS = 3,
     parameter HARTID = 32'h01,
-    parameter CPU = 20,
+    parameter CPU = 2,
+    parameter COPROCESSOR = 0,
     parameter DM_HALTADDRESS = cei_mochila_pkg::DEBUG_BOOTROM_START_ADDRESS + 32'h50
 ) (
     // Clock and Reset
@@ -298,6 +299,7 @@ end else if (CPU==2) begin : gen_cv32e40px
     .X_MISA(fpu_ss_pkg::X_MISA)
   ) ext_if_core0 ();
 
+  if (COPROCESSOR == 1) begin
   fpu_ss_wrapper #(
     .PULP_ZFINX(ZFINX),
     .INPUT_BUFFER_DEPTH(1),
@@ -309,7 +311,6 @@ end else if (CPU==2) begin : gen_cv32e40px
     // Clock and reset
     .clk_i,
     .rst_ni,
-
     // eXtension Interface
     .xif_compressed_if(ext_if_core0),
     .xif_issue_if(ext_if_core0),
@@ -318,6 +319,30 @@ end else if (CPU==2) begin : gen_cv32e40px
     .xif_mem_result_if(ext_if_core0),
     .xif_result_if(ext_if_core0)
   );
+  end else begin
+
+        // CORE-V-XIF
+        // Compressed interface
+        assign ext_if_core0.compressed_ready = '0;
+        assign ext_if_core0.compressed_resp = '0;
+
+        // Issue Interface
+        assign ext_if_core0.issue_ready = '0;
+        assign ext_if_core0.issue_resp = '0;
+
+        // Commit Interface
+
+        // Memory Request/Response Interface
+        assign ext_if_core0.mem_valid = '0;
+        assign ext_if_core0.mem_req = '0;
+
+        // Memory Result Interface
+
+        // Result Interface
+        assign ext_if_core0.result_valid = '0;
+        assign ext_if_core0.result = '0;
+
+  end
 
 
     // instantiate the core 1
@@ -411,6 +436,7 @@ end else if (CPU==2) begin : gen_cv32e40px
     .X_MISA(fpu_ss_pkg::X_MISA)
   ) ext_if_core1 ();
 
+  if (COPROCESSOR == 1) begin
   fpu_ss_wrapper #(
     .PULP_ZFINX(ZFINX),
     .INPUT_BUFFER_DEPTH(1),
@@ -422,7 +448,6 @@ end else if (CPU==2) begin : gen_cv32e40px
     // Clock and reset
     .clk_i,
     .rst_ni,
-
     // eXtension Interface
     .xif_compressed_if(ext_if_core1),
     .xif_issue_if(ext_if_core1),
@@ -431,6 +456,30 @@ end else if (CPU==2) begin : gen_cv32e40px
     .xif_mem_result_if(ext_if_core1),
     .xif_result_if(ext_if_core1)
   );
+  end else begin
+
+        // CORE-V-XIF
+        // Compressed interface
+        assign ext_if_core1.compressed_ready = '0;
+        assign ext_if_core1.compressed_resp = '0;
+
+        // Issue Interface
+        assign ext_if_core1.issue_ready = '0;
+        assign ext_if_core1.issue_resp = '0;
+
+        // Commit Interface
+
+        // Memory Request/Response Interface
+        assign ext_if_core1.mem_valid = '0;
+        assign ext_if_core1.mem_req = '0;
+
+        // Memory Result Interface
+
+        // Result Interface
+        assign ext_if_core1.result_valid = '0;
+        assign ext_if_core1.result = '0;
+
+  end
 
     // instantiate the core 2
     cv32e40px_top #(
@@ -523,6 +572,7 @@ end else if (CPU==2) begin : gen_cv32e40px
     .X_MISA(fpu_ss_pkg::X_MISA)
   ) ext_if_core2 ();
 
+  if (COPROCESSOR == 1) begin
   fpu_ss_wrapper #(
     .PULP_ZFINX(ZFINX),
     .INPUT_BUFFER_DEPTH(1),
@@ -534,7 +584,6 @@ end else if (CPU==2) begin : gen_cv32e40px
     // Clock and reset
     .clk_i,
     .rst_ni,
-
     // eXtension Interface
     .xif_compressed_if(ext_if_core2),
     .xif_issue_if(ext_if_core2),
@@ -543,6 +592,31 @@ end else if (CPU==2) begin : gen_cv32e40px
     .xif_mem_result_if(ext_if_core2),
     .xif_result_if(ext_if_core2)
   );
+  end else begin
+
+        // CORE-V-XIF
+        // Compressed interface
+        assign ext_if_core2.compressed_ready = '0;
+        assign ext_if_core2.compressed_resp = '0;
+
+        // Issue Interface
+        assign ext_if_core2.issue_ready = '0;
+        assign ext_if_core2.issue_resp = '0;
+
+        // Commit Interface
+
+        // Memory Request/Response Interface
+        assign ext_if_core2.mem_valid = '0;
+        assign ext_if_core2.mem_req = '0;
+
+        // Memory Result Interface
+
+        // Result Interface
+        assign ext_if_core2.result_valid = '0;
+        assign ext_if_core2.result = '0;
+
+  end
+
 end else begin
   
   // instantiate the core 0

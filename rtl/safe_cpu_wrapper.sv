@@ -9,7 +9,7 @@ module safe_cpu_wrapper
   import cei_mochila_pkg::*;
 #(
     parameter NHARTS = 3,
-    parameter NCYCLES = 2
+    parameter NCYCLES = 1
 ) (
     // Clock and Reset
     input logic clk_i,
@@ -96,11 +96,11 @@ localparam NRCOMPARATORS = NHARTS == 3 ? 3 : 1 ;
     obi_resp_t [NHARTS-1 : 0][1:0] xbar_core_data_resp; 
 
     // Voted_CPU Signals
-    obi_req_t  voted_core_instr_req_o;
-    obi_req_t  voted_core_data_req_o; 
-    logic tmr_error_s;
+    obi_req_t  [NHARTS-1 : 0] voted_core_instr_req_o;
+    obi_req_t  [NHARTS-1 : 0] voted_core_data_req_o; 
+    logic [NHARTS-1:0] tmr_error_s;
     logic [2:0] dmr_error_s;
-    logic [2:0] tmr_errorid_s;
+    logic [NHARTS-1:0][2:0] tmr_errorid_s;
     logic tmr_voter_enable_s;
     logic [2:0] dmr_config_s;
     logic dual_mode_s;
@@ -281,9 +281,19 @@ safe_FSM safe_FSM_i (
 //            if (tmr_voter_enable_s == 1'b1) begin
                 if(tmr_voter_enable_s == 1'b1 && dual_mode_s == 1'b0) begin
                     //Instruction
-                    core_instr_req_o[0] = voted_core_instr_req_o;
-                    core_instr_req_o[1] = '0;
-                    core_instr_req_o[2] = '0;
+                    if (master_core_s == 3'b001) begin
+                        core_instr_req_o[0] = voted_core_instr_req_o[0];
+                        core_instr_req_o[1] = '0;
+                        core_instr_req_o[2] = '0;
+                    end else if (master_core_s == 3'b010) begin
+                        core_instr_req_o[0] = '0;
+                        core_instr_req_o[1] = voted_core_instr_req_o[1];
+                        core_instr_req_o[2] = '0;                    
+                    end else begin
+                        core_instr_req_o[0] = '0;
+                        core_instr_req_o[1] = '0;
+                        core_instr_req_o[2] = voted_core_instr_req_o[2];  
+                    end
 
                     if (Select_wfi_core_s == 3'b001) begin
                         mux_core_instr_resp_i[0].rvalid = 1'b1;
@@ -315,12 +325,28 @@ safe_FSM safe_FSM_i (
                         mux_core_instr_resp_i[2] = core_instr_resp_i[0];  
                     end
                     //Data
-                    core_data_req_o[0] = voted_core_data_req_o;
-                    core_data_req_o[1] = '0;
-                    core_data_req_o[2] = '0;
-                    mux_core_data_resp_i[0] = core_data_resp_i[0]; 
-                    mux_core_data_resp_i[1] = core_data_resp_i[0]; 
-                    mux_core_data_resp_i[2] = core_data_resp_i[0];    
+                    if (master_core_s == 3'b001) begin
+                        core_data_req_o[0] = voted_core_data_req_o[0];
+                        core_data_req_o[1] = '0;
+                        core_data_req_o[2] = '0;
+                        mux_core_data_resp_i[0] = core_data_resp_i[0]; 
+                        mux_core_data_resp_i[1] = core_data_resp_i[0]; 
+                        mux_core_data_resp_i[2] = core_data_resp_i[0];     
+                    end else if (master_core_s == 3'b010) begin
+                        core_data_req_o[0] = '0;
+                        core_data_req_o[1] = voted_core_data_req_o[1];
+                        core_data_req_o[2] = '0;
+                        mux_core_data_resp_i[0] = core_data_resp_i[1]; 
+                        mux_core_data_resp_i[1] = core_data_resp_i[1]; 
+                        mux_core_data_resp_i[2] = core_data_resp_i[1];                    
+                    end else begin
+                        core_data_req_o[0] = '0;
+                        core_data_req_o[1] = '0;
+                        core_data_req_o[2] = voted_core_data_req_o[2]; 
+                        mux_core_data_resp_i[0] = core_data_resp_i[2]; 
+                        mux_core_data_resp_i[1] = core_data_resp_i[2]; 
+                        mux_core_data_resp_i[2] = core_data_resp_i[2];  
+                    end 
                 end
                 else if (dual_mode_s == 1'b1) begin
                     if (dmr_config_s == 3'b011) begin   //Comparator cpu0_cpu1
@@ -617,101 +643,7 @@ end
         end
     end
 end
-/*
-for(genvar i=0; i<NHARTS; i++) begin : Nharts_delayed_mux
 
-    logic       [NCYCLES-1:0] debug_req_ff;
-    logic       [NCYCLES-1:0][31:0] intr_ff;
-
-    obi_req_t   [NCYCLES-1:0] core_instr_req_ff;
-    obi_resp_t  [NCYCLES-1:0] core_instr_resp_ff;
-    
-    obi_req_t   [NCYCLES-1:0] core_data_req_ff;
-    obi_resp_t  [NCYCLES-1:0] core_data_resp_ff;
-
-    assign mux_core_data_req_i[i] = xbar_core_data_req[i][0];
-    assign xbar_core_data_resp[i][0] = mux_core_data_resp_o[i];
-
-always_comb begin
-    //bypass by default 
-    assign mux_core_instr_req_o[i]   =   mux_core_instr_req_i[i];
-    assign mux_core_instr_resp_o[i]  =   mux_core_instr_resp_i[i];
-    assign mux_core_data_req_o[i]    =   mux_core_data_req_i[i];
-    assign mux_core_data_resp_o[i]   =   mux_core_data_resp_i[i];
-
-    assign mux_intr_o[i]       = mux_intr_i[i];
-    assign mux_debug_req_o[i]  = mux_debug_req_i[i];
-
-    if (Delay_en == 1'b1 && dual_mode_s == 1'b1) begin
-    //inject NCYCLES delay
-        if (dmr_config_s == 3'b011) begin   // CPU0 Entry NDelay  CPU1 Ouput NDelay
-            if (i == 0) begin
-                assign mux_core_instr_resp_o[0]  =   core_instr_resp_ff[NCYCLES-1];
-                assign mux_core_data_resp_o[0]   =   core_data_resp_ff[NCYCLES-1];
-                assign mux_intr_o[0]             =   intr_ff[NCYCLES-1];
-                assign mux_debug_req_o[0]        =   debug_req_ff[NCYCLES-1];
-            end else if (i == 1) begin
-                assign mux_core_instr_req_o[1]   =   core_instr_req_ff[NCYCLES-1];            
-                assign mux_core_data_req_o[1]    =   core_data_req_ff[NCYCLES-1];                
-            end
-
-        end else if (dmr_config_s == 3'b110) begin   // CPU1 Entry NDelay  CPU2 Ouput NDelay
-            if (i == 1) begin
-                assign mux_core_instr_resp_o[1]  =   core_instr_resp_ff[NCYCLES-1];
-                assign mux_core_data_resp_o[1]   =   core_data_resp_ff[NCYCLES-1];
-                assign mux_intr_o[1]             =   intr_ff[NCYCLES-1];
-                assign mux_debug_req_o[1]        =   debug_req_ff[NCYCLES-1];
-            end else if (i == 2) begin
-                assign mux_core_instr_req_o[2]   =   core_instr_req_ff[NCYCLES-1];            
-                assign mux_core_data_req_o[2]    =   core_data_req_ff[NCYCLES-1];                
-            end     
-        end else begin                              // CPU0 Entry NDelay  CPU2 Ouput NDelay
-            if (i == 0) begin
-                assign mux_core_instr_resp_o[0]  =   core_instr_resp_ff[NCYCLES-1];
-                assign mux_core_data_resp_o[0]   =   core_data_resp_ff[NCYCLES-1];
-                assign mux_intr_o[0]             =   intr_ff[NCYCLES-1];
-                assign mux_debug_req_o[0]        =   debug_req_ff[NCYCLES-1];
-            end else if (i == 2) begin
-                assign mux_core_instr_req_o[2]   =   core_instr_req_ff[NCYCLES-1];            
-                assign mux_core_data_req_o[2]    =   core_data_req_ff[NCYCLES-1];                
-            end
-        end
-    end
-end
-    for(genvar j=0; j<NCYCLES; j++) begin : N_Cycles_ff
-    // Delayed Signals CPU ports
-        always_ff @(posedge clk_i or negedge rst_ni) begin : proc_ndelay
-            if(~rst_ni) begin
-                core_instr_req_ff   <= '0;
-                core_data_req_ff    <= '0;
-                core_instr_resp_ff  <= '0;
-                core_data_resp_ff   <= '0;
-            end else begin
-                if (j == 0) begin
-                    core_instr_req_ff[0] <= mux_core_instr_req_i[i];
-                    core_data_req_ff[0]  <= mux_core_data_req_i[i];
-
-                    core_instr_resp_ff[0] <= mux_core_instr_resp_i[i];
-                    core_data_resp_ff[0]  <= mux_core_data_resp_i[i];
-
-                    intr_ff[0]      <= mux_intr_i[i];
-                    debug_req_ff[0] <= mux_debug_req_i[i];
-                end else begin
-                    core_instr_req_ff[j]   <= core_instr_req_ff[j-1];
-                    core_data_req_ff[j]    <= core_data_req_ff[j-1];
-                    
-                    core_instr_resp_ff[j]   <= core_instr_resp_ff[j-1];
-                    core_data_resp_ff[j]    <= core_data_resp_ff[j-1];
-                    
-                    debug_req_ff[j] <= debug_req_ff[j-1];
-                    intr_ff[j]      <= intr_ff[j-1];
-                end
-            end
-        end
-    end
-
-end
-*/
 /************************Isolate BUS***************************/
 
 for(genvar i=0; i<NHARTS; i++) begin : isolate_obi_bus_instr
@@ -749,17 +681,45 @@ end
 
     tmr_voter #(
 
-    ) tmr_voter_i (
+    ) tmr_voter0_i (
         // Instruction Bus
         .core_instr_req_i(mux_core_instr_req_o),
-        .voted_core_instr_req_o(voted_core_instr_req_o),
+        .voted_core_instr_req_o(voted_core_instr_req_o[0]),
         .enable_i(tmr_voter_enable_s),
         // Data Bus
         .core_data_req_i(mux_core_data_req_o),
-        .voted_core_data_req_o(voted_core_data_req_o),
+        .voted_core_data_req_o(voted_core_data_req_o[0]),
     
-        .error_o(tmr_error_s),
-        .error_id_o(tmr_errorid_s)
+        .error_o(tmr_error_s[0]),
+        .error_id_o(tmr_errorid_s[0])
+    );
+    tmr_voter #(
+
+    ) tmr_voter1_i (
+        // Instruction Bus
+        .core_instr_req_i(mux_core_instr_req_o),
+        .voted_core_instr_req_o(voted_core_instr_req_o[1]),
+        .enable_i(tmr_voter_enable_s),
+        // Data Bus
+        .core_data_req_i(mux_core_data_req_o),
+        .voted_core_data_req_o(voted_core_data_req_o[1]),
+    
+        .error_o(tmr_error_s[1]),
+        .error_id_o(tmr_errorid_s[1])
+    );
+    tmr_voter #(
+
+    ) tmr_voter2_i (
+        // Instruction Bus
+        .core_instr_req_i(mux_core_instr_req_o),
+        .voted_core_instr_req_o(voted_core_instr_req_o[2]),
+        .enable_i(tmr_voter_enable_s),
+        // Data Bus
+        .core_data_req_i(mux_core_data_req_o),
+        .voted_core_data_req_o(voted_core_data_req_o[2]),
+    
+        .error_o(tmr_error_s[2]),
+        .error_id_o(tmr_errorid_s[2])
     );
 
 //******************Safety Comparator********************//
